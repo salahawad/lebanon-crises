@@ -1,0 +1,220 @@
+{
+  "common": {
+    "appName": "Lebanon Relief",
+    "tagline": "Connecting those who need help with those who can help",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "noResults": "No results found",
+    "required": "Required",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "viewAll": "View all",
+    "loadMore": "Load more",
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "landing": {
+    "title": "How can we help?",
+    "subtitle": "A simple way to connect people who need help with those who can provide it",
+    "needHelp": "I need help",
+    "needHelpDesc": "Request medicine, shelter, food, or other essential support",
+    "offerHelp": "I want to help",
+    "offerHelpDesc": "Browse open requests and offer your support",
+    "safeNotice": "Your privacy and safety are our priority. Personal information is protected.",
+    "openRequests": "Open requests",
+    "helpersRegistered": "Helpers registered",
+    "requestsFulfilled": "Requests fulfilled"
+  },
+  "request": {
+    "title": "Request Help",
+    "subtitle": "Tell us what you need. We will share your request with helpers in your area.",
+    "category": "What do you need?",
+    "categories": {
+      "medicine": "Medicine",
+      "shelter": "Shelter",
+      "food": "Food",
+      "baby_milk": "Baby milk / formula",
+      "transport": "Transport",
+      "clothing": "Clothing",
+      "hygiene": "Hygiene supplies",
+      "other": "Other"
+    },
+    "description": "Brief description",
+    "descriptionPlaceholder": "Describe what you need (e.g., insulin for diabetic patient, family of 5 needs shelter)",
+    "governorate": "Governorate",
+    "governorates": {
+      "beirut": "Beirut",
+      "mount_lebanon": "Mount Lebanon",
+      "north": "North Lebanon",
+      "south": "South Lebanon",
+      "bekaa": "Bekaa",
+      "baalbek_hermel": "Baalbek-Hermel",
+      "akkar": "Akkar",
+      "nabatieh": "Nabatieh"
+    },
+    "city": "City / Town",
+    "cityPlaceholder": "Enter your city or town",
+    "area": "General area",
+    "areaPlaceholder": "Neighborhood or area (do not share exact address)",
+    "peopleCount": "Number of people",
+    "peopleCountPlaceholder": "How many people need help?",
+    "urgency": "How urgent is this?",
+    "urgencyLevels": {
+      "critical": "Critical — life at risk",
+      "high": "High — very urgent",
+      "medium": "Medium — can wait a day or two",
+      "low": "Low — not immediately urgent"
+    },
+    "contactMethod": "How should helpers reach you?",
+    "contactMethods": {
+      "phone": "Phone call",
+      "whatsapp": "WhatsApp",
+      "no_contact": "No direct contact (admin will coordinate)"
+    },
+    "phone": "Phone number",
+    "phonePlaceholder": "e.g., 03 123 456",
+    "phoneNote": "Your phone number will not be shown publicly",
+    "name": "Your name",
+    "namePlaceholder": "Optional — first name is enough",
+    "consent": "I understand this is a volunteer coordination tool, not an emergency service. I agree to share the above information with verified helpers.",
+    "submitting": "Submitting your request...",
+    "submitRequest": "Submit request"
+  },
+  "success": {
+    "title": "Request submitted",
+    "subtitle": "Your request has been received. Helpers in your area will be able to see it.",
+    "referenceCode": "Your reference code",
+    "referenceNote": "Save this code to check on your request later",
+    "whatNext": "What happens next?",
+    "step1": "Your request is now visible to volunteers and organizations",
+    "step2": "A helper may reach out to you using your preferred contact method",
+    "step3": "If you selected no direct contact, an admin will coordinate",
+    "backHome": "Back to home",
+    "submitAnother": "Submit another request"
+  },
+  "browse": {
+    "title": "Open Requests",
+    "subtitle": "Browse requests from people who need help",
+    "filterBy": "Filter by",
+    "allCategories": "All categories",
+    "allAreas": "All areas",
+    "allUrgency": "All urgency levels",
+    "clearFilters": "Clear filters",
+    "people": "people",
+    "viewDetails": "View details",
+    "claimHelp": "I can help",
+    "noRequests": "No open requests match your filters",
+    "noRequestsSubtitle": "Try changing your filters or check back soon"
+  },
+  "details": {
+    "title": "Request Details",
+    "requestedOn": "Requested on",
+    "status": "Status",
+    "needsHelp": "needs help",
+    "iCanHelp": "I can help with this",
+    "alreadyClaimed": "A helper is already working on this",
+    "loginToHelp": "Sign in or register to help",
+    "claimMessage": "Optional message to the requester",
+    "claimMessagePlaceholder": "Let them know you can help...",
+    "claimSubmit": "Confirm — I can help",
+    "claimSuccess": "Thank you! You've offered to help.",
+    "contactInfo": "Contact information",
+    "contactHidden": "Contact details are shared only with verified helpers",
+    "referenceCode": "Reference code"
+  },
+  "helper": {
+    "title": "Register as a Helper",
+    "subtitle": "Create an account to offer help and contact people in need",
+    "name": "Your name",
+    "namePlaceholder": "Full name",
+    "organization": "Organization",
+    "organizationPlaceholder": "Optional — NGO, charity, etc.",
+    "phone": "Phone number",
+    "whatsapp": "WhatsApp number",
+    "email": "Email",
+    "password": "Password",
+    "governorate": "Your governorate",
+    "supplies": "What can you provide?",
+    "register": "Register",
+    "registering": "Creating your account...",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "loginTitle": "Helper Sign In",
+    "loginSubtitle": "Sign in to your helper account"
+  },
+  "admin": {
+    "login": "Admin Login",
+    "dashboard": "Dashboard",
+    "moderation": "Moderation",
+    "totalRequests": "Total Requests",
+    "openRequests": "Open Requests",
+    "fulfilled": "Fulfilled",
+    "totalHelpers": "Helpers",
+    "totalClaims": "Claims",
+    "recentRequests": "Recent Requests",
+    "changeStatus": "Change status",
+    "flag": "Flag",
+    "flagAs": "Flag as",
+    "flags": {
+      "spam": "Spam",
+      "inappropriate": "Inappropriate",
+      "duplicate": "Duplicate",
+      "suspicious": "Suspicious"
+    },
+    "statuses": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "fulfilled": "Fulfilled",
+      "archived": "Archived",
+      "flagged": "Flagged"
+    },
+    "signOut": "Sign out",
+    "exportCsv": "Export CSV",
+    "viewContact": "View contact info"
+  },
+  "urgency": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "status": {
+    "open": "Open",
+    "in_progress": "In Progress",
+    "fulfilled": "Fulfilled",
+    "archived": "Archived",
+    "flagged": "Flagged"
+  },
+  "privacy": {
+    "title": "Privacy Notice",
+    "content": "This platform collects minimal personal data to coordinate humanitarian assistance. Your information is shared only with verified helpers and administrators. Phone numbers are stored securely and never displayed publicly. You may request deletion of your data at any time by contacting an administrator. This service is provided on a volunteer basis with no guarantees."
+  },
+  "terms": {
+    "title": "Terms of Use & Humanitarian Notice",
+    "content": "This platform is a volunteer-operated humanitarian coordination tool. It is NOT an emergency service. If you are in immediate danger, contact local emergency services. By using this platform, you acknowledge that: (1) This is a best-effort volunteer service; (2) We cannot guarantee any specific response time or outcome; (3) Information shared is used solely for coordinating humanitarian assistance; (4) You will not misuse this platform for fraudulent requests or harmful purposes."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Connection error. Please check your internet and try again.",
+    "rateLimit": "Too many requests. Please wait a moment before trying again.",
+    "notFound": "Page not found",
+    "unauthorized": "You are not authorized to access this page"
+  },
+  "empty": {
+    "noRequests": "No requests yet",
+    "noRequestsDesc": "New requests will appear here as they are submitted",
+    "noClaims": "No offers yet",
+    "noClaimsDesc": "Helpers who respond to this request will appear here"
+  }
+}

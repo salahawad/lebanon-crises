@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #1e3a5f;
+  --color-primary-light: #2d5a8e;
+  --color-primary-dark: #152a45;
+  --color-accent: #e8913a;
+  --color-accent-light: #f0a85c;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-critical: #dc2626;
+  --color-high: #f97316;
+  --color-medium: #eab308;
+  --color-low: #3b82f6;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans Arabic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Large tap targets for mobile */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* RTL support utilities */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Smooth focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

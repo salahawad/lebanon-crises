@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isHelper() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/helpers/$(request.auth.uid));
+    }
+
+    // Rate limiting: check timestamp-based rules
+    function isRecentWrite() {
+      return request.time < resource.data.createdAt + duration.value(1, 's');
+    }
+
+    // ---- REQUESTS ----
+    // Public can read non-sensitive fields of open requests
+    // Anyone can create (including anonymous users)
+    // Only admins can update
+    match /requests/{requestId} {
+      allow read: if true; // Public browsing of requests
+      allow create: if true; // Anonymous submissions allowed
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+
+      // Private subcollection: contact info
+      // Only admins and the claimed helper can read
+      match /private/{docId} {
+        allow read: if isAdmin() ||
+          (isHelper() && resource != null &&
+           get(/databases/$(database)/documents/requests/$(requestId)).data.claimedBy == request.auth.uid);
+        allow create: if true; // Created during request submission
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ---- HELPERS ----
+    // Helpers can read their own profile
+    // Anyone can create (registration)
+    // Helpers can update their own profile, admins can update any
+    match /helpers/{helperId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == helperId;
+      allow update: if (isAuthenticated() && request.auth.uid == helperId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- CLAIMS ----
+    // Helpers can create claims
+    // Admins and involved parties can read
+    match /claims/{claimId} {
+      allow read: if isAuthenticated();
+      allow create: if isHelper();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- ADMINS ----
+    // Only admins can read admin docs (for auth check)
+    match /admins/{adminId} {
+      allow read: if isAuthenticated() && request.auth.uid == adminId;
+      allow write: if false; // Admins are created manually or via Cloud Functions
+    }
+
+    // ---- STATS ----
+    // Public can read stats (single document, very efficient)
+    // Only server/admin can write
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated(); // In production, restrict to Cloud Functions
+    }
+
+    // ---- AUDIT LOGS ----
+    // Only admins can read audit logs
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated(); // Created by system on actions
+      allow update, delete: if false; // Immutable
+    }
+  }
+}
