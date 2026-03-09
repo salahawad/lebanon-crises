@@ -255,18 +255,35 @@ export async function flagRequest(
   });
 }
 
-// Get app stats (single read, very cost-efficient)
+// Get app stats by counting actual documents, then cache to stats/global
 export async function getAppStats() {
-  const snapshot = await getDoc(doc(db, 'stats', 'global'));
-  if (!snapshot.exists()) {
-    return {
-      totalRequests: 0,
-      openRequests: 0,
-      fulfilledRequests: 0,
-      totalHelpers: 0,
-      totalClaims: 0,
-      lastUpdated: Date.now(),
-    };
-  }
-  return snapshot.data();
+  const now = Date.now();
+
+  const [requestsSnap, helpersSnap, claimsSnap] = await Promise.all([
+    getDocs(collection(db, REQUESTS_COLLECTION)),
+    getDocs(collection(db, 'helpers')),
+    getDocs(collection(db, 'claims')),
+  ]);
+
+  let openRequests = 0;
+  let fulfilledRequests = 0;
+  requestsSnap.docs.forEach((d) => {
+    const status = d.data().status;
+    if (status === 'open' || status === 'in_progress') openRequests++;
+    if (status === 'fulfilled') fulfilledRequests++;
+  });
+
+  const stats = {
+    totalRequests: requestsSnap.size,
+    openRequests,
+    fulfilledRequests,
+    totalHelpers: helpersSnap.size,
+    totalClaims: claimsSnap.size,
+    lastUpdated: now,
+  };
+
+  // Cache the computed stats
+  setDoc(doc(db, 'stats', 'global'), stats).catch(() => {});
+
+  return stats;
 }

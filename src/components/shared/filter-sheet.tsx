@@ -54,7 +54,7 @@ export function FilterSheet({ filters, onApply }: FilterSheetProps) {
             className="absolute inset-0 bg-black/30"
             onClick={() => setOpen(false)}
           />
-          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md p-5 pb-8 animate-slide-up">
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md p-4 sm:p-5 pb-6 sm:pb-8 animate-slide-up">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">{t("browse.filterBy")}</h3>
               <button

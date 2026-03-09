@@ -68,14 +68,14 @@ export default function AdminDashboardPage() {
       <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="text-base font-bold">{t("admin.dashboard")}</h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               href="/admin/moderation"
-              className="text-sm text-white/90 hover:text-white"
+              className="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/20 text-white text-sm font-medium hover:bg-white/30 transition-colors"
             >
               {t("admin.moderation")}
             </Link>
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white hover:bg-white/20">
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/80 hover:bg-white/10 hover:text-white">
               {t("admin.signOut")}
             </Button>
           </div>
@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
         ) : (
           <>
             {/* Stats grid - single Firestore read for all stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
               <Card className="text-center">
                 <p className="text-xs text-slate-500 mb-1">
                   {t("admin.totalRequests")}
@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
                   {stats?.totalHelpers || 0}
                 </p>
               </Card>
-              <Card className="text-center col-span-2 sm:col-span-1">
+              <Card className="text-center col-span-2 sm:col-span-1 md:col-span-1">
                 <p className="text-xs text-slate-500 mb-1">
                   {t("admin.totalClaims")}
                 </p>

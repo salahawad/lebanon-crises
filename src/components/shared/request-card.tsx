@@ -38,7 +38,7 @@ export function RequestCard({
   return (
     <Card className="hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span className="text-2xl" aria-hidden="true">
             {categoryIcons[request.category] || "📦"}
           </span>
@@ -90,9 +90,10 @@ export function RequestCard({
         <div className="mt-3 pt-3 border-t border-slate-100">
           <Link
             href={adminView ? `/admin/moderation?id=${request.id}` : `/request/${request.id}`}
-            className="text-sm font-medium text-primary hover:text-primary-light tap-target inline-flex items-center"
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors tap-target"
           >
-            {adminView ? t("admin.moderation") : t("browse.viewDetails")} →
+            {adminView ? t("admin.moderation") : t("browse.viewDetails")}
+            <span className="rtl-flip inline-block">→</span>
           </Link>
         </div>
       )}

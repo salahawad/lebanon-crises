@@ -11,7 +11,8 @@ export interface InputProps
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, id, ...props }, ref) => {
+  ({ className, label, error, hint, id, type, ...props }, ref) => {
+    const isTel = type === "tel";
     return (
       <div className="w-full">
         {label && (
@@ -25,12 +26,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={id}
+          type={type}
+          dir={isTel ? "ltr" : undefined}
           className={cn(
             "w-full px-3 py-2.5 rounded-lg border text-base tap-target",
             "bg-white border-slate-300 placeholder:text-slate-400",
             "focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none",
             "transition-colors",
             error && "border-danger focus:border-danger focus:ring-danger",
+            isTel && "text-start",
             className
           )}
           {...props}

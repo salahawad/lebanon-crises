@@ -179,7 +179,7 @@ export default function ModerationPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-40 bg-primary text-white">
-        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="text-sm text-white/90 hover:text-white">
               {t("admin.dashboard")}
@@ -199,7 +199,7 @@ export default function ModerationPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-4">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-4 overflow-x-auto pb-2">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
             onClick={() => setFilterStatus("")}
             className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
@@ -243,8 +243,8 @@ export default function ModerationPage() {
               <Card key={req.id} className="space-y-3">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h3 className="font-semibold text-slate-900">
                         {t(`request.categories.${req.category}`)}
                       </h3>
@@ -277,7 +277,7 @@ export default function ModerationPage() {
 
                 {/* Contact info (expandable) */}
                 {expandedId === req.id && contactInfo[req.id] && (
-                  <div className="bg-blue-50 rounded-lg p-3 text-sm">
+                  <div className="bg-blue-50 rounded-lg p-3 text-sm break-words">
                     <p className="font-medium text-blue-800 mb-1">
                       {t("details.contactInfo")}
                     </p>
@@ -285,7 +285,7 @@ export default function ModerationPage() {
                       <p>Name: {contactInfo[req.id].name}</p>
                     )}
                     {contactInfo[req.id].phone && (
-                      <p>
+                      <p dir="ltr" className="text-start">
                         Phone: {contactInfo[req.id].phoneCountryCode}{" "}
                         {contactInfo[req.id].phone}
                       </p>
@@ -313,7 +313,7 @@ export default function ModerationPage() {
                         handleStatusChange(req.id, e.target.value as RequestStatus);
                       }
                     }}
-                    className="text-sm border rounded-lg px-2 py-1.5 bg-white"
+                    className="text-sm border border-slate-300 rounded-xl px-3 py-2.5 bg-white min-h-[44px] tap-target focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors"
                   >
                     <option value="">{t("admin.changeStatus")}</option>
                     {STATUSES.map((s) => (
@@ -330,7 +330,7 @@ export default function ModerationPage() {
                         handleFlag(req.id, e.target.value as ModerationFlag);
                       }
                     }}
-                    className="text-sm border rounded-lg px-2 py-1.5 bg-white"
+                    className="text-sm border border-slate-300 rounded-xl px-3 py-2.5 bg-white min-h-[44px] tap-target focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors"
                   >
                     <option value="">{t("admin.flagAs")}</option>
                     {FLAGS.map((f) => (
