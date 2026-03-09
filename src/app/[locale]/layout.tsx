@@ -27,14 +27,14 @@ export const metadata: Metadata = {
       "Connecting displaced people with volunteers and organizations who can help.",
     siteName: "Lebanon Relief",
     type: "website",
-    images: [{ url: "/og.svg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Lebanon Relief — Humanitarian Coordination",
     description:
       "Connecting displaced people with volunteers and organizations who can help.",
-    images: ["/og.svg"],
+    images: ["/opengraph-image"],
   },
 };
 
