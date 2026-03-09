@@ -247,6 +247,23 @@ firebase deploy --only firestore
 | `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret key (server-side) |
 | `NEXT_PUBLIC_BASE_URL` | No | Base URL for OG images (defaults to Vercel URL) |
 
+## What Makes This Different
+
+Most humanitarian tools are either heavyweight enterprise platforms or simple static directories. Lebanon Relief fills the gap:
+
+| Feature | Typical Tools | Lebanon Relief |
+|---------|--------------|----------------|
+| Setup complexity | Weeks of integration | Single `npm run seed` with Firebase |
+| Smart matching | Manual browse only | Weighted scoring recommends relevant requests to each helper |
+| Request triage | Admin-only prioritization | Automatic priority queue: urgency × age × people count |
+| Route efficiency | Helpers pick randomly | Request clustering groups nearby same-category needs |
+| Helper burnout | No tracking | Capacity warnings at 3 active claims (never blocks) |
+| Language support | English-only or bolted-on | Native bilingual (EN/AR) with full RTL from day one |
+| Device requirements | Desktop-first | Mobile-first, works on low-end phones and slow networks |
+| Bot protection | None or CAPTCHA walls | Invisible reCAPTCHA v3 — zero friction for real users |
+| Privacy | Contact info exposed | Phone numbers in private subcollections, never shown publicly |
+| Cost | Paid platforms or heavy infra | Firebase free tier handles thousands of requests |
+
 ## Future Roadmap
 
 - [ ] WhatsApp/SMS notifications via Cloud Functions
