@@ -18,6 +18,22 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
     apple: "/icon.svg",
   },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://lebanon-crises.vercel.app"
+  ),
+  openGraph: {
+    title: "Lebanon Relief — Humanitarian Coordination",
+    description:
+      "Connecting displaced people with volunteers and organizations who can help.",
+    siteName: "Lebanon Relief",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lebanon Relief — Humanitarian Coordination",
+    description:
+      "Connecting displaced people with volunteers and organizations who can help.",
+  },
 };
 
 export default async function LocaleLayout({
