@@ -11,6 +11,10 @@ export const metadata: Metadata = {
     "Connecting displaced people with volunteers and organizations who can help.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   themeColor: "#1e3a5f",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default async function LocaleLayout({

@@ -12,9 +12,12 @@ export default function LandingPage() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-primary">
-            {t("common.appName")}
-          </h1>
+          <div className="flex items-center gap-2">
+            <img src="/icon.svg" alt="" width={28} height={28} className="rounded" />
+            <h1 className="text-lg font-bold text-primary">
+              {t("common.appName")}
+            </h1>
+          </div>
           <LanguageSwitcher />
         </div>
       </header>
