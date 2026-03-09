@@ -255,6 +255,21 @@ export async function flagRequest(
   });
 }
 
+// Get open request counts per governorate (for map heatmap)
+export async function getRequestCountsByGovernorate(): Promise<Record<string, number>> {
+  const q = query(
+    collection(db, REQUESTS_COLLECTION),
+    where('status', 'in', ['open', 'in_progress'])
+  );
+  const snapshot = await getDocs(q);
+  const counts: Record<string, number> = {};
+  snapshot.docs.forEach((d) => {
+    const gov = d.data().governorate as string;
+    counts[gov] = (counts[gov] || 0) + 1;
+  });
+  return counts;
+}
+
 // Get app stats by counting actual documents, then cache to stats/global
 export async function getAppStats() {
   const now = Date.now();

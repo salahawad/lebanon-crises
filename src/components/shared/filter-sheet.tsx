@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
@@ -23,6 +23,11 @@ export function FilterSheet({ filters, onApply }: FilterSheetProps) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<RequestFilters>(filters);
+
+  // Sync local state when parent filters change (e.g. chip removal)
+  useEffect(() => {
+    setLocal(filters);
+  }, [filters]);
 
   const handleApply = () => {
     onApply(local);

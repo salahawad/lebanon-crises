@@ -1,11 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { LebanonMap } from "@/components/shared/lebanon-map";
+import { getRequestCountsByGovernorate } from "@/lib/firebase/requests";
 
 export default function LandingPage() {
   const t = useTranslations();
+  const router = useRouter();
+  const [govCounts, setGovCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    getRequestCountsByGovernorate()
+      .then(setGovCounts)
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,6 +91,19 @@ export default function LandingPage() {
             </span>
           </Link>
         </div>
+
+        {/* Map */}
+        {Object.keys(govCounts).length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-sm font-bold text-slate-700 text-center mb-3">
+              {t("landing.openRequests")}
+            </h3>
+            <LebanonMap
+              counts={govCounts}
+              onSelect={(gov) => router.push(`/browse?governorate=${gov}`)}
+            />
+          </div>
+        )}
 
         {/* Safety notice */}
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">

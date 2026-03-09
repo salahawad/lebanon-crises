@@ -95,7 +95,7 @@ src/
 │       └── terms/              # Terms & humanitarian notice
 ├── components/
 │   ├── ui/                     # Button, Input, Select, Card, etc.
-│   └── shared/                 # RequestCard, UrgencyBadge, FilterSheet, etc.
+│   └── shared/                 # RequestCard, UrgencyBadge, FilterSheet, LebanonMap, etc.
 ├── lib/
 │   ├── firebase/               # Config, auth, requests, helpers
 │   ├── types/                  # TypeScript types
@@ -107,6 +107,11 @@ src/
 
 ## User Flows
 
+### Landing Page
+- Interactive SVG heatmap of Lebanon's 8 governorates showing live open request counts
+- Color-coded by density (green → amber → orange → red)
+- Click any governorate to browse its filtered requests
+
 ### "I Need Help" (Requester)
 1. Landing page → tap "I need help"
 2. Fill minimal form: category, description, location, urgency, contact preference
@@ -115,7 +120,7 @@ src/
 
 ### "I Want to Help" (Helper)
 1. Landing page → tap "I want to help"
-2. Browse paginated requests with filters (category, area, urgency)
+2. Browse paginated requests with filters (category, area, urgency) and removable filter chips
 3. Smart matching: personalized recommendations, priority sorting, grouped view
 4. View request details (privacy-safe: no exact address, no phone shown)
 5. Register → claim a request → contact via admin coordination or direct
@@ -145,7 +150,7 @@ src/
 
 ### Performance
 - **Mobile-first design** — 44px minimum tap targets, high contrast, minimal JS.
-- **No heavy libraries** — no maps by default, no rich text editors.
+- **No heavy libraries** — lightweight inline SVG map, no rich text editors.
 - **System fonts** — no web font downloads.
 - **Static translations** — bundled in JS, no Firestore reads for i18n.
 - **PWA manifest** — installable on mobile devices.
@@ -274,7 +279,7 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 - [ ] Request search by reference code
 - [ ] Soft delete with audit trail
 - [ ] Image upload for requests (Firebase Storage)
-- [ ] Map view (optional, lightweight)
+- [x] Interactive SVG heatmap on landing page
 - [ ] Push notifications via FCM
 
 ## License

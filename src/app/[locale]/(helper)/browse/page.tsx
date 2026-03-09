@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { PageHeader } from "@/components/shared/page-header";
@@ -28,10 +29,14 @@ type ViewMode = "list" | "clustered";
 
 export default function BrowsePage() {
   const t = useTranslations();
+  const searchParams = useSearchParams();
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [filters, setFilters] = useState<RequestFilters>({});
+  const [filters, setFilters] = useState<RequestFilters>(() => {
+    const gov = searchParams.get("governorate");
+    return gov ? { governorate: gov } : {};
+  });
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
@@ -41,6 +46,16 @@ export default function BrowsePage() {
   const [recommended, setRecommended] = useState<ScoredRequest[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+
+  // Sync filters from URL query params
+  useEffect(() => {
+    const gov = searchParams.get("governorate");
+    if (gov && gov !== filters.governorate) {
+      setFilters((prev) => ({ ...prev, governorate: gov }));
+      setLastDoc(null);
+      setHasMore(true);
+    }
+  }, [searchParams]);
 
   // Load helper profile for matching
   useEffect(() => {
@@ -107,6 +122,14 @@ export default function BrowsePage() {
     setHasMore(true);
   };
 
+  const hasActiveFilters = !!(filters.governorate || filters.category || filters.urgency || filters.status);
+
+  const clearFilters = () => {
+    setFilters({});
+    setLastDoc(null);
+    setHasMore(true);
+  };
+
   const atCapacity = helper ? isHelperAtCapacity(claims) : false;
   const activeCount = getActiveClaimCount(claims);
 
@@ -130,6 +153,54 @@ export default function BrowsePage() {
           <p className="text-sm text-slate-600">{t("browse.subtitle")}</p>
           <FilterSheet filters={filters} onApply={handleFilterChange} />
         </div>
+
+        {/* Active filters */}
+        {hasActiveFilters && (
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {filters.governorate && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                {t(`request.governorates.${filters.governorate}`)}
+                <button
+                  onClick={() => handleFilterChange({ ...filters, governorate: undefined })}
+                  className="hover:text-primary-dark"
+                  aria-label="Remove"
+                >
+                  &times;
+                </button>
+              </span>
+            )}
+            {filters.category && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                {t(`request.categories.${filters.category}`)}
+                <button
+                  onClick={() => handleFilterChange({ ...filters, category: undefined })}
+                  className="hover:text-primary-dark"
+                  aria-label="Remove"
+                >
+                  &times;
+                </button>
+              </span>
+            )}
+            {filters.urgency && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                {t(`request.urgency.${filters.urgency}`)}
+                <button
+                  onClick={() => handleFilterChange({ ...filters, urgency: undefined })}
+                  className="hover:text-primary-dark"
+                  aria-label="Remove"
+                >
+                  &times;
+                </button>
+              </span>
+            )}
+            <button
+              onClick={clearFilters}
+              className="text-xs text-slate-500 hover:text-slate-700 underline"
+            >
+              {t("browse.clearFilters")}
+            </button>
+          </div>
+        )}
 
         {/* Sort & View toggles */}
         <div className="flex items-center gap-2 mb-4">
