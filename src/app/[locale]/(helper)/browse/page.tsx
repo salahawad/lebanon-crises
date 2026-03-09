@@ -158,11 +158,11 @@ export default function BrowsePage() {
         {hasActiveFilters && (
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             {filters.governorate && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
                 {t(`request.governorates.${filters.governorate}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, governorate: undefined })}
-                  className="hover:text-primary-dark"
+                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
@@ -170,11 +170,11 @@ export default function BrowsePage() {
               </span>
             )}
             {filters.category && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
                 {t(`request.categories.${filters.category}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, category: undefined })}
-                  className="hover:text-primary-dark"
+                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
@@ -182,11 +182,11 @@ export default function BrowsePage() {
               </span>
             )}
             {filters.urgency && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
                 {t(`request.urgency.${filters.urgency}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, urgency: undefined })}
-                  className="hover:text-primary-dark"
+                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
@@ -195,7 +195,7 @@ export default function BrowsePage() {
             )}
             <button
               onClick={clearFilters}
-              className="text-xs text-slate-500 hover:text-slate-700 underline"
+              className="text-sm text-slate-500 hover:text-slate-700 underline"
             >
               {t("browse.clearFilters")}
             </button>
@@ -204,30 +204,30 @@ export default function BrowsePage() {
 
         {/* Sort & View toggles */}
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
+          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-sm">
             <button
               onClick={() => setSortMode("newest")}
-              className={`px-3 py-1.5 ${sortMode === "newest" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
+              className={`px-3.5 py-2 ${sortMode === "newest" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
             >
               {t("browse.sortNewest")}
             </button>
             <button
               onClick={() => setSortMode("priority")}
-              className={`px-3 py-1.5 ${sortMode === "priority" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
+              className={`px-3.5 py-2 ${sortMode === "priority" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
             >
               {t("browse.sortPriority")}
             </button>
           </div>
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
+          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-sm">
             <button
               onClick={() => setViewMode("list")}
-              className={`px-3 py-1.5 ${viewMode === "list" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
+              className={`px-3.5 py-2 ${viewMode === "list" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
             >
               {t("browse.listView")}
             </button>
             <button
               onClick={() => setViewMode("clustered")}
-              className={`px-3 py-1.5 ${viewMode === "clustered" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
+              className={`px-3.5 py-2 ${viewMode === "clustered" ? "bg-primary text-white" : "bg-white text-slate-600"}`}
             >
               {t("browse.clusteredView")}
             </button>
