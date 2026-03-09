@@ -21,7 +21,7 @@ import {
   isHelperAtCapacity,
   getActiveClaimCount,
 } from "@/lib/utils/matching";
-import type { HelpRequest, Helper, Claim, RequestFilters, ScoredRequest } from "@/lib/types";
+import type { HelpRequest, Helper, Claim, RequestFilters, ScoredRequest, Governorate } from "@/lib/types";
 import type { DocumentSnapshot } from "firebase/firestore";
 
 type SortMode = "newest" | "priority";
@@ -35,7 +35,7 @@ export default function BrowsePage() {
   const [error, setError] = useState(false);
   const [filters, setFilters] = useState<RequestFilters>(() => {
     const gov = searchParams.get("governorate");
-    return gov ? { governorate: gov } : {};
+    return gov ? { governorate: gov as Governorate } : {};
   });
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -51,7 +51,7 @@ export default function BrowsePage() {
   useEffect(() => {
     const gov = searchParams.get("governorate");
     if (gov && gov !== filters.governorate) {
-      setFilters((prev) => ({ ...prev, governorate: gov }));
+      setFilters((prev) => ({ ...prev, governorate: gov as Governorate }));
       setLastDoc(null);
       setHasMore(true);
     }
