@@ -1,6 +1,6 @@
 # Lebanon Relief — Humanitarian Coordination App
 
-A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions.
+A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions..
 
 ## Quick Start
 
