@@ -88,7 +88,7 @@ export function LebanonMap({ counts, onSelect }: LebanonMapProps) {
     <div className="relative">
       <svg
         viewBox="0 40 500 620"
-        className="w-full max-w-[240px] sm:max-w-[280px] mx-auto"
+        className="w-full max-w-[300px] sm:max-w-[340px] mx-auto"
         role="img"
         aria-label={t("common.appName")}
       >

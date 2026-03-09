@@ -31,9 +31,11 @@ export function PageHeader({
             </Link>
           )}
           {title && (
-            <h1 className="text-base font-bold text-slate-900 truncate">
-              {title}
-            </h1>
+            <Link href="/">
+              <h1 className="text-base font-bold text-slate-900 truncate">
+                {title}
+              </h1>
+            </Link>
           )}
         </div>
         {showLang && <LanguageSwitcher />}
