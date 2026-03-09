@@ -217,7 +217,8 @@
     "network": "Connection error. Please check your internet and try again.",
     "rateLimit": "Too many requests. Please wait a moment before trying again.",
     "notFound": "Page not found",
-    "unauthorized": "You are not authorized to access this page"
+    "unauthorized": "You are not authorized to access this page",
+    "captchaFailed": "Verification failed. Please try again."
   },
   "empty": {
     "noRequests": "No requests yet",

@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { helpRequestSchema } from "@/lib/validators/request";
 import { createHelpRequest } from "@/lib/firebase/requests";
 import { checkRateLimit } from "@/lib/utils/helpers";
+import { getRecaptchaToken } from "@/lib/utils/recaptcha";
 import type { RequestCategory, UrgencyLevel, ContactMethod, Governorate } from "@/lib/types";
 import type { z } from "zod";
 
@@ -66,6 +67,21 @@ export default function RequestHelpPage() {
     setError("");
 
     try {
+      // Verify human with reCAPTCHA v3
+      const recaptchaToken = await getRecaptchaToken("submit_request");
+      if (recaptchaToken) {
+        const verifyRes = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: recaptchaToken }),
+        });
+        if (!verifyRes.ok) {
+          setError(t("errors.captchaFailed"));
+          setSubmitting(false);
+          return;
+        }
+      }
+
       const result = await createHelpRequest(data as import("@/lib/types").HelpRequestFormData);
       router.push(`/success?ref=${result.referenceCode}`);
     } catch (err) {

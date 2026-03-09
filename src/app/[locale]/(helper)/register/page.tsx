@@ -12,6 +12,7 @@ import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { helperSchema } from "@/lib/validators/request";
 import { registerHelper } from "@/lib/firebase/auth";
+import { getRecaptchaToken } from "@/lib/utils/recaptcha";
 import type { RequestCategory, Governorate } from "@/lib/types";
 import { Link } from "@/i18n/navigation";
 import type { z } from "zod";
@@ -59,6 +60,21 @@ export default function RegisterPage() {
     setError("");
 
     try {
+      // Verify human with reCAPTCHA v3
+      const recaptchaToken = await getRecaptchaToken("register_helper");
+      if (recaptchaToken) {
+        const verifyRes = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: recaptchaToken }),
+        });
+        if (!verifyRes.ok) {
+          setError(t("errors.captchaFailed"));
+          setSubmitting(false);
+          return;
+        }
+      }
+
       await registerHelper(data.email, data.password, {
         name: data.name,
         organization: data.organization,
