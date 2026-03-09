@@ -12,6 +12,7 @@ interface RequestCardProps {
   request: HelpRequest;
   showActions?: boolean;
   adminView?: boolean;
+  matchReasons?: string[];
 }
 
 const categoryIcons: Record<string, string> = {
@@ -29,6 +30,7 @@ export function RequestCard({
   request,
   showActions = true,
   adminView = false,
+  matchReasons,
 }: RequestCardProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -51,6 +53,19 @@ export function RequestCard({
         </div>
         <UrgencyBadge urgency={request.urgency} />
       </div>
+
+      {matchReasons && matchReasons.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {matchReasons.map((reason) => (
+            <span
+              key={reason}
+              className="px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent"
+            >
+              {t(`matching.${reason}`)}
+            </span>
+          ))}
+        </div>
+      )}
 
       <p className="mt-2 text-sm text-slate-700 leading-relaxed">
         {truncate(request.description, 120)}

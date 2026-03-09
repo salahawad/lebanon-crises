@@ -115,7 +115,24 @@
     "viewDetails": "View details",
     "claimHelp": "I can help",
     "noRequests": "No open requests match your filters",
-    "noRequestsSubtitle": "Try changing your filters or check back soon"
+    "noRequestsSubtitle": "Try changing your filters or check back soon",
+    "sortBy": "Sort",
+    "sortNewest": "Newest",
+    "sortPriority": "Priority",
+    "listView": "List",
+    "clusteredView": "Grouped"
+  },
+  "matching": {
+    "recommendedForYou": "Recommended for you",
+    "goodMatch": "Good match",
+    "sameArea": "Same area",
+    "categoryMatch": "Matches your supplies",
+    "nearYou": "Near you",
+    "atCapacity": "You have reached the maximum active claims",
+    "atCapacityDesc": "Complete or release some of your current claims to help more people",
+    "activeClaims": "Active claims: {count}/3",
+    "requestsInArea": "{count} requests for {category} in {governorate}",
+    "totalPeople": "{count} people total"
   },
   "details": {
     "title": "Request Details",
@@ -219,6 +236,9 @@
     "notFound": "Page not found",
     "unauthorized": "You are not authorized to access this page",
     "captchaFailed": "Verification failed. Please try again."
+  },
+  "disclaimer": {
+    "banner": "This platform is in demo mode. All data shown is for demonstration purposes only."
   },
   "empty": {
     "noRequests": "No requests yet",

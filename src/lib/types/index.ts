@@ -74,6 +74,7 @@ export interface Helper {
   whatsapp?: string;
   email?: string;
   governorate?: Governorate;
+  city?: string;
   suppliesCanProvide: RequestCategory[];
   verified: boolean;
   createdAt: number;
@@ -169,4 +170,21 @@ export interface RequestFilters {
   governorate?: Governorate;
   urgency?: UrgencyLevel;
   status?: RequestStatus;
+}
+
+// ---- Matching Types ----
+
+export interface ScoredRequest {
+  request: HelpRequest;
+  score: number;
+  matchReasons: string[];
+}
+
+export interface RequestCluster {
+  key: string;
+  governorate: Governorate;
+  category: RequestCategory;
+  city?: string;
+  requests: HelpRequest[];
+  totalPeople: number;
 }

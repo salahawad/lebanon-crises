@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { getRequest } from "@/lib/firebase/requests";
-import { createClaim } from "@/lib/firebase/helpers";
+import { createClaim, getClaimsByHelper } from "@/lib/firebase/helpers";
 import { getCurrentUser } from "@/lib/firebase/auth";
+import { isHelperAtCapacity, getActiveClaimCount } from "@/lib/utils/matching";
 import { timeAgo, timeAgoAr } from "@/lib/utils/helpers";
 import type { HelpRequest } from "@/lib/types";
 import { Link } from "@/i18n/navigation";
@@ -31,12 +32,19 @@ export default function RequestDetailPage() {
   const [claimed, setClaimed] = useState(false);
   const [showClaimForm, setShowClaimForm] = useState(false);
   const [claimMessage, setClaimMessage] = useState("");
+  const [atCapacity, setAtCapacity] = useState(false);
 
   useEffect(() => {
     async function load() {
       try {
         const data = await getRequest(requestId);
         setRequest(data);
+        // Check helper capacity
+        const user = getCurrentUser();
+        if (user && !user.isAnonymous) {
+          const helperClaims = await getClaimsByHelper(user.uid);
+          setAtCapacity(isHelperAtCapacity(helperClaims));
+        }
       } catch {
         setError(true);
       } finally {
@@ -197,6 +205,12 @@ export default function RequestDetailPage() {
           </Card>
         ) : request.status === "open" ? (
           <div className="space-y-3">
+            {atCapacity && (
+              <Card className="bg-amber-50 border-amber-200">
+                <p className="text-sm font-medium text-amber-800">{t("matching.atCapacity")}</p>
+                <p className="text-xs text-amber-700 mt-1">{t("matching.atCapacityDesc")}</p>
+              </Card>
+            )}
             {!showClaimForm ? (
               <Button
                 variant="primary"
@@ -204,7 +218,6 @@ export default function RequestDetailPage() {
                 onClick={() => {
                   const user = getCurrentUser();
                   if (!user || user.isAnonymous) {
-                    // Redirect to register
                     setShowClaimForm(false);
                   } else {
                     setShowClaimForm(true);

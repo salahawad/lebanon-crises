@@ -115,7 +115,24 @@
     "viewDetails": "عرض التفاصيل",
     "claimHelp": "أستطيع المساعدة",
     "noRequests": "لا توجد طلبات مفتوحة تطابق التصفية",
-    "noRequestsSubtitle": "جرب تغيير التصفية أو تحقق مجدداً قريباً"
+    "noRequestsSubtitle": "جرب تغيير التصفية أو تحقق مجدداً قريباً",
+    "sortBy": "ترتيب",
+    "sortNewest": "الأحدث",
+    "sortPriority": "الأولوية",
+    "listView": "قائمة",
+    "clusteredView": "مجموعات"
+  },
+  "matching": {
+    "recommendedForYou": "موصى بها لك",
+    "goodMatch": "تطابق جيد",
+    "sameArea": "نفس المنطقة",
+    "categoryMatch": "تطابق احتياجاتك",
+    "nearYou": "بالقرب منك",
+    "atCapacity": "لقد وصلت للحد الأقصى من المطالبات النشطة",
+    "atCapacityDesc": "أكمل أو حرر بعض مطالباتك الحالية لمساعدة المزيد",
+    "activeClaims": "مطالبات نشطة: {count}/3",
+    "requestsInArea": "{count} طلبات لـ {category} في {governorate}",
+    "totalPeople": "{count} أشخاص إجمالاً"
   },
   "details": {
     "title": "تفاصيل الطلب",
@@ -219,6 +236,9 @@
     "notFound": "الصفحة غير موجودة",
     "unauthorized": "غير مصرح لك بالوصول لهذه الصفحة",
     "captchaFailed": "فشل التحقق. يرجى المحاولة مجدداً."
+  },
+  "disclaimer": {
+    "banner": "هذه المنصة في وضع تجريبي. جميع البيانات المعروضة هي لأغراض العرض فقط."
   },
   "empty": {
     "noRequests": "لا توجد طلبات بعد",

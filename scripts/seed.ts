@@ -92,29 +92,41 @@ async function seed() {
     }
   }
 
-  // 2. Create sample helper
-  console.log('Creating sample helper...');
-  try {
-    const helperResult = await createUserWithEmailAndPassword(auth, 'helper@example.com', 'helper123');
-    await setDoc(doc(db, 'helpers', helperResult.user.uid), {
-      id: helperResult.user.uid,
-      name: 'Ahmad Khalil',
-      organization: 'Lebanese Red Cross',
-      phone: '03111222',
-      whatsapp: '03111222',
-      email: 'helper@example.com',
-      governorate: 'beirut',
-      suppliesCanProvide: ['medicine', 'food', 'hygiene'],
-      verified: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-    console.log('  Helper created: helper@example.com / helper123');
-  } catch (e: any) {
-    if (e.code === 'auth/email-already-in-use') {
-      console.log('  Helper already exists');
-    } else {
-      console.error('  Error creating helper:', e.message);
+  // 2. Create sample helpers
+  console.log('Creating sample helpers...');
+  const helpers = [
+    { email: 'helper@example.com', password: 'helper123', name: 'Ahmad Khalil', org: 'Lebanese Red Cross', governorate: 'beirut', city: 'Beirut', supplies: ['medicine', 'food', 'hygiene'] },
+    { email: 'helper2@example.com', password: 'helper123', name: 'Nadia Haddad', org: 'Caritas Lebanon', governorate: 'mount_lebanon', city: 'Jounieh', supplies: ['shelter', 'clothing', 'baby_milk'] },
+    { email: 'helper3@example.com', password: 'helper123', name: 'Omar Farah', org: '', governorate: 'north', city: 'Tripoli', supplies: ['food', 'transport', 'other'] },
+    { email: 'helper4@example.com', password: 'helper123', name: 'Layla Mansour', org: 'UNHCR Partner', governorate: 'bekaa', city: 'Zahle', supplies: ['medicine', 'baby_milk', 'shelter'] },
+  ];
+  const helperUids: string[] = [];
+
+  for (const h of helpers) {
+    try {
+      const result = await createUserWithEmailAndPassword(auth, h.email, h.password);
+      helperUids.push(result.user.uid);
+      await setDoc(doc(db, 'helpers', result.user.uid), {
+        id: result.user.uid,
+        name: h.name,
+        organization: h.org || undefined,
+        phone: `03${Math.floor(100000 + Math.random() * 900000)}`,
+        whatsapp: `03${Math.floor(100000 + Math.random() * 900000)}`,
+        email: h.email,
+        governorate: h.governorate,
+        city: h.city,
+        suppliesCanProvide: h.supplies,
+        verified: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+      console.log(`  Helper created: ${h.email} / ${h.password} (${h.name})`);
+    } catch (e: any) {
+      if (e.code === 'auth/email-already-in-use') {
+        console.log(`  Helper already exists: ${h.email}`);
+      } else {
+        console.error(`  Error creating helper ${h.email}:`, e.message);
+      }
     }
   }
 
@@ -165,21 +177,39 @@ async function seed() {
     console.log(`  Request ${i + 1}/${sampleRequests.length}: ${sample.category} in ${sample.city} [${status}]`);
   }
 
-  // 4. Create stats document
+  // 4. Create sample claims (to test capacity tracking and reputation)
+  console.log('Creating sample claims...');
+  if (helperUids.length > 0) {
+    const claimStatuses = ['pending', 'accepted', 'completed', 'completed'] as const;
+    for (let i = 0; i < 4; i++) {
+      await addDoc(collection(db, 'claims'), {
+        requestId: `seed-request-${i}`,
+        helperId: helperUids[0], // Ahmad gets 4 claims (2 completed, 1 accepted, 1 pending)
+        helperName: 'Ahmad Khalil',
+        message: `I can help with this request. Claim #${i + 1}`,
+        status: claimStatuses[i],
+        createdAt: now - (i * 86400000),
+        updatedAt: now - (i * 86400000),
+      });
+    }
+    console.log('  4 claims created for Ahmad Khalil (testing capacity: 2 active, 2 completed)');
+  }
+
+  // 5. Create stats document
   console.log('Creating stats document...');
   await setDoc(doc(db, 'stats', 'global'), {
     totalRequests: sampleRequests.length,
     openRequests: openCount,
     fulfilledRequests: fulfilledCount,
-    totalHelpers: 1,
-    totalClaims: 0,
+    totalHelpers: helpers.length,
+    totalClaims: 4,
     lastUpdated: now,
   });
 
   console.log('\nSeed complete!');
   console.log(`  ${sampleRequests.length} requests created`);
   console.log(`  1 admin user: admin@relief.lb / admin123`);
-  console.log(`  1 helper user: helper@example.com / helper123`);
+  console.log(`  ${helpers.length} helper users (password: helper123 for all)`);
   process.exit(0);
 }
 

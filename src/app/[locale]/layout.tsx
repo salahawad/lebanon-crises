@@ -1,19 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { DemoBanner } from "@/components/shared/demo-banner";
 import "../globals.css";
 
 const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#1e3a5f",
+};
 
 export const metadata: Metadata = {
   title: "Lebanon Relief — Humanitarian Coordination",
   description:
     "Connecting displaced people with volunteers and organizations who can help.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
-  themeColor: "#1e3a5f",
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg",
@@ -73,6 +79,7 @@ export default async function LocaleLayout({
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         <NextIntlClientProvider messages={messages}>
+          <DemoBanner />
           {children}
         </NextIntlClientProvider>
       </body>

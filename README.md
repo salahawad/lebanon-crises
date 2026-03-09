@@ -1,6 +1,8 @@
 # Lebanon Relief — Humanitarian Coordination App
 
-A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions..
+A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions.
+
+> **Demo mode:** The deployed application currently uses synthetic data for demonstration purposes.
 
 ## Quick Start
 
@@ -46,8 +48,9 @@ npm run seed
 
 The seed script creates:
 - **15 realistic help requests** across all categories and governorates
+- **4 helper users** across different governorates with varied supply specialties
 - **1 admin user**: `admin@relief.lb` / `admin123`
-- **1 helper user**: `helper@example.com` / `helper123`
+- **Sample claims** to test capacity tracking
 - **Stats document** for the dashboard
 
 ```bash
@@ -75,6 +78,8 @@ npm run seed
 | Forms | React Hook Form + Zod 4 |
 | i18n | next-intl (English + Arabic with RTL) |
 | Testing | Vitest + Testing Library |
+| Anti-spam | Google reCAPTCHA v3 |
+| Social sharing | Dynamic Open Graph images (edge-rendered) |
 
 ## Project Structure
 
@@ -94,7 +99,7 @@ src/
 ├── lib/
 │   ├── firebase/               # Config, auth, requests, helpers
 │   ├── types/                  # TypeScript types
-│   ├── utils/                  # Helpers, cn
+│   ├── utils/                  # Helpers, cn, matching
 │   └── validators/             # Zod schemas
 ├── messages/                   # en.json, ar.json
 └── i18n/                       # Routing, navigation, request config
@@ -111,8 +116,9 @@ src/
 ### "I Want to Help" (Helper)
 1. Landing page → tap "I want to help"
 2. Browse paginated requests with filters (category, area, urgency)
-3. View request details (privacy-safe: no exact address, no phone shown)
-4. Register → claim a request → contact via admin coordination or direct
+3. Smart matching: personalized recommendations, priority sorting, grouped view
+4. View request details (privacy-safe: no exact address, no phone shown)
+5. Register → claim a request → contact via admin coordination or direct
 
 ### Admin
 1. Sign in at `/admin/login`
@@ -134,6 +140,7 @@ src/
 - **Contact info access-controlled** — only admins and claimed helpers can read.
 - **Anonymous submission** — requesters don't need accounts.
 - **Client-side rate limiting** — prevents spam submissions.
+- **Google reCAPTCHA v3** — invisible bot protection on all public forms.
 - **Firestore security rules** — enforce read/write permissions.
 
 ### Performance
@@ -143,11 +150,37 @@ src/
 - **Static translations** — bundled in JS, no Firestore reads for i18n.
 - **PWA manifest** — installable on mobile devices.
 
+### Smart Matching (no AI)
+All matching logic is pure client-side arithmetic — no external APIs or ML models.
+
+- **Weighted scoring** — Requests scored by governorate (50pts), category (30pts), availability (20pts), city (15pts), and helper reputation (5-10pts)
+- **Personalized recommendations** — Top 5 scored requests shown in "Recommended for you" section
+- **Request clustering** — Groups nearby same-category requests for efficient route planning
+- **Priority sorting** — `urgency_weight × time_boost × log₂(people_count)` — older unfulfilled requests with more people rank higher
+- **Capacity tracking** — Warns helpers at 3 active claims but never blocks them from helping
+
 ### Authentication Strategy
 - **Requesters**: Anonymous (Firebase Anonymous Auth) — zero friction.
 - **Helpers**: Email/password registration — lightweight, no phone OTP cost.
 - **Admins**: Email/password + `admins` collection check — secure without expensive provider.
 - **Modular**: Phone auth can be added later without restructuring.
+
+## Testing
+
+56 tests across 3 test suites covering validators, utility functions, and smart matching logic.
+
+```bash
+npm run test              # Run all tests
+npm run test:watch        # Run tests in watch mode
+npx vitest run --coverage # Run with coverage report
+```
+
+| File | Statements | Branches | Functions | Lines |
+|------|-----------|----------|-----------|-------|
+| matching.ts | 100% | 96% | 100% | 100% |
+| request.ts (validators) | 100% | 100% | 100% | 100% |
+| helpers.ts | 72% | 61% | 100% | 74% |
+| **Overall** | **87%** | **81%** | **100%** | **89%** |
 
 ## Commands
 
@@ -203,6 +236,16 @@ firebase deploy --only firestore
 - Arabic (`/ar/...`) — RTL with full layout mirroring
 - Language switcher on every page
 - All UI text in `src/messages/en.json` and `src/messages/ar.json`
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_FIREBASE_*` | Yes | Firebase project configuration |
+| `NEXT_PUBLIC_USE_EMULATORS` | No | Set `true` to use Firebase emulators |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | No | Google reCAPTCHA v3 site key |
+| `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret key (server-side) |
+| `NEXT_PUBLIC_BASE_URL` | No | Base URL for OG images (defaults to Vercel URL) |
 
 ## Future Roadmap
 
