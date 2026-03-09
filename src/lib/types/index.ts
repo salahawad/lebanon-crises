@@ -150,6 +150,18 @@ export interface ClaimFormData {
   message?: string;
 }
 
+// Contact person for an area (public directory)
+export interface AreaContact {
+  id: string;
+  fullName: string;
+  phone: string;
+  governorate: Governorate;
+  area: string; // city or neighborhood
+  available: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
 // ---- Filter Types ----
 
 export interface RequestFilters {

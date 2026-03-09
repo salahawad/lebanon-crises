@@ -62,6 +62,20 @@ export default function LandingPage() {
               {t("landing.offerHelpDesc")}
             </span>
           </Link>
+          <Link
+            href="/contacts"
+            className="block w-full p-5 rounded-2xl bg-slate-700 text-white text-center shadow-lg hover:bg-slate-600 transition-colors"
+          >
+            <span className="text-3xl block mb-2" aria-hidden="true">
+              📞
+            </span>
+            <span className="text-xl font-bold block">
+              {t("contacts.title")}
+            </span>
+            <span className="text-sm opacity-90 mt-1 block">
+              {t("contacts.subtitle")}
+            </span>
+          </Link>
         </div>
 
         {/* Safety notice */}

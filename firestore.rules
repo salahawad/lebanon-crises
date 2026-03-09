@@ -80,6 +80,13 @@ service cloud.firestore {
       allow write: if isAuthenticated(); // In production, restrict to Cloud Functions
     }
 
+    // ---- CONTACTS ----
+    // Public directory of area contacts
+    match /contacts/{contactId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ---- AUDIT LOGS ----
     // Only admins can read audit logs
     match /audit_logs/{logId} {

@@ -196,6 +196,14 @@
     "archived": "Archived",
     "flagged": "Flagged"
   },
+  "contacts": {
+    "title": "Contact Directory",
+    "subtitle": "People you can call or WhatsApp for help in your area",
+    "filterByArea": "Filter by governorate",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "noContacts": "No contacts available yet. Check back soon."
+  },
   "privacy": {
     "title": "Privacy Notice",
     "content": "This platform collects minimal personal data to coordinate humanitarian assistance. Your information is shared only with verified helpers and administrators. Phone numbers are stored securely and never displayed publicly. You may request deletion of your data at any time by contacting an administrator. This service is provided on a volunteer basis with no guarantees."
