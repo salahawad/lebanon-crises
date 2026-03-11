@@ -241,6 +241,18 @@ export default function SheltersPage() {
             ))}
           </div>
         )}
+
+        {/* Disclaimer */}
+        {!loading && !error && (
+          <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-start">
+            <p className="text-xs text-emerald-800 leading-relaxed">
+              {t("shelters.disclaimer")}
+            </p>
+            <p className="text-xs text-emerald-600 mt-2 pt-2 border-t border-emerald-200 leading-relaxed">
+              {t("shelters.disclaimerSource")}
+            </p>
+          </div>
+        )}
       </main>
     </div>
   );

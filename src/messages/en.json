@@ -249,7 +249,9 @@
     "viewSheltersDesc": "Find approved shelter locations across Lebanon",
     "sheltersIn": "Shelters in {area}",
     "changeArea": "Change area",
-    "callShelter": "Call"
+    "callShelter": "Call",
+    "disclaimer": "This platform identifies the locations of public schools and institutes being used as shelter centers for families displaced by the Israeli aggression. It aims to support coordination efforts among solidarity organizations by mapping shelter locations for those wishing to provide donations, based on the school list issued by the Ministerial Committee for Disaster Management dated September 27. The map will be updated regularly as information changes.",
+    "disclaimerSource": "This platform is based on data published by the National Committee for Disaster and Crisis Response Coordination and the school directory issued by the Center for Educational Research and Development."
   },
   "privacy": {
     "title": "Privacy Notice",
