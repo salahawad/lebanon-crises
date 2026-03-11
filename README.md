@@ -337,3 +337,7 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 ## License
 
 This project is provided for humanitarian purposes. Use freely for non-commercial humanitarian coordination.
+
+---
+
+Built with care for Lebanon.
