@@ -298,24 +298,41 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 
 ## Future Roadmap
 
-- [ ] WhatsApp/SMS notifications via Cloud Functions
+### Completed
+- [x] Interactive SVG heatmap with dual-mode toggle (requests / shelters)
+- [x] Approved shelter centers with daily-cached ArcGIS data and fail-safe fallback
+- [x] Emergency contacts directory with governorate filter and WhatsApp integration
+- [x] Helper verification by admin with reputation scoring
+- [x] Manual moderation queue with request cooldown (duplicate prevention)
+- [x] Delivery confirmation system (dual-sided: helper + requester)
+- [x] Anti-fraud: moderation queue, cooldown rules, audit logging
+
+### Notifications & Communication
+- [ ] WhatsApp/SMS notifications for request status changes (Cloud Functions)
+- [ ] Push notifications via FCM for helpers when new requests match their area
+- [ ] In-app messaging between helpers and requesters (privacy-preserving)
+
+### Authentication & Trust
 - [ ] Phone OTP authentication (optional, cost-aware)
-- [x] Helper verification by admin
-- [x] Manual moderation queue for requests
-- [x] Request cooldown (duplicate prevention)
-- [x] Delivery confirmation system
-- [x] Basic reputation scoring
-- [ ] Verified organization badges for helpers
-- [ ] Offline draft saving for request form
-- [ ] Admin analytics dashboard with charts
-- [ ] Request search by reference code
-- [ ] Soft delete with audit trail
-- [ ] Image upload for requests (Firebase Storage)
-- [x] Interactive SVG heatmap on landing page
-- [x] Approved shelter centers with ArcGIS daily caching
-- [x] Emergency contacts directory with governorate filter
-- [x] Dual-mode map (requests / shelters) on landing page
-- [ ] Push notifications via FCM
+- [ ] Verified organization badges for NGOs and established helpers
+- [ ] Social login (Google, Facebook) for faster helper onboarding
+
+### Data & Analytics
+- [ ] Admin analytics dashboard with charts (requests over time, response rates, coverage gaps)
+- [ ] Exportable reports for NGOs and government coordination
+- [ ] Shelter occupancy tracking (live capacity data from field updates)
+- [ ] Request search by reference code for status tracking
+
+### UX & Offline
+- [ ] Offline draft saving for request form (IndexedDB)
+- [ ] Progressive Web App enhancements (background sync, offline shelter browsing)
+- [ ] Image upload for requests to show damage/conditions (Firebase Storage)
+- [ ] Voice input for request descriptions (accessibility for elderly users)
+
+### Operations
+- [ ] Soft delete with audit trail for data retention compliance
+- [ ] Multi-language expansion (French, Turkish) for cross-border coordination
+- [ ] Automated shelter data sync (Cloud Functions scheduled trigger instead of first-request)
 
 ## License
 
