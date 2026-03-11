@@ -87,6 +87,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ---- SHELTERS ----
+    // Public can read shelter data (cached from external source)
+    // Only authenticated users can write (caching layer)
+    match /shelters/{shelterId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Shelter cache metadata
+    match /shelters_cache/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
     // ---- AUDIT LOGS ----
     // Only admins can read audit logs
     match /audit_logs/{logId} {

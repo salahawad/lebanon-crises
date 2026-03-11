@@ -19,7 +19,9 @@ interface GovernorateCounts {
 
 interface LebanonMapProps {
   counts: GovernorateCounts;
+  shelterCounts?: GovernorateCounts;
   onSelect?: (governorate: GovernorateId) => void;
+  tooltipLabel?: string;
 }
 
 // Accurate SVG paths derived from GADM administrative boundaries
@@ -77,7 +79,7 @@ function getHeatBorder(count: number, maxCount: number): string {
   return "#dc2626";                    // red-600
 }
 
-export function LebanonMap({ counts, onSelect }: LebanonMapProps) {
+export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: LebanonMapProps) {
   const t = useTranslations();
   const [hovered, setHovered] = useState<GovernorateId | null>(null);
 
@@ -147,20 +149,40 @@ export function LebanonMap({ counts, onSelect }: LebanonMapProps) {
         {governorates.map((id) => {
           const { labelX, labelY } = GOVERNORATE_PATHS[id];
           const count = counts[id] || 0;
-          if (count === 0) return null;
+          const sCount = shelterCounts?.[id] || 0;
+          if (count === 0 && sCount === 0) return null;
 
+          // If we have both counts, show stacked (top/bottom) for small areas, side by side otherwise
+          if (shelterCounts && sCount > 0 && count > 0) {
+            const isSmall = id === "beirut";
+            const oX = isSmall ? 0 : 16;
+            const oY = isSmall ? 14 : 0;
+            const r = isSmall ? 11 : 13;
+            const fs = isSmall ? "10" : "12";
+            return (
+              <g key={`badge-${id}`} className="pointer-events-none">
+                {/* Request badge */}
+                <circle cx={labelX - oX} cy={labelY - oY} r={r} fill="#1e3a5f" opacity={0.9} />
+                <text x={labelX - oX} y={labelY - oY + 4} textAnchor="middle" fontSize={fs} fontWeight="700" fill="white">
+                  {count}
+                </text>
+                {/* Shelter badge */}
+                <circle cx={labelX + oX} cy={labelY + oY} r={r} fill="#047857" opacity={0.9} />
+                <text x={labelX + oX} y={labelY + oY + 4} textAnchor="middle" fontSize={fs} fontWeight="700" fill="white">
+                  {sCount}
+                </text>
+              </g>
+            );
+          }
+
+          // Single badge
+          const badgeCount = count || sCount;
+          const badgeColor = count > 0 ? "#1e3a5f" : "#047857";
           return (
             <g key={`badge-${id}`} className="pointer-events-none">
-              <circle cx={labelX} cy={labelY} r={14} fill="#1e3a5f" opacity={0.9} />
-              <text
-                x={labelX}
-                y={labelY + 5}
-                textAnchor="middle"
-                fontSize="14"
-                fontWeight="700"
-                fill="white"
-              >
-                {count}
+              <circle cx={labelX} cy={labelY} r={14} fill={badgeColor} opacity={0.9} />
+              <text x={labelX} y={labelY + 5} textAnchor="middle" fontSize="14" fontWeight="700" fill="white">
+                {badgeCount}
               </text>
             </g>
           );
@@ -173,12 +195,19 @@ export function LebanonMap({ counts, onSelect }: LebanonMapProps) {
           {t(`request.governorates.${hovered}`)}
           <span className="mx-1">&mdash;</span>
           <span className="font-bold">{counts[hovered] || 0}</span>{" "}
-          {t("landing.openRequests").toLowerCase()}
+          {tooltipLabel || t("landing.openRequests").toLowerCase()}
+          {shelterCounts && (
+            <>
+              <span className="mx-1">·</span>
+              <span className="font-bold text-emerald-300">{shelterCounts[hovered] || 0}</span>{" "}
+              {t("shelters.viewShelters").toLowerCase()}
+            </>
+          )}
         </div>
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-3 mt-3 text-[10px] text-slate-500">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-3 text-[10px] text-slate-500">
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded-sm bg-[#e2e8f0] border border-slate-300 inline-block" />
           0
@@ -195,6 +224,19 @@ export function LebanonMap({ counts, onSelect }: LebanonMapProps) {
           <span className="w-3 h-3 rounded-sm bg-[#fecaca] border border-red-400 inline-block" />
           High
         </span>
+        {shelterCounts && (
+          <>
+            <span className="text-slate-300">|</span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-[#1e3a5f] inline-block" />
+              {t("landing.openRequests")}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-[#047857] inline-block" />
+              {t("shelters.viewShelters")}
+            </span>
+          </>
+        )}
       </div>
     </div>
   );

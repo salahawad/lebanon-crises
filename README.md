@@ -260,6 +260,7 @@ firebase deploy --only firestore
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | No | Google reCAPTCHA v3 site key |
 | `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret key (server-side) |
 | `NEXT_PUBLIC_BASE_URL` | No | Base URL for OG images (defaults to Vercel URL) |
+| `NEXT_PUBLIC_SHELTERS_API_URL` | No | ArcGIS shelter data endpoint (has built-in default) |
 
 ## What Makes This Different
 

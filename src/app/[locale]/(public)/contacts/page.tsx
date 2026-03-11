@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { PageHeader } from "@/components/shared/page-header";
 import { Select } from "@/components/ui/select";
 import { getContacts } from "@/lib/firebase/contacts";
@@ -89,6 +90,20 @@ export default function ContactsPage() {
             {error}
           </div>
         )}
+
+        {/* Link to shelters */}
+        <Link
+          href="/shelters"
+          className="block mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏫</span>
+            <div>
+              <p className="font-semibold text-emerald-800 text-sm">{t("shelters.viewShelters")}</p>
+              <p className="text-xs text-emerald-600">{t("shelters.viewSheltersDesc")}</p>
+            </div>
+          </div>
+        </Link>
 
         {!loading && !error && contacts.length === 0 && (
           <div className="text-center py-12">

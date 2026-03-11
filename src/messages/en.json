@@ -234,6 +234,23 @@
     "whatsapp": "WhatsApp",
     "noContacts": "No contacts available yet. Check back soon."
   },
+  "shelters": {
+    "title": "Approved Shelter Centers",
+    "subtitle": "Find the nearest approved shelter center in your area.",
+    "whereAreYou": "Where are you?",
+    "pickArea": "Choose your governorate to see nearby shelters",
+    "searchPlaceholder": "Search by name or area...",
+    "totalCount": "{count} approved shelter centers in Lebanon",
+    "showing": "Showing {count} shelters",
+    "noResults": "No shelters found",
+    "noResultsSearch": "Try a different search or clear the filter",
+    "classrooms": "{count} classrooms",
+    "viewShelters": "Shelter Centers",
+    "viewSheltersDesc": "Find approved shelter locations across Lebanon",
+    "sheltersIn": "Shelters in {area}",
+    "changeArea": "Change area",
+    "callShelter": "Call"
+  },
   "privacy": {
     "title": "Privacy Notice",
     "content": "This platform collects minimal personal data to coordinate humanitarian assistance. Your information is shared only with verified helpers and administrators. Phone numbers are stored securely and never displayed publicly. You may request deletion of your data at any time by contacting an administrator. This service is provided on a volunteer basis with no guarantees."

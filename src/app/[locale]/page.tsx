@@ -6,15 +6,21 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { LebanonMap } from "@/components/shared/lebanon-map";
 import { getRequestCountsByGovernorate } from "@/lib/firebase/requests";
+import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelters";
 
 export default function LandingPage() {
   const t = useTranslations();
   const router = useRouter();
   const [govCounts, setGovCounts] = useState<Record<string, number>>({});
+  const [shelterGovCounts, setShelterGovCounts] = useState<Record<string, number>>({});
+  const [mapMode, setMapMode] = useState<"requests" | "shelters">("requests");
 
   useEffect(() => {
     getRequestCountsByGovernorate()
       .then(setGovCounts)
+      .catch(() => {});
+    getShelters()
+      .then((s) => setShelterGovCounts(getShelterCountsByGovernorate(s)))
       .catch(() => {});
   }, []);
 
@@ -90,17 +96,61 @@ export default function LandingPage() {
               {t("contacts.subtitle")}
             </span>
           </Link>
+          <Link
+            href="/shelters"
+            className="block w-full p-5 rounded-2xl bg-emerald-700 text-white text-center shadow-lg hover:bg-emerald-600 transition-colors"
+          >
+            <span className="text-3xl block mb-2" aria-hidden="true">
+              🏫
+            </span>
+            <span className="text-xl font-bold block">
+              {t("shelters.viewShelters")}
+            </span>
+            <span className="text-sm opacity-90 mt-1 block">
+              {t("shelters.viewSheltersDesc")}
+            </span>
+          </Link>
         </div>
 
         {/* Map */}
-        {Object.keys(govCounts).length > 0 && (
+        {(Object.keys(govCounts).length > 0 || Object.keys(shelterGovCounts).length > 0) && (
           <div className="mb-8">
-            <h3 className="text-sm font-bold text-slate-700 text-center mb-3">
-              {t("landing.openRequests")}
-            </h3>
+            {/* Map mode toggle */}
+            <div className="flex items-center justify-center gap-1 mb-3 bg-slate-100 rounded-full p-1 max-w-xs mx-auto">
+              <button
+                onClick={() => setMapMode("requests")}
+                className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  mapMode === "requests"
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-800"
+                }`}
+              >
+                🆘 {t("landing.openRequests")}
+              </button>
+              <button
+                onClick={() => setMapMode("shelters")}
+                className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  mapMode === "shelters"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-800"
+                }`}
+              >
+                🏫 {t("shelters.viewShelters")}
+              </button>
+            </div>
+
             <LebanonMap
-              counts={govCounts}
-              onSelect={(gov) => router.push(`/browse?governorate=${gov}`)}
+              counts={mapMode === "requests" ? govCounts : shelterGovCounts}
+              onSelect={(gov) =>
+                mapMode === "requests"
+                  ? router.push(`/browse?governorate=${gov}`)
+                  : router.push(`/shelters?gov=${gov}`)
+              }
+              tooltipLabel={
+                mapMode === "shelters"
+                  ? t("shelters.viewShelters").toLowerCase()
+                  : undefined
+              }
             />
           </div>
         )}

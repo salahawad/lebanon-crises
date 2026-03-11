@@ -166,6 +166,21 @@ export interface AreaContact {
   updatedAt: number;
 }
 
+// ---- Shelter Types ----
+
+export interface Shelter {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+  area: string; // Cadastral
+  district: string; // Caza
+  governorate: Governorate;
+  lat: number;
+  lng: number;
+  phone?: string;
+  classrooms?: number;
+}
+
 // ---- Filter Types ----
 
 export interface RequestFilters {
