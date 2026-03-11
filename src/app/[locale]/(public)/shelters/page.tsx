@@ -11,15 +11,15 @@ import { LebanonMap } from "@/components/shared/lebanon-map";
 import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelters";
 import type { Shelter, Governorate } from "@/lib/types";
 
-const GOVERNORATES: { id: Governorate; emoji: string }[] = [
-  { id: "beirut", emoji: "🏙️" },
-  { id: "mount_lebanon", emoji: "⛰️" },
-  { id: "north", emoji: "🌲" },
-  { id: "akkar", emoji: "🌾" },
-  { id: "baalbek_hermel", emoji: "🏛️" },
-  { id: "bekaa", emoji: "🌿" },
-  { id: "south", emoji: "🌊" },
-  { id: "nabatieh", emoji: "🫒" },
+const GOVERNORATES: { id: Governorate; letterEn: string; letterAr: string; color: string }[] = [
+  { id: "beirut", letterEn: "B", letterAr: "ب", color: "#1e3a5f" },
+  { id: "mount_lebanon", letterEn: "ML", letterAr: "ج.ل", color: "#2d6a4f" },
+  { id: "north", letterEn: "N", letterAr: "ش", color: "#7c3aed" },
+  { id: "akkar", letterEn: "AK", letterAr: "ع", color: "#b45309" },
+  { id: "baalbek_hermel", letterEn: "BH", letterAr: "ب.هـ", color: "#be123c" },
+  { id: "bekaa", letterEn: "BK", letterAr: "بق", color: "#0d9488" },
+  { id: "south", letterEn: "S", letterAr: "ج", color: "#2563eb" },
+  { id: "nabatieh", letterEn: "NB", letterAr: "نب", color: "#c2410c" },
 ];
 
 export default function SheltersPage() {
@@ -116,7 +116,8 @@ export default function SheltersPage() {
             </p>
 
             <div className="grid grid-cols-2 gap-3">
-              {GOVERNORATES.map(({ id, emoji }) => {
+              {GOVERNORATES.map(({ id, letterEn, letterAr, color }) => {
+                const letter = isAr ? letterAr : letterEn;
                 const count = govCounts[id] || 0;
                 return (
                   <button
@@ -124,7 +125,10 @@ export default function SheltersPage() {
                     onClick={() => setSelectedGov(id)}
                     className="flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 border-slate-200 bg-white text-center hover:border-emerald-500 hover:bg-emerald-50 active:bg-emerald-100 transition-colors tap-target"
                   >
-                    <span className="text-2xl">{emoji}</span>
+                    <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+                      <circle cx="18" cy="18" r="17" fill={color} />
+                      <text x="18" y="19" textAnchor="middle" dominantBaseline="central" fill="white" fontSize={letter.length > 1 ? "11" : "14"} fontWeight="700" fontFamily="system-ui, sans-serif">{letter}</text>
+                    </svg>
                     <span className="text-sm font-semibold text-slate-800">
                       {t(`request.governorates.${id}`)}
                     </span>
