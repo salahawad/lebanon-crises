@@ -18,7 +18,7 @@ export type UrgencyLevel = 'critical' | 'high' | 'medium' | 'low';
 
 export type ContactMethod = 'phone' | 'whatsapp' | 'no_contact';
 
-export type RequestStatus = 'open' | 'in_progress' | 'fulfilled' | 'archived' | 'flagged';
+export type RequestStatus = 'pending_review' | 'open' | 'in_progress' | 'fulfilled' | 'archived' | 'flagged';
 
 export type CreatedByType = 'anonymous' | 'authenticated' | 'admin';
 
@@ -77,6 +77,7 @@ export interface Helper {
   city?: string;
   suppliesCanProvide: RequestCategory[];
   verified: boolean;
+  completedDeliveries?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -88,6 +89,8 @@ export interface Claim {
   helperName: string;
   message?: string;
   status: 'pending' | 'accepted' | 'rejected' | 'completed';
+  helperConfirmedDelivery?: boolean;
+  requesterConfirmedDelivery?: boolean;
   createdAt: number;
   updatedAt: number;
 }

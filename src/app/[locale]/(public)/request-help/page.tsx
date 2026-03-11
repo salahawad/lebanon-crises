@@ -12,7 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { helpRequestSchema } from "@/lib/validators/request";
-import { createHelpRequest } from "@/lib/firebase/requests";
+import { createHelpRequest, checkDuplicateRequest } from "@/lib/firebase/requests";
+import { getCurrentUser } from "@/lib/firebase/auth";
 import { checkRateLimit } from "@/lib/utils/helpers";
 import { getRecaptchaToken } from "@/lib/utils/recaptcha";
 import type { RequestCategory, UrgencyLevel, ContactMethod, Governorate } from "@/lib/types";
@@ -67,6 +68,21 @@ export default function RequestHelpPage() {
     setError("");
 
     try {
+      // Check for duplicate request from same user
+      const user = getCurrentUser();
+      if (user?.uid) {
+        const isDuplicate = await checkDuplicateRequest(
+          user.uid,
+          data.category as RequestCategory,
+          data.governorate as Governorate
+        );
+        if (isDuplicate) {
+          setError(t("errors.duplicateRequest"));
+          setSubmitting(false);
+          return;
+        }
+      }
+
       // Verify human with reCAPTCHA v3
       const recaptchaToken = await getRecaptchaToken("submit_request");
       if (recaptchaToken) {

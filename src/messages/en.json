@@ -97,7 +97,7 @@
     "referenceCode": "Your reference code",
     "referenceNote": "Save this code to check on your request later",
     "whatNext": "What happens next?",
-    "step1": "Your request is now visible to volunteers and organizations",
+    "step1": "Your request will be reviewed and published shortly",
     "step2": "A helper may reach out to you using your preferred contact method",
     "step3": "If you selected no direct contact, an admin will coordinate",
     "backHome": "Back to home",
@@ -148,7 +148,11 @@
     "claimSuccess": "Thank you! You've offered to help.",
     "contactInfo": "Contact information",
     "contactHidden": "Contact details are shared only with verified helpers",
-    "referenceCode": "Reference code"
+    "referenceCode": "Reference code",
+    "confirmDelivery": "Confirm delivery",
+    "deliveryConfirmed": "You confirmed delivery",
+    "awaitingConfirmation": "Waiting for other party to confirm",
+    "bothConfirmed": "Delivery confirmed by both parties!"
   },
   "helper": {
     "title": "Register as a Helper",
@@ -190,6 +194,7 @@
       "suspicious": "Suspicious"
     },
     "statuses": {
+      "pending_review": "Pending Review",
       "open": "Open",
       "in_progress": "In Progress",
       "fulfilled": "Fulfilled",
@@ -198,7 +203,14 @@
     },
     "signOut": "Sign out",
     "exportCsv": "Export CSV",
-    "viewContact": "View contact info"
+    "viewContact": "View contact info",
+    "helpers": "Helpers",
+    "verifyHelper": "Verify",
+    "unverifyHelper": "Unverify",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "deliveries": "{count} deliveries",
+    "pendingReview": "Pending Review"
   },
   "urgency": {
     "critical": "Critical",
@@ -207,6 +219,7 @@
     "low": "Low"
   },
   "status": {
+    "pending_review": "Pending Review",
     "open": "Open",
     "in_progress": "In Progress",
     "fulfilled": "Fulfilled",
@@ -235,7 +248,8 @@
     "rateLimit": "Too many requests. Please wait a moment before trying again.",
     "notFound": "Page not found",
     "unauthorized": "You are not authorized to access this page",
-    "captchaFailed": "Verification failed. Please try again."
+    "captchaFailed": "Verification failed. Please try again.",
+    "duplicateRequest": "You recently submitted a similar request. Please wait before submitting again."
   },
   "disclaimer": {
     "banner": "This platform is in demo mode. All data shown is for demonstration purposes only."

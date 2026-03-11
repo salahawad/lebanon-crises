@@ -129,6 +129,7 @@ src/
 1. Sign in at `/admin/login`
 2. Dashboard with live stats (single Firestore read)
 3. Moderation: change status, flag requests, view contact info, export CSV
+4. Helpers tab: verify/unverify helpers, view delivery counts
 
 ## Architecture Decisions
 
@@ -138,6 +139,14 @@ src/
 - **No real-time listeners**: All data fetched on-demand with `getDocs()` to avoid persistent connection costs.
 - **Indexed queries**: Composite indexes pre-configured for common filter combinations.
 - **Contact data separation**: Private subcollection `requests/{id}/private/contact` — only read when needed by authorized users.
+
+### Anti-Fraud & Trust
+- **Manual moderation queue** — new requests start as `pending_review`; admin approves before they go live.
+- **Request cooldown** — duplicate requests (same user, category, governorate) blocked within 1 hour.
+- **Helper verification** — admin can verify helpers; verified badge shown across the app.
+- **Delivery confirmation** — both helper and requester must confirm delivery before a request is marked fulfilled.
+- **Reputation scoring** — completed deliveries tracked per helper, visible to admins.
+- **Audit logging** — every status change, flag, and verification action is logged.
 
 ### Privacy & Safety
 - **No exact addresses collected** — only governorate, city, and general area.
@@ -259,6 +268,7 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 | Feature | Typical Tools | Lebanon Relief |
 |---------|--------------|----------------|
 | Setup complexity | Weeks of integration | Single `npm run seed` with Firebase |
+| Fraud prevention | None | Moderation queue, cooldown rules, dual delivery confirmation |
 | Smart matching | Manual browse only | Weighted scoring recommends relevant requests to each helper |
 | Request triage | Admin-only prioritization | Automatic priority queue: urgency × age × people count |
 | Route efficiency | Helpers pick randomly | Request clustering groups nearby same-category needs |
@@ -273,6 +283,11 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 
 - [ ] WhatsApp/SMS notifications via Cloud Functions
 - [ ] Phone OTP authentication (optional, cost-aware)
+- [x] Helper verification by admin
+- [x] Manual moderation queue for requests
+- [x] Request cooldown (duplicate prevention)
+- [x] Delivery confirmation system
+- [x] Basic reputation scoring
 - [ ] Verified organization badges for helpers
 - [ ] Offline draft saving for request form
 - [ ] Admin analytics dashboard with charts

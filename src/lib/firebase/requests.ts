@@ -23,6 +23,8 @@ import type {
   RequestContactInfo,
   RequestFilters,
   RequestStatus,
+  RequestCategory,
+  Governorate,
   ModerationFlag,
 } from '../types';
 import { generateReferenceCode } from '../utils/helpers';
@@ -48,7 +50,7 @@ export async function createHelpRequest(
     urgency: data.urgency,
     contactMethod: data.contactMethod,
     language: data.language,
-    status: 'open',
+    status: 'pending_review',
     createdAt: now,
     updatedAt: now,
     createdByType: uid ? 'authenticated' : 'anonymous',
@@ -268,6 +270,24 @@ export async function getRequestCountsByGovernorate(): Promise<Record<string, nu
     counts[gov] = (counts[gov] || 0) + 1;
   });
   return counts;
+}
+
+// Check for duplicate request from same user within cooldown period
+export async function checkDuplicateRequest(
+  uid: string,
+  category: RequestCategory,
+  governorate: Governorate
+): Promise<boolean> {
+  const oneHourAgo = Date.now() - 3600000;
+  const q = query(
+    collection(db, REQUESTS_COLLECTION),
+    where('createdByUid', '==', uid),
+    where('category', '==', category),
+    where('governorate', '==', governorate),
+    where('createdAt', '>', oneHourAgo)
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.size > 0;
 }
 
 // Get app stats by counting actual documents, then cache to stats/global

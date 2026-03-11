@@ -12,11 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { getRequest } from "@/lib/firebase/requests";
-import { createClaim, getClaimsByHelper } from "@/lib/firebase/helpers";
+import { createClaim, getClaimsByHelper, getClaimsForRequest, confirmDelivery } from "@/lib/firebase/helpers";
 import { getCurrentUser } from "@/lib/firebase/auth";
 import { isHelperAtCapacity, getActiveClaimCount } from "@/lib/utils/matching";
 import { timeAgo, timeAgoAr } from "@/lib/utils/helpers";
-import type { HelpRequest } from "@/lib/types";
+import type { HelpRequest, Claim } from "@/lib/types";
 import { Link } from "@/i18n/navigation";
 
 export default function RequestDetailPage() {
@@ -33,6 +33,9 @@ export default function RequestDetailPage() {
   const [showClaimForm, setShowClaimForm] = useState(false);
   const [claimMessage, setClaimMessage] = useState("");
   const [atCapacity, setAtCapacity] = useState(false);
+  const [activeClaim, setActiveClaim] = useState<Claim | null>(null);
+  const [confirmingDelivery, setConfirmingDelivery] = useState(false);
+  const [deliveryState, setDeliveryState] = useState<"none" | "confirmed" | "both">("none");
 
   useEffect(() => {
     async function load() {
@@ -44,6 +47,17 @@ export default function RequestDetailPage() {
         if (user && !user.isAnonymous) {
           const helperClaims = await getClaimsByHelper(user.uid);
           setAtCapacity(isHelperAtCapacity(helperClaims));
+          // Check if this helper has an active claim on this request
+          const requestClaims = await getClaimsForRequest(requestId);
+          const myClaim = requestClaims.find((c) => c.helperId === user.uid && c.status !== 'rejected');
+          if (myClaim) {
+            setActiveClaim(myClaim);
+            if (myClaim.helperConfirmedDelivery && myClaim.requesterConfirmedDelivery) {
+              setDeliveryState("both");
+            } else if (myClaim.helperConfirmedDelivery) {
+              setDeliveryState("confirmed");
+            }
+          }
         }
       } catch {
         setError(true);
@@ -72,6 +86,23 @@ export default function RequestDetailPage() {
       console.error(err);
     } finally {
       setClaiming(false);
+    }
+  };
+
+  const handleConfirmDelivery = async () => {
+    if (!activeClaim) return;
+    setConfirmingDelivery(true);
+    try {
+      const result = await confirmDelivery(activeClaim.id, "helper", requestId);
+      if (result.bothConfirmed) {
+        setDeliveryState("both");
+      } else {
+        setDeliveryState("confirmed");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConfirmingDelivery(false);
     }
   };
 
@@ -196,6 +227,41 @@ export default function RequestDetailPage() {
             <p className="text-sm font-medium text-green-800">
               {t("details.claimSuccess")}
             </p>
+          </Card>
+        ) : request.status === "in_progress" && activeClaim ? (
+          <Card className="space-y-3">
+            {deliveryState === "both" ? (
+              <div className="text-center">
+                <span className="text-2xl block mb-1">✅</span>
+                <p className="text-sm font-medium text-green-800">
+                  {t("details.bothConfirmed")}
+                </p>
+              </div>
+            ) : deliveryState === "confirmed" ? (
+              <div className="text-center">
+                <span className="text-2xl block mb-1">⏳</span>
+                <p className="text-sm font-medium text-blue-800">
+                  {t("details.deliveryConfirmed")}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {t("details.awaitingConfirmation")}
+                </p>
+              </div>
+            ) : (
+              <div className="text-center space-y-3">
+                <p className="text-sm text-slate-600">
+                  {t("details.alreadyClaimed")}
+                </p>
+                <Button
+                  variant="primary"
+                  size="md"
+                  loading={confirmingDelivery}
+                  onClick={handleConfirmDelivery}
+                >
+                  {t("details.confirmDelivery")}
+                </Button>
+              </div>
+            )}
           </Card>
         ) : request.status === "in_progress" ? (
           <Card className="bg-slate-50">

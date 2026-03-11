@@ -16,10 +16,12 @@ import {
   flagRequest,
   getRequestContactInfo,
 } from "@/lib/firebase/requests";
+import { getAdminHelpers, setHelperVerified } from "@/lib/firebase/helpers";
 import { signOut, onAuthChange, checkIsAdmin, getCurrentUser } from "@/lib/firebase/auth";
 import { timeAgo } from "@/lib/utils/helpers";
 import type {
   HelpRequest,
+  Helper,
   RequestFilters,
   RequestStatus,
   ModerationFlag,
@@ -27,7 +29,7 @@ import type {
 } from "@/lib/types";
 import type { DocumentSnapshot } from "firebase/firestore";
 
-const STATUSES: RequestStatus[] = ["open", "in_progress", "fulfilled", "archived", "flagged"];
+const STATUSES: RequestStatus[] = ["pending_review", "open", "in_progress", "fulfilled", "archived", "flagged"];
 const FLAGS: ModerationFlag[] = ["spam", "inappropriate", "duplicate", "suspicious"];
 
 export default function ModerationPage() {
@@ -41,6 +43,9 @@ export default function ModerationPage() {
   const [hasMore, setHasMore] = useState(true);
   const [contactInfo, setContactInfo] = useState<Record<string, RequestContactInfo>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"requests" | "helpers">("requests");
+  const [helpers, setHelpers] = useState<Helper[]>([]);
+  const [helpersLoading, setHelpersLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthChange(async (user) => {
@@ -126,10 +131,29 @@ export default function ModerationPage() {
       return;
     }
     const info = await getRequestContactInfo(reqId);
-    if (info) {
-      setContactInfo((prev) => ({ ...prev, [reqId]: info }));
-    }
+    setContactInfo((prev) => ({ ...prev, [reqId]: info || {} }));
     setExpandedId(reqId);
+  };
+
+  const fetchHelpers = async () => {
+    setHelpersLoading(true);
+    try {
+      const data = await getAdminHelpers();
+      setHelpers(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setHelpersLoading(false);
+    }
+  };
+
+  const handleVerifyToggle = async (helperId: string, currentVerified: boolean) => {
+    const user = getCurrentUser();
+    if (!user) return;
+    await setHelperVerified(helperId, !currentVerified, user.uid);
+    setHelpers((prev) =>
+      prev.map((h) => (h.id === helperId ? { ...h, verified: !currentVerified } : h))
+    );
   };
 
   const handleSignOut = async () => {
@@ -198,6 +222,35 @@ export default function ModerationPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-4">
+        {/* Tabs */}
+        <div className="flex gap-1 mb-4 border-b border-slate-200">
+          <button
+            onClick={() => setActiveTab("requests")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "requests"
+                ? "border-primary text-primary"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            {t("admin.moderation")}
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("helpers");
+              if (helpers.length === 0) fetchHelpers();
+            }}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "helpers"
+                ? "border-primary text-primary"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            {t("admin.helpers")}
+          </button>
+        </div>
+
+        {activeTab === "requests" && (
+        <>
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
@@ -353,6 +406,55 @@ export default function ModerationPage() {
               >
                 {t("common.loadMore")}
               </Button>
+            )}
+          </div>
+        )}
+        </>
+        )}
+
+        {/* Helpers tab */}
+        {activeTab === "helpers" && (
+          <div className="space-y-3">
+            {helpersLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white rounded-xl border p-4 animate-pulse">
+                    <div className="h-5 bg-slate-200 rounded w-1/3 mb-3" />
+                    <div className="h-4 bg-slate-100 rounded w-full mb-2" />
+                  </div>
+                ))}
+              </div>
+            ) : helpers.length === 0 ? (
+              <EmptyState icon="👥" title="No helpers registered" />
+            ) : (
+              helpers.map((helper) => (
+                <Card key={helper.id} className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-slate-900 truncate">{helper.name}</h3>
+                      {helper.verified && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                          {t("admin.verified")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      {helper.email} · {helper.governorate ? t(`request.governorates.${helper.governorate}`) : "—"}
+                      {helper.organization ? ` · ${helper.organization}` : ""}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {t("admin.deliveries", { count: helper.completedDeliveries || 0 })}
+                    </p>
+                  </div>
+                  <Button
+                    variant={helper.verified ? "outline" : "primary"}
+                    size="sm"
+                    onClick={() => handleVerifyToggle(helper.id, helper.verified)}
+                  >
+                    {helper.verified ? t("admin.unverifyHelper") : t("admin.verifyHelper")}
+                  </Button>
+                </Card>
+              ))
             )}
           </div>
         )}
