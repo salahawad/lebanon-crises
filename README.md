@@ -88,7 +88,7 @@ src/
 ├── app/
 │   └── [locale]/              # i18n routing
 │       ├── page.tsx            # Landing page
-│       ├── (public)/           # Request help, success
+│       ├── (public)/           # Request help, shelters, contacts, success
 │       ├── (helper)/           # Browse, request details, registration
 │       ├── (admin)/            # Dashboard, moderation, login
 │       ├── privacy/            # Privacy notice
@@ -97,7 +97,7 @@ src/
 │   ├── ui/                     # Button, Input, Select, Card, etc.
 │   └── shared/                 # RequestCard, UrgencyBadge, FilterSheet, LebanonMap, etc.
 ├── lib/
-│   ├── firebase/               # Config, auth, requests, helpers
+│   ├── firebase/               # Config, auth, requests, helpers, shelters, contacts
 │   ├── types/                  # TypeScript types
 │   ├── utils/                  # Helpers, cn, matching
 │   └── validators/             # Zod schemas
@@ -108,9 +108,10 @@ src/
 ## User Flows
 
 ### Landing Page
-- Interactive SVG heatmap of Lebanon's 8 governorates showing live open request counts
+- Interactive SVG heatmap of Lebanon's 8 governorates with toggle between open requests and shelter counts
 - Color-coded by density (green → amber → orange → red)
-- Click any governorate to browse its filtered requests
+- Click any governorate to browse its filtered requests or shelters depending on active mode
+- Quick-access buttons: Request Help, Offer Help, Emergency Contacts, Shelter Centers
 
 ### "I Need Help" (Requester)
 1. Landing page → tap "I need help"
@@ -124,6 +125,18 @@ src/
 3. Smart matching: personalized recommendations, priority sorting, grouped view
 4. View request details (privacy-safe: no exact address, no phone shown)
 5. Register → claim a request → contact via admin coordination or direct
+
+### Shelter Centers
+1. Landing page → tap "Shelter Centers" or click a governorate on the map in shelter mode
+2. Step-by-step flow: pick your governorate from buttons or interactive map → see shelters
+3. Shelters grouped by district with search within the selected area
+4. Each shelter shows Arabic/English name, area, call button, and classroom count
+5. Data sourced from ArcGIS and cached daily in Firestore (fail-safe: never deletes stale data if API fails)
+
+### Emergency Contacts
+1. Landing page → tap "Emergency Contacts"
+2. Filter by governorate, call or WhatsApp directly
+3. Cross-link to shelter centers page
 
 ### Admin
 1. Sign in at `/admin/login`
@@ -181,7 +194,7 @@ All matching logic is pure client-side arithmetic — no external APIs or ML mod
 
 ## Testing
 
-56 tests across 3 test suites covering validators, utility functions, and smart matching logic.
+70 tests across 4 test suites covering validators, utility functions, smart matching logic, and shelter data fetching/caching.
 
 ```bash
 npm run test              # Run all tests
@@ -243,6 +256,8 @@ firebase deploy --only firestore
 | `admins` | Admin user records | Self-read only |
 | `stats/global` | Aggregated counters | Public read |
 | `audit_logs` | Action audit trail | Admin read, system create |
+| `shelters` | Cached shelter center data from ArcGIS | Public read, authenticated write |
+| `shelters_cache/meta` | Cache TTL tracking (last fetch date) | Public read, authenticated write |
 
 ## i18n
 
@@ -278,6 +293,7 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 | Device requirements | Desktop-first | Mobile-first, works on low-end phones and slow networks |
 | Bot protection | None or CAPTCHA walls | Invisible reCAPTCHA v3 — zero friction for real users |
 | Privacy | Contact info exposed | Phone numbers in private subcollections, never shown publicly |
+| Shelter data | Static lists, quickly outdated | Daily-cached ArcGIS data with fail-safe fallback |
 | Cost | Paid platforms or heavy infra | Firebase free tier handles thousands of requests |
 
 ## Future Roadmap
@@ -296,6 +312,9 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 - [ ] Soft delete with audit trail
 - [ ] Image upload for requests (Firebase Storage)
 - [x] Interactive SVG heatmap on landing page
+- [x] Approved shelter centers with ArcGIS daily caching
+- [x] Emergency contacts directory with governorate filter
+- [x] Dual-mode map (requests / shelters) on landing page
 - [ ] Push notifications via FCM
 
 ## License

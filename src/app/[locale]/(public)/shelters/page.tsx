@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
+import { LebanonMap } from "@/components/shared/lebanon-map";
 import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelters";
 import type { Shelter, Governorate } from "@/lib/types";
 
@@ -134,6 +135,17 @@ export default function SheltersPage() {
                 );
               })}
             </div>
+
+            {/* Map */}
+            {Object.keys(govCounts).length > 0 && (
+              <div className="mt-6">
+                <LebanonMap
+                  counts={govCounts}
+                  onSelect={(gov) => setSelectedGov(gov as Governorate)}
+                  tooltipLabel={t("shelters.viewShelters").toLowerCase()}
+                />
+              </div>
+            )}
           </div>
         )}
 
