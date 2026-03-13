@@ -44,8 +44,8 @@ async function test(name: string, fn: () => Promise<void>) {
     await fn();
     console.log(`  ✅ ${name}`);
     passed++;
-  } catch (err: any) {
-    console.log(`  ❌ ${name} — ${err.message || err}`);
+  } catch (err: unknown) {
+    console.log(`  ❌ ${name} — ${err instanceof Error ? err.message : err}`);
     failed++;
   }
 }

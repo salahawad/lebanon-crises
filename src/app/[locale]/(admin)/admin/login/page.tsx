@@ -38,8 +38,8 @@ export default function AdminLoginPage() {
     try {
       await signInAdmin(data.email, data.password);
       router.push("/admin/dashboard");
-    } catch (err: any) {
-      if (err?.message === "Not authorized as admin") {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === "Not authorized as admin") {
         setError(t("errors.unauthorized"));
       } else {
         setError(t("errors.generic"));
