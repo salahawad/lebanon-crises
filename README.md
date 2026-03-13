@@ -64,7 +64,7 @@ npm run seed
 | Admin | `admin@relief.lb` | `admin123` | Access admin dashboard and moderation at `/admin/login` |
 | Helper | `helper@example.com` | `helper123` | Browse requests, claim help, view contact info |
 
-> **Note:** Change these credentials before deploying to production.
+> **Security Warning:** These are development-only credentials for local testing and seeding. **You must change all default passwords immediately before deploying to production.** Never reuse these credentials in any real environment.
 
 ## Tech Stack
 
@@ -334,9 +334,17 @@ Most humanitarian tools are either heavyweight enterprise platforms or simple st
 - [ ] Multi-language expansion (French, Turkish) for cross-border coordination
 - [ ] Automated shelter data sync (Cloud Functions scheduled trigger instead of first-request)
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## License
 
-This project is provided for humanitarian purposes. Use freely for non-commercial humanitarian coordination.
+This project is licensed under the [MIT License](LICENSE).
+
+## Security
+
+To report a vulnerability, please see [SECURITY.md](SECURITY.md).
 
 ---
 
