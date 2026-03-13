@@ -25,6 +25,8 @@ const makeRequest = (overrides: Partial<HelpRequest> = {}): HelpRequest => ({
   status: 'open',
   language: 'en',
   createdAt: Date.now() - 3_600_000, // 1 hour ago
+  updatedAt: Date.now() - 3_600_000,
+  createdByType: 'anonymous',
   referenceCode: 'HLP-TEST',
   moderationFlags: [],
   ...overrides,
@@ -36,7 +38,9 @@ const makeHelper = (overrides: Partial<Helper> = {}): Helper => ({
   email: 'ahmad@test.com',
   governorate: 'beirut',
   suppliesCanProvide: ['medicine', 'food'],
+  verified: false,
   createdAt: Date.now(),
+  updatedAt: Date.now(),
   ...overrides,
 });
 
@@ -47,6 +51,7 @@ const makeClaim = (overrides: Partial<Claim> = {}): Claim => ({
   helperName: 'Ahmad',
   status: 'pending',
   createdAt: Date.now(),
+  updatedAt: Date.now(),
   ...overrides,
 });
 
