@@ -85,8 +85,9 @@ export default function RegisterPage() {
         suppliesCanProvide: data.suppliesCanProvide || [],
       });
       router.push("/browse");
-    } catch (err: any) {
-      if (err?.code === "auth/email-already-in-use") {
+    } catch (err: unknown) {
+      const firebaseErr = err as { code?: string };
+      if (firebaseErr.code === "auth/email-already-in-use") {
         setError("This email is already registered. Try signing in.");
       } else {
         setError(t("errors.generic"));

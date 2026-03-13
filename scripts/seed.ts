@@ -84,11 +84,12 @@ async function seed() {
       createdAt: now,
     });
     console.log('  Admin created: admin@relief.lb / admin123');
-  } catch (e: any) {
-    if (e.code === 'auth/email-already-in-use') {
+  } catch (e: unknown) {
+    const err = e as { code?: string; message?: string };
+    if (err.code === 'auth/email-already-in-use') {
       console.log('  Admin already exists');
     } else {
-      console.error('  Error creating admin:', e.message);
+      console.error('  Error creating admin:', err.message);
     }
   }
 
@@ -121,11 +122,12 @@ async function seed() {
         updatedAt: now,
       });
       console.log(`  Helper created: ${h.email} / ${h.password} (${h.name})`);
-    } catch (e: any) {
-      if (e.code === 'auth/email-already-in-use') {
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      if (err.code === 'auth/email-already-in-use') {
         console.log(`  Helper already exists: ${h.email}`);
       } else {
-        console.error(`  Error creating helper ${h.email}:`, e.message);
+        console.error(`  Error creating helper ${h.email}:`, err.message);
       }
     }
   }

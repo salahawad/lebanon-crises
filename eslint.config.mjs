@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Dev-only and generated files:
+    "coverage/**",
+    "scripts/**",
   ]),
 ]);
 
