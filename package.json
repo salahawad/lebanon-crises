@@ -1,7 +1,25 @@
 {
   "name": "lebanon-crises",
   "version": "0.1.0",
+  "description": "A mobile-first web app connecting displaced people with volunteers and organizations who can help",
+  "author": "Lebanon Relief Contributors",
   "license": "MIT",
+  "homepage": "https://github.com/salahawad/lebanon-crises#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salahawad/lebanon-crises.git"
+  },
+  "bugs": {
+    "url": "https://github.com/salahawad/lebanon-crises/issues"
+  },
+  "keywords": [
+    "lebanon",
+    "humanitarian",
+    "crisis-response",
+    "volunteers",
+    "nextjs",
+    "firebase"
+  ],
   "scripts": {
     "dev": "next dev --port 4001",
     "build": "next build",
