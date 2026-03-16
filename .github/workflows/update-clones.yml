@@ -1,0 +1,68 @@
+name: Update Clone Badge
+
+# Runs daily and can be triggered manually.
+# Note: The GitHub traffic/clones endpoint requires push (write) access to the repo.
+# GITHUB_TOKEN is granted this by default for workflows in the same repo.
+# If the workflow still gets a 403, create a personal access token (PAT) with
+# the `repo` scope, store it as a secret (e.g. TRAFFIC_TOKEN), and replace
+# `GITHUB_TOKEN` below with `${{ secrets.TRAFFIC_TOKEN }}`.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # daily at 02:00 UTC
+  workflow_dispatch:
+
+# Prevent concurrent runs from racing on the JSON commit.
+concurrency:
+  group: update-clones
+  cancel-in-progress: true
+
+jobs:
+  update-clones:
+    name: Fetch & commit clone count
+    runs-on: ubuntu-latest
+    # Only write back to main; skip on forks.
+    if: github.repository == 'salahawad/lebanon-crises'
+
+    permissions:
+      contents: write   # needed to push the updated JSON file
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch clone traffic from GitHub API
+        id: fetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          response=$(curl -sf \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/salahawad/lebanon-crises/traffic/clones")
+          total=$(echo "$response" | jq '.count')
+          unique=$(echo "$response" | jq '.uniques')
+          echo "total=$total" >> "$GITHUB_OUTPUT"
+          echo "unique=$unique" >> "$GITHUB_OUTPUT"
+
+      - name: Read current clones.json message
+        id: current
+        run: |
+          current_msg=$(jq -r '.message' badges/clones.json)
+          echo "message=$current_msg" >> "$GITHUB_OUTPUT"
+
+      - name: Update badges/clones.json (only if changed)
+        if: steps.fetch.outputs.total != steps.current.outputs.message
+        run: |
+          jq --arg msg "${{ steps.fetch.outputs.total }}" \
+            '.message = $msg' badges/clones.json > badges/clones.tmp.json
+          mv badges/clones.tmp.json badges/clones.json
+
+      - name: Commit updated clones.json
+        if: steps.fetch.outputs.total != steps.current.outputs.message
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add badges/clones.json
+          git commit -m "chore: update clone badge to ${{ steps.fetch.outputs.total }} [skip ci]"
+          git push
