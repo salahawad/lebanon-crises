@@ -6,7 +6,10 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from './config';
+import { createLogger } from '../logger';
 import type { AreaContact, Governorate } from '../types';
+
+const log = createLogger('firebase:contacts');
 
 const CONTACTS_COLLECTION = 'contacts';
 
@@ -40,7 +43,7 @@ export async function getContacts(
     })) as AreaContact[];
   } catch (error) {
     // If composite index isn't ready yet, fall back to a simple query
-    console.warn('Contacts query failed, using fallback:', error);
+    log.warn('contacts query failed, using index fallback', error, { collection: 'contacts' });
     const q = query(collection(db, CONTACTS_COLLECTION));
     const snapshot = await getDocs(q);
     const all = snapshot.docs.map((d) => ({

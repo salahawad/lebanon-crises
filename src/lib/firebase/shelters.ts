@@ -7,7 +7,10 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./config";
+import { createLogger } from "../logger";
 import type { Shelter, Governorate } from "../types";
+
+const log = createLogger("firebase:shelters");
 
 const SHELTERS_COLLECTION = "shelters";
 const SHELTERS_META_DOC = "shelters_cache/meta";
@@ -131,13 +134,15 @@ export async function getShelters(): Promise<Shelter[]> {
   }
 
   // Cache is stale or empty — refresh from ArcGIS
+  const arcgisStart = Date.now();
   try {
     const fresh = await fetchFromArcGIS();
+    log.info("ArcGIS fetch completed", { operation: "getShelters", count: fresh.length, duration: Date.now() - arcgisStart });
 
     // Safety: only cache if we got real data (API might return empty on error)
     if (fresh.length > 0) {
       cacheSheltersToFirestore(fresh).catch((err) =>
-        console.error("Failed to cache shelters:", err)
+        log.warn("failed to cache shelters to firestore", err, { operation: "getShelters", count: fresh.length })
       );
     }
 
@@ -150,7 +155,7 @@ export async function getShelters(): Promise<Shelter[]> {
     return fresh;
   } catch (err) {
     // If ArcGIS fails, try stale cache as fallback — never lose existing data
-    console.error("ArcGIS fetch failed, using cached data:", err);
+    log.error("ArcGIS fetch failed, using cached data", err, { operation: "getShelters" });
     const stale = await readSheltersFromCache();
     if (stale.length > 0) return stale;
     throw err;

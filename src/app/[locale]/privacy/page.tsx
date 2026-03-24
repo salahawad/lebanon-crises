@@ -18,26 +18,26 @@ export default function PrivacyPage() {
           <div className="prose prose-sm text-slate-700 leading-relaxed">
             <p>{t("privacy.content")}</p>
 
-            <h2 className="text-base font-bold mt-6 mb-2">Data We Collect</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("privacy.dataWeCollect")}</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Help request details (category, area, description)</li>
-              <li>Optional contact information (phone number, name)</li>
-              <li>Helper registration details (name, email, organization)</li>
+              <li>{t("privacy.dataItem1")}</li>
+              <li>{t("privacy.dataItem2")}</li>
+              <li>{t("privacy.dataItem3")}</li>
             </ul>
 
-            <h2 className="text-base font-bold mt-6 mb-2">How We Protect Your Data</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("privacy.howWeProtect")}</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Phone numbers are stored in a separate, access-controlled collection</li>
-              <li>Exact addresses are never collected or displayed</li>
-              <li>Public request listings show only general area information</li>
-              <li>Contact details are shared only with verified helpers and administrators</li>
+              <li>{t("privacy.protectItem1")}</li>
+              <li>{t("privacy.protectItem2")}</li>
+              <li>{t("privacy.protectItem3")}</li>
+              <li>{t("privacy.protectItem4")}</li>
             </ul>
 
-            <h2 className="text-base font-bold mt-6 mb-2">Your Rights</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("privacy.yourRights")}</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Request deletion of your data at any time</li>
-              <li>Submit requests anonymously</li>
-              <li>Choose your preferred contact method or opt out of direct contact</li>
+              <li>{t("privacy.rightsItem1")}</li>
+              <li>{t("privacy.rightsItem2")}</li>
+              <li>{t("privacy.rightsItem3")}</li>
             </ul>
           </div>
         </Card>

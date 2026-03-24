@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -28,7 +34,23 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".test-artifacts/next/playwright-39835/types/**/*.ts",
+    ".test-artifacts/next/playwright-39835/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-46409/types/**/*.ts",
+    ".test-artifacts/next/playwright-46409/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-35369/types/**/*.ts",
+    ".test-artifacts/next/playwright-35369/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-34881/types/**/*.ts",
+    ".test-artifacts/next/playwright-34881/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-36365/types/**/*.ts",
+    ".test-artifacts/next/playwright-36365/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-41927/types/**/*.ts",
+    ".test-artifacts/next/playwright-41927/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-38897/types/**/*.ts",
+    ".test-artifacts/next/playwright-38897/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

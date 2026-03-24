@@ -233,6 +233,19 @@ describe('computePriorityScore', () => {
     const many = computePriorityScore(makeRequest({ peopleCount: 20 }));
     expect(many).toBeGreaterThan(few);
   });
+
+  it('falls back to the default urgency weight for unexpected urgency values', () => {
+    const unknownUrgencyRequest = makeRequest({
+      urgency: 'unexpected' as never,
+      createdAt: Date.now() - 24 * 3_600_000,
+      peopleCount: 3,
+    });
+
+    const score = computePriorityScore(unknownUrgencyRequest);
+    const expected = 1 * 1.2 * Math.log2(4);
+
+    expect(score).toBeCloseTo(expected);
+  });
 });
 
 describe('sortByPriority', () => {

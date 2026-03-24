@@ -10,7 +10,12 @@
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, doc, setDoc, addDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, connectAuthEmulator } from 'firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  connectAuthEmulator,
+} from 'firebase/auth';
 import { connectFirestoreEmulator } from 'firebase/firestore';
 
 // Load env
@@ -31,8 +36,13 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
-  connectFirestoreEmulator(db, 'localhost', 8080);
-  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+  const firestoreHost = process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST || 'localhost';
+  const firestorePort = Number(process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_PORT || '8080');
+  const authEmulatorUrl =
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_URL || 'http://localhost:9099';
+
+  connectFirestoreEmulator(db, firestoreHost, firestorePort);
+  connectAuthEmulator(auth, authEmulatorUrl, { disableWarnings: true });
 }
 
 const CATEGORIES = ['medicine', 'shelter', 'food', 'baby_milk', 'transport', 'clothing', 'hygiene', 'other'] as const;
@@ -132,7 +142,64 @@ async function seed() {
     }
   }
 
-  // 3. Create sample requests
+  // 3. Create sample Shabaka platform users
+  console.log('Creating sample Shabaka platform users...');
+  const platformUsers = [
+    {
+      email: 'platformadmin@shabaka.lb',
+      password: 'platform123',
+      displayName: 'Shabaka Coordination Admin',
+      role: 'platform_admin',
+      actorId: undefined,
+      actorName: undefined,
+    },
+    {
+      email: 'actor.a1@shabaka.lb',
+      password: 'platform123',
+      displayName: 'Amel Association Desk',
+      role: 'actor_admin',
+      actorId: 'a1',
+      actorName: 'Amel Association',
+    },
+  ] as const;
+
+  async function writePlatformUserDoc(uid: string, platformUser: (typeof platformUsers)[number]) {
+    await setDoc(doc(db, 'platform_users', uid), {
+      id: uid,
+      email: platformUser.email,
+      displayName: platformUser.displayName,
+      role: platformUser.role,
+      actorId: platformUser.actorId,
+      actorName: platformUser.actorName,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  for (const platformUser of platformUsers) {
+    try {
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        platformUser.email,
+        platformUser.password
+      );
+      await writePlatformUserDoc(result.user.uid, platformUser);
+      console.log(
+        `  Platform user created: ${platformUser.email} / ${platformUser.password} (${platformUser.role})`
+      );
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      if (err.code === 'auth/email-already-in-use') {
+        const result = await signInWithEmailAndPassword(auth, platformUser.email, platformUser.password);
+        await writePlatformUserDoc(result.user.uid, platformUser);
+        console.log(`  Platform user synced: ${platformUser.email}`);
+      } else {
+        console.error(`  Error creating platform user ${platformUser.email}:`, err.message);
+      }
+    }
+  }
+
+  // 4. Create sample requests
   console.log('Creating sample requests...');
   let openCount = 0;
   let fulfilledCount = 0;
@@ -179,7 +246,7 @@ async function seed() {
     console.log(`  Request ${i + 1}/${sampleRequests.length}: ${sample.category} in ${sample.city} [${status}]`);
   }
 
-  // 4. Create sample claims (to test capacity tracking and reputation)
+  // 5. Create sample claims (to test capacity tracking and reputation)
   console.log('Creating sample claims...');
   if (helperUids.length > 0) {
     const claimStatuses = ['pending', 'accepted', 'completed', 'completed'] as const;
@@ -197,7 +264,7 @@ async function seed() {
     console.log('  4 claims created for Ahmad Khalil (testing capacity: 2 active, 2 completed)');
   }
 
-  // 5. Create stats document
+  // 6. Create stats document
   console.log('Creating stats document...');
   await setDoc(doc(db, 'stats', 'global'), {
     totalRequests: sampleRequests.length,
@@ -212,6 +279,7 @@ async function seed() {
   console.log(`  ${sampleRequests.length} requests created`);
   console.log(`  1 admin user: admin@relief.lb / admin123`);
   console.log(`  ${helpers.length} helper users (password: helper123 for all)`);
+  console.log('  2 platform users: platformadmin@shabaka.lb / platform123, actor.a1@shabaka.lb / platform123');
   process.exit(0);
 }
 

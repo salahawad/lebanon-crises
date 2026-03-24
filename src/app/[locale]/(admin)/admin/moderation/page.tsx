@@ -261,7 +261,7 @@ export default function ModerationPage() {
                 : "bg-white text-slate-600 border border-slate-200"
             }`}
           >
-            All
+            {t("admin.all")}
           </button>
           {STATUSES.map((s) => (
             <button
@@ -335,16 +335,15 @@ export default function ModerationPage() {
                       {t("details.contactInfo")}
                     </p>
                     {contactInfo[req.id].name && (
-                      <p>Name: {contactInfo[req.id].name}</p>
+                      <p>{t("admin.contactName", { name: contactInfo[req.id].name as string })}</p>
                     )}
                     {contactInfo[req.id].phone && (
                       <p dir="ltr" className="text-start">
-                        Phone: {contactInfo[req.id].phoneCountryCode}{" "}
-                        {contactInfo[req.id].phone}
+                        {t("admin.contactPhone", { phone: `${contactInfo[req.id].phoneCountryCode} ${contactInfo[req.id].phone}` })}
                       </p>
                     )}
                     {!contactInfo[req.id].phone && !contactInfo[req.id].name && (
-                      <p className="text-slate-500">No contact info provided</p>
+                      <p className="text-slate-500">{t("admin.noContactInfo")}</p>
                     )}
                   </div>
                 )}
@@ -425,7 +424,7 @@ export default function ModerationPage() {
                 ))}
               </div>
             ) : helpers.length === 0 ? (
-              <EmptyState icon="👥" title="No helpers registered" />
+              <EmptyState icon="👥" title={t("admin.noHelpers")} />
             ) : (
               helpers.map((helper) => (
                 <Card key={helper.id} className="flex items-center justify-between gap-3">

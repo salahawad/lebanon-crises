@@ -1,7 +1,7 @@
 {
   "name": "lebanon-crises",
   "version": "0.1.0",
-  "description": "A mobile-first web app connecting displaced people with volunteers and organizations who can help",
+  "description": "Mobile-first crisis coordination platform connecting displaced people with volunteers and enabling organizational collaboration across Lebanon",
   "author": "Lebanon Relief Contributors",
   "license": "MIT",
   "homepage": "https://github.com/salahawad/lebanon-crises#readme",
@@ -16,9 +16,14 @@
     "lebanon",
     "humanitarian",
     "crisis-response",
+    "crisis-coordination",
+    "shabaka",
     "volunteers",
+    "ngo",
     "nextjs",
-    "firebase"
+    "firebase",
+    "pwa",
+    "arabic-rtl"
   ],
   "scripts": {
     "dev": "next dev --port 4001",
@@ -27,7 +32,13 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "seed:platform": "npx tsx scripts/seed-platform.ts",
+    "seed:platform:emulator": "npx tsx scripts/seed-platform.ts --emulator",
+    "test:e2e": "npx playwright test",
+    "test:e2e:emulator": "npx tsx scripts/test-e2e-emulator.ts",
+    "test:integration": "npm run test:e2e:emulator",
+    "test:all": "vitest run && npm run test:e2e:emulator"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -52,6 +63,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -62,6 +74,7 @@
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "firebase-admin": "^13.7.0",
     "jsdom": "^28.1.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

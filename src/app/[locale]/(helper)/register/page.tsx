@@ -88,7 +88,7 @@ export default function RegisterPage() {
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string };
       if (firebaseErr.code === "auth/email-already-in-use") {
-        setError("This email is already registered. Try signing in.");
+        setError(t("helper.emailAlreadyRegistered"));
       } else {
         setError(t("errors.generic"));
       }

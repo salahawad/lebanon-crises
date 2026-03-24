@@ -1,8 +1,11 @@
-# Lebanon Relief — Humanitarian Coordination App
+# Lebanon Relief + Shabaka — Crisis Coordination Platform
 
-A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions.
+A mobile-first web app with two integrated modules:
 
-> **Demo mode:** The deployed application currently uses synthetic data for demonstration purposes.
+1. **Lebanon Relief** — Connecting displaced people with volunteers who can help
+2. **Shabaka (شبكة)** — Organizational crisis coordination platform for NGOs, municipalities, and ground initiatives
+
+> **Data mode:** Both the individual help flows and the Shabaka coordination platform now read from Firebase. The synthetic platform dataset remains in-repo as a seed source and fixture set.
 
 ## Quick Start
 
@@ -16,323 +19,469 @@ cp .env.example .env.local
 # 3. Start development server
 npm run dev
 
-# 4. Open http://localhost:3000
+# 4. Open http://localhost:4001
 ```
 
-## Firebase Setup
+## Platform Overview
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable **Authentication** → Sign-in methods: Email/Password and Anonymous
-3. Create a **Firestore Database**
-4. Copy your project config to `.env.local`
-5. Deploy security rules: `firebase deploy --only firestore:rules`
-6. Deploy indexes: `firebase deploy --only firestore:indexes`
+### Module 1: Individual Help Requests (Lebanon Relief)
 
-### Using Firebase Emulators (recommended for development)
+| Page | URL | Description |
+|------|-----|-------------|
+| Landing Page | `/en` | Interactive heatmap, action buttons |
+| Request Help | `/en/request-help` | Anonymous help request form |
+| Browse Requests | `/en/browse` | Helpers browse & claim requests |
+| Shelter Centers | `/en/shelters` | ArcGIS-sourced shelter directory |
+| Emergency Contacts | `/en/contacts` | Direct call/WhatsApp directory |
+| Privacy Notice | `/en/privacy` | Fully translated (EN/AR) privacy policy |
+| Terms of Use | `/en/terms` | Fully translated (EN/AR) terms & humanitarian notice |
+| Admin Dashboard | `/en/admin/dashboard` | Stats & request management |
+| Admin Moderation | `/en/admin/moderation` | Review queue, CSV export |
 
-```bash
-# Install Firebase CLI if needed
-npm install -g firebase-tools
+### Module 2: Shabaka Crisis Coordination Platform (23 Features)
 
-# Start emulators
-firebase emulators:start
+All 23 features from the platform spec, organized into 4 layers:
 
-# Set in .env.local
-NEXT_PUBLIC_USE_EMULATORS=true
+#### Foundation Layer (Phase 1)
 
-# Seed sample data
-npm run seed
-```
+| # | Feature | URL | Description |
+|---|---------|-----|-------------|
+| 1 | **Public Awareness Dashboard** | `/en` | Stats, org list, coverage gaps, sector flags |
+| 2 | **Actor Intake Form** | `/en/intake` | Org onboarding: name, type, sectors, zones, contact |
+| 3 | **Basic Static Map** | `/en/map` | Interactive SVG governorate map with coverage and gap indicators |
+| 4 | **Open API v0** | `/api/v0/coverage` | Public JSON endpoints for coverage, gaps, orgs |
 
-### Seed Data
+#### Identity Layer (Phase 1)
 
-The seed script creates:
-- **15 realistic help requests** across all categories and governorates
-- **4 helper users** across different governorates with varied supply specialties
-- **1 admin user**: `admin@relief.lb` / `admin123`
-- **Sample claims** to test capacity tracking
-- **Stats document** for the dashboard
+| # | Feature | URL | Description |
+|---|---------|-----|-------------|
+| 4b | **Shabaka Sign In** | `/en/platform/login` | Dedicated org-user and platform-admin access for actor-owned workflows |
+| 5 | **Actor Registry** | `/en/actors` | Living org profiles with search, filter, freshness |
+| 5 | **Actor Profile** | `/en/actors/a1` | Full profile: sectors, zones, capacity, vouch chain |
+| 5b | **My Organization** | `/en/platform/me` | Signed-in org workspace with actor summary, sectors, zones, and capacity snapshot |
+| 6 | **Capacity Cards** | `/en/capacity` | Per-org capacity: services, resources, stock levels |
+| 6 | **Capacity Edit** | `/en/capacity/a1` | Toggle UI: switches, steppers, stock buttons (<90s) |
+| 7 | **Peer Verification** | `/en/verification` | 3-stage trust: Pending → Provisional → Verified |
+| 8 | **Arabic-First UI** | All pages | Bilingual AR/EN labels, RTL layout via CSS logical properties |
 
-```bash
-npm run seed
-```
+#### Visibility Layer (Phase 2)
 
-### Default Users
+| # | Feature | URL | Description |
+|---|---------|-----|-------------|
+| 9 | **Needs Board** | `/en/needs` | Real-time needs sorted by urgency (Red/Amber/Gray) |
+| 10 | **Live Map** | `/en/map` | Governorate heatmap with sector filters, alert markers, and gap detail |
+| 11 | **Resource Tracker** | `/en/resources` | Aggregate resources across all actors by zone |
+| 12 | **Capacity Timeline** | `/en/timeline` | Change log, staleness alerts, pattern detection |
+| 13 | **Urgency Alerts** | `/en/alerts` | One-tap alerts with 48h expiry & escalation |
 
-| Role | Email | Password | Purpose |
-|------|-------|----------|---------|
-| Admin | `admin@relief.lb` | `admin123` | Access admin dashboard and moderation at `/admin/login` |
-| Helper | `helper@example.com` | `helper123` | Browse requests, claim help, view contact info |
+#### Coordination Layer (Phase 2–3)
 
-> **Security Warning:** These are development-only credentials for local testing and seeding. **You must change all default passwords immediately before deploying to production.** Never reuse these credentials in any real environment.
+| # | Feature | URL | Description |
+|---|---------|-----|-------------|
+| 14 | **Collaboration System** | `/en/collaborate` | Capacity-need matching, joint operation workspaces |
+| 15 | **Shared Task Board** | `/en/collaborate/jo1` | Kanban board: To Do / In Progress / Done / Blocked |
+| 16 | **Flash Assessment** | `/en/assessment` | 10-question rapid assessment with zone snapshots |
+| 17 | **Sector Planning** | `/en/planning` | Coverage plans & gap analysis matrix |
+| 17b | **Secure Messaging** | `/en/messages` | E2E encrypted 1:1 and group threads |
+| 17b | **Chat Thread** | `/en/messages/mt1` | Chat bubbles, read receipts, file sharing |
+
+#### Infrastructure Layer (Phase 3–4)
+
+| # | Feature | URL | Description |
+|---|---------|-----|-------------|
+| 18 | **WhatsApp Integration** | Settings | Opt-in WhatsApp/SMS for check-ins & alerts |
+| 19 | **Community Feedback** | `/en/feedback` | Anonymous feedback via QR/URL with discrepancy detection |
+| 20 | **Outcome Monitoring** | `/en/outcomes` | Network stats: families reached, collabs, gaps closed |
+| 21 | **Advanced API v1** | `/en/api` | Authenticated endpoints, CSV/JSON export, time-series |
+| 22 | **Privacy Controls** | `/en/settings` | Field-level visibility, offline mode, data export |
+| 23 | **Multi-Region** | Settings | Region-scoped data with cross-region visibility |
+| 23b | **Review Queue** | `/en/platform/review` | Platform-admin intake review queue with duplicate warnings |
+
+#### Navigation
+
+| Page | URL | Description |
+|------|-----|-------------|
+| More (Feature Hub) | `/en/more` | Links to all platform features by category |
+| Shabaka Sign In | `/en/platform/login` | Entry point for organization and platform-admin accounts |
+| My Organization | `/en/platform/me` | Signed-in org workspace |
+| Review Queue | `/en/platform/review` | Signed-in platform-admin queue |
+| API Documentation | `/en/api` | v0 + v1 endpoint docs with examples |
+
+### API Endpoints
+
+#### Public API v0 (No Authentication)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v0/coverage` | Sector coverage and org count by zone |
+| GET | `/api/v0/gaps` | Zones with zero coverage per sector |
+| GET | `/api/v0/orgs` | Public org list (no contact details) |
+
+All v0 responses are JSON with `Cache-Control: max-age=1800` (30 min cache).
+
+#### Authenticated API v1 (Planned)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/gaps` | Persistent gaps with time-series data |
+| GET | `/api/v1/actors` | Verified actor list with sector/zone |
+| GET | `/api/v1/resources` | Aggregate resource availability by zone |
+| GET | `/api/v1/export` | Bulk CSV/JSON export of aggregated data |
+
+## Platform Design Principles
+
+Three non-negotiable constraints shape every decision:
+
+| No Hierarchy | Freshness Over Precision | Works Under Crisis |
+|-------------|--------------------------|-------------------|
+| All verified actors are peers. No actor has authority over another. No designated "lead" per sector or zone. | Rough data updated today beats exact data from last week. Every data point shows a timestamp. Stale data is visually degraded. | Offline mode required. SMS fallback for critical alerts. Arabic RTL is the default. Must function during power cuts. |
+
+### What Is Deliberately Out of Scope
+
+- No donation or payment flows
+- No individual beneficiary case files
+- No reporting dashboards for external funders
+- No star ratings or quality scores
+- No single "cluster lead" per sector
+- No centralized admin that can unilaterally remove actors
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS 4 |
-| Components | Custom components (shadcn-inspired) with Radix UI primitives |
+| Components | Custom + Radix UI primitives |
 | Backend | Firebase (Firestore + Auth) |
+| Platform Data | Firestore-backed platform API |
 | Forms | React Hook Form + Zod 4 |
-| i18n | next-intl (English + Arabic with RTL) |
-| Testing | Vitest + Testing Library |
+| i18n | next-intl (Arabic RTL default + English) |
+| Unit Tests | Vitest + Testing Library |
+| E2E Tests | Playwright (Chromium) |
 | Anti-spam | Google reCAPTCHA v3 |
-| Social sharing | Dynamic Open Graph images (edge-rendered) |
+| Icons | Lucide React |
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   └── [locale]/              # i18n routing
-│       ├── page.tsx            # Landing page
-│       ├── (public)/           # Request help, shelters, contacts, success
-│       ├── (helper)/           # Browse, request details, registration
-│       ├── (admin)/            # Dashboard, moderation, login
-│       ├── privacy/            # Privacy notice
-│       └── terms/              # Terms & humanitarian notice
+│   ├── not-found.tsx                    # Root 404 (outside locale)
+│   ├── global-error.tsx                 # Root error boundary (catches layout crashes)
+│   └── [locale]/
+│       ├── page.tsx                    # Landing page (Lebanon Relief)
+│       ├── not-found.tsx               # 404 page (translated)
+│       ├── error.tsx                   # Runtime error boundary (translated)
+│       ├── loading.tsx                 # Loading skeleton
+│       ├── (public)/                   # Request help, shelters, contacts
+│       ├── (helper)/                   # Browse, request details, registration
+│       ├── (admin)/                    # Admin dashboard, moderation
+│       └── (platform)/                # Shabaka coordination platform
+│           ├── page.tsx               # Platform dashboard
+│           ├── layout.tsx             # Bottom nav + header
+│           ├── actors/                # Actor registry + profile
+│           ├── capacity/              # Capacity cards + edit
+│           ├── needs/                 # Needs board
+│           ├── map/                   # Live map (SVG governorate map + filters)
+│           ├── alerts/                # Urgency alerts
+│           ├── resources/             # Resource tracker
+│           ├── timeline/              # Capacity timeline
+│           ├── collaborate/           # Collaboration + task board
+│           ├── messages/              # Secure messaging + threads
+│           ├── assessment/            # Flash assessment
+│           ├── planning/              # Sector planning + gap analysis
+│           ├── verification/          # Peer verification network
+│           ├── feedback/              # Community feedback
+│           ├── outcomes/              # Outcome monitoring
+│           ├── intake/                # Actor intake form
+│           ├── platform/              # Shabaka sign-in, org workspace, admin review queue
+│           ├── settings/              # Privacy controls
+│           ├── api/                   # API documentation
+│           └── more/                  # Navigation hub
 ├── components/
-│   ├── ui/                     # Button, Input, Select, Card, etc.
-│   └── shared/                 # RequestCard, UrgencyBadge, FilterSheet, LebanonMap, etc.
+│   ├── ui/                            # Button, Input, Select, Card, etc.
+│   └── shared/                        # RequestCard, LebanonMap, etc.
 ├── lib/
-│   ├── firebase/               # Config, auth, requests, helpers, shelters, contacts
-│   ├── types/                  # TypeScript types
-│   ├── utils/                  # Helpers, cn, matching
-│   └── validators/             # Zod schemas
-├── messages/                   # en.json, ar.json
-└── i18n/                       # Routing, navigation, request config
+│   ├── firebase/                      # Firebase config + CRUD
+│   ├── data/                          # Platform data layer
+│   │   ├── platform-api.ts           # Firestore-backed platform data access
+│   │   ├── synthetic.ts              # Seed/reference dataset for platform migration
+│   │   └── zones.ts                  # 31 Lebanese zones + 9 sectors
+│   ├── logger.ts                      # Structured logging (server: JSON, client: console)
+│   ├── types/
+│   │   ├── index.ts                  # Individual help request types
+│   │   └── platform.ts              # Platform types (23 features)
+│   ├── utils/                        # Helpers, cn, matching
+│   └── validators/                   # Zod schemas
+├── messages/                          # en.json, ar.json (full EN/AR coverage)
+└── i18n/                              # Routing, navigation
 ```
 
-## User Flows
+## Data Architecture
 
-### Landing Page
-- Interactive SVG heatmap of Lebanon's 8 governorates with toggle between open requests and shelter counts
-- Color-coded by density (green → amber → orange → red)
-- Click any governorate to browse its filtered requests or shelters depending on active mode
-- Quick-access buttons: Request Help, Offer Help, Emergency Contacts, Shelter Centers
-
-### "I Need Help" (Requester)
-1. Landing page → tap "I need help"
-2. Fill minimal form: category, description, location, urgency, contact preference
-3. Submit → get reference code
-4. No login required (anonymous submission)
-
-### "I Want to Help" (Helper)
-1. Landing page → tap "I want to help"
-2. Browse paginated requests with filters (category, area, urgency) and removable filter chips
-3. Smart matching: personalized recommendations, priority sorting, grouped view
-4. View request details (privacy-safe: no exact address, no phone shown)
-5. Register → claim a request → contact via admin coordination or direct
-
-### Shelter Centers
-1. Landing page → tap "Shelter Centers" or click a governorate on the map in shelter mode
-2. Step-by-step flow: pick your governorate from buttons or interactive map → see shelters
-3. Shelters grouped by district with search within the selected area
-4. Each shelter shows Arabic/English name, area, call button, and classroom count
-5. Data sourced from ArcGIS and cached daily in Firestore (fail-safe: never deletes stale data if API fails)
-
-### Emergency Contacts
-1. Landing page → tap "Emergency Contacts"
-2. Filter by governorate, call or WhatsApp directly
-3. Cross-link to shelter centers page
-
-### Admin
-1. Sign in at `/admin/login`
-2. Dashboard with live stats (single Firestore read)
-3. Moderation: change status, flag requests, view contact info, export CSV
-4. Helpers tab: verify/unverify helpers, view delivery counts
-
-## Architecture Decisions
-
-### Cost Optimization (Firebase)
-- **Stats document**: Single `stats/global` doc for dashboard counters instead of aggregation queries. Updated via `increment()` on writes.
-- **Pagination**: All list views paginate with Firestore cursors (20-50 items).
-- **No real-time listeners**: All data fetched on-demand with `getDocs()` to avoid persistent connection costs.
-- **Indexed queries**: Composite indexes pre-configured for common filter combinations.
-- **Contact data separation**: Private subcollection `requests/{id}/private/contact` — only read when needed by authorized users.
-
-### Anti-Fraud & Trust
-- **Manual moderation queue** — new requests start as `pending_review`; admin approves before they go live.
-- **Request cooldown** — duplicate requests (same user, category, governorate) blocked within 1 hour.
-- **Helper verification** — admin can verify helpers; verified badge shown across the app.
-- **Delivery confirmation** — both helper and requester must confirm delivery before a request is marked fulfilled.
-- **Reputation scoring** — completed deliveries tracked per helper, visible to admins.
-- **Audit logging** — every status change, flag, and verification action is logged.
-
-### Privacy & Safety
-- **No exact addresses collected** — only governorate, city, and general area.
-- **Phone numbers in subcollection** — not readable from public request list.
-- **Contact info access-controlled** — only admins and claimed helpers can read.
-- **Anonymous submission** — requesters don't need accounts.
-- **Client-side rate limiting** — prevents spam submissions.
-- **Google reCAPTCHA v3** — invisible bot protection on all public forms.
-- **Firestore security rules** — enforce read/write permissions.
-
-### Performance
-- **Mobile-first design** — 44px minimum tap targets, high contrast, minimal JS.
-- **No heavy libraries** — lightweight inline SVG map, no rich text editors.
-- **System fonts** — no web font downloads.
-- **Static translations** — bundled in JS, no Firestore reads for i18n.
-- **PWA manifest** — installable on mobile devices.
-
-### Smart Matching (no AI)
-All matching logic is pure client-side arithmetic — no external APIs or ML models.
-
-- **Weighted scoring** — Requests scored by governorate (50pts), category (30pts), availability (20pts), city (15pts), and helper reputation (5-10pts)
-- **Personalized recommendations** — Top 5 scored requests shown in "Recommended for you" section
-- **Request clustering** — Groups nearby same-category requests for efficient route planning
-- **Priority sorting** — `urgency_weight × time_boost × log₂(people_count)` — older unfulfilled requests with more people rank higher
-- **Capacity tracking** — Warns helpers at 3 active claims but never blocks them from helping
-
-### Authentication Strategy
-- **Requesters**: Anonymous (Firebase Anonymous Auth) — zero friction.
-- **Helpers**: Email/password registration — lightweight, no phone OTP cost.
-- **Admins**: Email/password + `admins` collection check — secure without expensive provider.
-- **Modular**: Phone auth can be added later without restructuring.
-
-## Testing
-
-70 tests across 4 test suites covering validators, utility functions, smart matching logic, and shelter data fetching/caching.
-
-```bash
-npm run test              # Run all tests
-npm run test:watch        # Run tests in watch mode
-npx vitest run --coverage # Run with coverage report
-```
-
-| File | Statements | Branches | Functions | Lines |
-|------|-----------|----------|-----------|-------|
-| matching.ts | 100% | 96% | 100% | 100% |
-| request.ts (validators) | 100% | 100% | 100% | 100% |
-| helpers.ts | 72% | 61% | 100% | 74% |
-| **Overall** | **87%** | **81%** | **100%** | **89%** |
-
-## Commands
-
-```bash
-npm run dev          # Development server
-npm run build        # Production build
-npm run start        # Start production server
-npm run test         # Run tests
-npm run test:watch   # Run tests in watch mode
-npm run lint         # Lint code
-npm run seed         # Seed Firestore with sample data
-```
-
-## Deployment
-
-### Vercel (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Set environment variables in Vercel dashboard
-```
-
-### Firebase Hosting
-```bash
-# Build
-npm run build
-
-# Deploy Firestore rules and indexes
-firebase deploy --only firestore
-
-# For hosting, use Firebase's Next.js integration or export static
-```
-
-## Firestore Collections
+### Existing Firebase Collections (Individual Help Requests)
 
 | Collection | Purpose | Access |
 |-----------|---------|--------|
-| `requests` | Help requests (public fields) | Public read, anyone create, admin update |
-| `requests/{id}/private/contact` | Phone, name | Admin + claimed helper read only |
+| `requests` | Help requests | Public read, anyone create, admin update |
+| `requests/{id}/private/contact` | Phone, name | Admin + claimed helper only |
 | `helpers` | Helper profiles | Authenticated read, self-write |
 | `claims` | Helper-to-request matches | Authenticated read, helper create |
 | `admins` | Admin user records | Self-read only |
 | `stats/global` | Aggregated counters | Public read |
-| `audit_logs` | Action audit trail | Admin read, system create |
-| `shelters` | Cached shelter center data from ArcGIS | Public read, authenticated write |
-| `shelters_cache/meta` | Cache TTL tracking (last fetch date) | Public read, authenticated write |
+| `shelters` | Cached ArcGIS shelter data | Public read |
+| `contacts` | Emergency contacts | Public read, admin write |
 
-## i18n
+### Platform Data Layer (Firestore-backed)
 
-- English (`/en/...`) — LTR
-- Arabic (`/ar/...`) — RTL with full layout mirroring
-- Language switcher on every page
-- All UI text in `src/messages/en.json` and `src/messages/ar.json`
+The platform now reads from Firestore through `src/lib/data/platform-api.ts`. The synthetic dataset in `src/lib/data/synthetic.ts` is retained as a deterministic seed source for local fixtures and remote seeding.
+
+| Data Entity | Feature | Records |
+|-------------|---------|---------|
+| Actors | Actor Registry (#5) | 14 organizations |
+| Capacity Cards | Capacity Cards (#6) | 8 cards with services, resources, stock |
+| Vouches | Peer Verification (#7) | 5 vouching records |
+| Needs | Needs Board (#9) | 11 open needs across zones |
+| Urgency Alerts | Urgency Alerts (#13) | 3 active alerts |
+| Collaborations | Collaboration (#14) | 3 requests (proposed/accepted) |
+| Joint Operations | Collaboration (#14) | 2 active operations |
+| Shared Tasks | Task Board (#15) | 5 tasks across 2 operations |
+| Flash Assessments | Assessment (#16) | 1 completed with snapshot |
+| Sector Plans | Planning (#17) | 2 coverage plans |
+| Gap Analyses | Planning (#17) | 1 zone analysis |
+| Message Threads | Messaging (#17b) | 3 threads (1:1 + group) |
+| Messages | Messaging (#17b) | 5 messages |
+| Community Feedback | Feedback (#19) | 3 submissions |
+| Outcome Reports | Outcomes (#20) | 4 weekly reports |
+| Pattern Alerts | Pattern Detection | 2 systemic gap alerts |
+| Zones | Shared | 31 Lebanese zones in 4 regions |
+| Sectors | Shared | 9 sector categories |
+
+### Platform Firestore Collections
+
+| Collection | Feature | Purpose |
+|-----------|---------|---------|
+| `actors` | 5 | Organization profiles |
+| `capacity_cards` | 6 | Per-org current capacity |
+| `capacity_cards/{id}/changelog` | 6, 12 | Per-field change history |
+| `vouches` | 7 | Peer verification records |
+| `needs` | 9 | Shared needs board entries |
+| `urgency_alerts` | 13 | One-tap urgent need flags |
+| `joint_operations` | 14 | Collaboration workspaces |
+| `joint_operations/{id}/tasks` | 15 | Shared task board items |
+| `flash_assessments` | 16 | Rapid assessment snapshots |
+| `sector_plans` | 17 | Sector planning coverage |
+| `messages` | 17b | E2E encrypted messages |
+| `feedback` | 19 | Anonymous community feedback |
+| `outcomes` | 20 | Self-reported impact data |
+| `api_keys` | 21 | Authenticated API access |
+| `zones` | Shared | Geographic zone reference |
+| `intake_submissions` | 2 | Org onboarding queue |
+| `platform_users` | Shared | Private auth-to-role mapping for Shabaka actor and platform-admin accounts |
+
+## Shared Taxonomy
+
+All features use the same sector taxonomy:
+
+| Sector | Arabic | Color | Notes |
+|--------|--------|-------|-------|
+| Food | غذاء | `#22c55e` | Food parcels, hot meals, baby formula |
+| Medical | طبي | `#ef4444` | Consultations, medications, wound care |
+| Shelter | مأوى | `#3b82f6` | Emergency beds, collective centres |
+| Psychosocial | دعم نفسي | `#a855f7` | Often most under-covered sector |
+| Legal | قانوني | `#6366f1` | Documentation, legal aid, asylum |
+| Logistics | لوجستيات | `#f97316` | Transport, vehicles, drivers, storage |
+| WASH | مياه وصرف صحي | `#06b6d4` | Water, sanitation, hygiene kits |
+| Education | تعليم | `#eab308` | Schooling, tutoring, literacy |
+| Protection | حماية | `#ec4899` | Sensitive — extra privacy controls |
+
+## Geographic Zones
+
+31 named zones across 4 regions (neighborhood/district level):
+
+| Region | Zones |
+|--------|-------|
+| **Beirut & Suburbs** | Bourj Hammoud, Dekwaneh, Sin El Fil, Sabra, Mar Elias, Haret Hreik, Hamra, Achrafieh, Cola, Tarik Jdide, Dahieh, Jnah |
+| **South Lebanon** | Saida, Sour (Tyre), Nabatieh, Marjayoun, Bint Jbeil, Khiam |
+| **Bekaa Valley** | Zahle, Baalbek, Hermel, Chtaura, Bar Elias, Anjar |
+| **North Lebanon** | Tripoli, Bcharre, Zgharta, Batroun, Akkar, Halba, Mina |
+
+The platform map is rendered from governorate SVG paths with distinct outlines for Bekaa and Baalbek-Hermel, and the current regression suite checks both map geometry and end-to-end filter behavior.
+
+## Testing
+
+### Unit Tests (Vitest)
+
+```bash
+npm run test              # Run all tests
+npm run test:watch        # Watch mode
+npx vitest run --coverage # Coverage report
+```
+
+The current Vitest suite focuses on helpers, matching logic, and validation flows, with full coverage across the tracked source files.
+
+### E2E Tests (Playwright)
+
+Playwright covers core platform flows, direct page navigation, and focused filter/map regressions. For day-to-day work, prefer the emulator-backed command so the suite runs against an isolated Firestore/Auth instance instead of live Firebase.
+
+```bash
+npm run test:e2e:emulator             # Safe default: fresh emulators + seed + Playwright
+npm run test:integration              # Alias for the emulator-backed integration/E2E run
+npm run test:all                      # Unit tests + emulator-backed Playwright
+npx playwright test                    # Run E2E against the app/env you already started
+npx playwright test e2e/filter-behavior.spec.ts  # Run focused filter + map regressions
+npx playwright test --reporter=list    # Verbose output
+npx playwright show-report             # View HTML report
+```
+
+The emulator-backed runner auto-selects free ports, uses its own Next.js build directory, and stores Playwright output, Vitest coverage, and Firebase emulator debug logs under `.test-artifacts/` (gitignored).
+
+Additional focused coverage:
+
+| Suite | Tests | Coverage |
+|------|------:|----------|
+| `more-page-links.spec.ts` | 38 | Feature hub links + direct page-load checks |
+| `filter-behavior.spec.ts` | 6 | Map geometry, sector filters, actor filters, needs/resources/timeline filtering |
+
+| Test Suite | Tests | Coverage |
+|-----------|-------|----------|
+| Feature 1: Public Dashboard | 2 | Landing page, no-auth access |
+| Feature 2: Actor Intake Form | 6 | Fields, types, sectors, zones, language |
+| Feature 3: Static Map | 3 | Interactive SVG map, gaps, sector filters |
+| Feature 4: Open API v0 | 4 | Coverage, gaps, orgs, cache headers |
+| Feature 5: Actor Registry | 4 | List, badges, profile, vouch chain |
+| Feature 6: Capacity Cards | 3 | Overview, stock levels, edit mode |
+| Feature 7: Peer Verification | 2 | Status categories, vouch counts |
+| Feature 9: Needs Board | 4 | Urgency sort, details, "I Can Help", patterns |
+| Feature 11: Resource Tracker | 2 | Aggregates, timestamps |
+| Feature 12: Timeline | 1 | Change history |
+| Feature 13: Urgency Alerts | 3 | Active alerts, escalation, flag button |
+| Feature 14: Collaboration | 2 | Requests, matches |
+| Feature 15: Task Board | 1 | Kanban board |
+| Feature 16: Flash Assessment | 2 | Snapshots, aggregated results |
+| Feature 17: Sector Planning | 2 | Coverage plans, gap matrix |
+| Feature 17b: Messaging | 3 | Threads, encryption, chat bubbles |
+| Feature 19: Feedback | 2 | Anonymous form, discrepancy flags |
+| Feature 20: Outcomes | 2 | Network stats, disclaimer |
+| Feature 21: API Docs | 1 | Endpoint documentation |
+| Feature 22: Privacy Controls | 3 | Visibility, notifications, offline |
+| Navigation & Layout | 3 | Bottom nav, more page, platform link |
+| Backward Compatibility | 5 | Landing, requests, shelters, contacts, Arabic |
+| **Core Feature Suite Total** | **60** | **Feature-level smoke coverage** |
+
+## Commands
+
+```bash
+npm run dev              # Development server (port 4001)
+npm run build            # Production build
+npm run start            # Start production server
+npm run test             # Unit tests (Vitest)
+npm run test:watch       # Unit tests watch mode
+npm run test:integration # Emulator-backed integration/E2E run
+npm run test:e2e:emulator # Playwright against fresh Firestore/Auth emulators
+npm run test:all         # Unit tests + emulator-backed Playwright
+npm run lint             # Lint code
+npm run seed             # Seed Firestore with sample data
+npm run seed:platform    # Seed Firestore with platform data (safe conflict check)
+npm run seed:platform:emulator # Reset + seed platform data in emulator
+npx playwright test      # E2E tests (Playwright)
+```
+
+### CI
+
+GitHub Actions runs lint, typecheck, unit tests, emulator-backed Playwright E2E, then the production build. The E2E job installs Java for the Firebase emulators, and failing Playwright runs upload `.test-artifacts/playwright/output` as a workflow artifact for debugging.
+
+## Architecture Decisions
+
+### Dual-Module Design
+The app has two modules sharing the same codebase: individual help requests and organizational coordination. Both use Firebase-backed data flows while still sharing UI components, i18n infrastructure, and the Tailwind theme.
+
+### Platform Data Layer
+Platform features read from Firestore through `platform-api.ts` (`getActors()`, `getNeeds()`, etc.). The synthetic dataset remains available as a seed/fallback reference, but it is no longer the runtime source of truth.
+
+### Anti-Fraud & Trust
+- Manual moderation queue for help requests
+- Peer verification (3 independent vouches) for organizations
+- No central gatekeeper — trust flows from mutual recognition
+- Founding cohort of 10–15 verified orgs as trust network roots
+
+### Privacy & Safety
+- No beneficiary case files ever stored
+- Phone numbers in secure subcollections
+- Field-level visibility controls (public/peers/private)
+- Anonymous feedback with private discrepancy alerts
+- Contact info access-controlled by verification status
+
+### Error Handling
+- Locale-level `error.tsx` catches runtime errors with translated UI and retry button
+- Root `global-error.tsx` catches layout-level crashes with its own `<html>`/`<body>`
+- Locale-level and root `not-found.tsx` for 404 pages
+- `loading.tsx` skeleton for route transitions
+
+### Performance
+- Mobile-first design with 44px tap targets
+- System fonts only — no web font downloads
+- Static translations bundled in JS
+- PWA manifest for mobile installation
+- Low-bandwidth text-only mode (planned)
+
+### Smart Matching
+Pure client-side arithmetic — no AI/ML:
+- Weighted scoring: governorate (50pts), category (30pts), availability (20pts)
+- Priority sorting: `urgency × age × log₂(people_count)`
+- Request clustering for route efficiency
+- Capacity-need matching for organizational collaboration
 
 ## Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NEXT_PUBLIC_FIREBASE_*` | Yes | Firebase project configuration |
-| `NEXT_PUBLIC_USE_EMULATORS` | No | Set `true` to use Firebase emulators |
-| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | No | Google reCAPTCHA v3 site key |
-| `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret key (server-side) |
-| `NEXT_PUBLIC_BASE_URL` | No | Base URL for OG images (defaults to Vercel URL) |
-| `NEXT_PUBLIC_SHELTERS_API_URL` | No | ArcGIS shelter data endpoint (has built-in default) |
+| `NEXT_PUBLIC_USE_EMULATORS` | No | Set `true` for Firebase emulators |
+| `NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST` | No | Override Firestore emulator host when not using the default `127.0.0.1` |
+| `NEXT_PUBLIC_FIRESTORE_EMULATOR_PORT` | No | Override Firestore emulator port when not using the default `8080` |
+| `NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_URL` | No | Override Auth emulator URL when not using the default `http://127.0.0.1:9099` |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | No | reCAPTCHA v3 site key |
+| `RECAPTCHA_SECRET_KEY` | No | reCAPTCHA v3 secret (server-side) |
+| `NEXT_PUBLIC_LOG_LEVEL` | No | Log level: `debug`, `info`, `warn`, `error` (defaults to `debug` in dev, `warn` in prod) |
+| `NEXT_PUBLIC_BASE_URL` | No | Base URL for OG images |
 
-## What Makes This Different
+## Firebase Setup
 
-Most humanitarian tools are either heavyweight enterprise platforms or simple static directories. Lebanon Relief fills the gap:
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable Authentication: Email/Password and Anonymous
+3. Create a Firestore Database
+4. Copy project config to `.env.local`
+5. Deploy rules: `firebase deploy --only firestore:rules`
+6. Deploy indexes: `firebase deploy --only firestore:indexes`
+7. Seed data: `npm run seed`
+8. Seed platform data: `npm run seed:platform`
 
-| Feature | Typical Tools | Lebanon Relief |
-|---------|--------------|----------------|
-| Setup complexity | Weeks of integration | Single `npm run seed` with Firebase |
-| Fraud prevention | None | Moderation queue, cooldown rules, dual delivery confirmation |
-| Smart matching | Manual browse only | Weighted scoring recommends relevant requests to each helper |
-| Request triage | Admin-only prioritization | Automatic priority queue: urgency × age × people count |
-| Route efficiency | Helpers pick randomly | Request clustering groups nearby same-category needs |
-| Helper burnout | No tracking | Capacity warnings at 3 active claims (never blocks) |
-| Language support | English-only or bolted-on | Native bilingual (EN/AR) with full RTL from day one |
-| Device requirements | Desktop-first | Mobile-first, works on low-end phones and slow networks |
-| Bot protection | None or CAPTCHA walls | Invisible reCAPTCHA v3 — zero friction for real users |
-| Privacy | Contact info exposed | Phone numbers in private subcollections, never shown publicly |
-| Shelter data | Static lists, quickly outdated | Daily-cached ArcGIS data with fail-safe fallback |
-| Cost | Paid platforms or heavy infra | Firebase free tier handles thousands of requests |
+### Emulator Test Workflow
 
-## Future Roadmap
+Use this when you want integration/E2E coverage without touching live Firebase data:
 
-### Completed
-- [x] Interactive SVG heatmap with dual-mode toggle (requests / shelters)
-- [x] Approved shelter centers with daily-cached ArcGIS data and fail-safe fallback
-- [x] Emergency contacts directory with governorate filter and WhatsApp integration
-- [x] Helper verification by admin with reputation scoring
-- [x] Manual moderation queue with request cooldown (duplicate prevention)
-- [x] Delivery confirmation system (dual-sided: helper + requester)
-- [x] Anti-fraud: moderation queue, cooldown rules, audit logging
+```bash
+npm run test:e2e:emulator
+```
 
-### Notifications & Communication
-- [ ] WhatsApp/SMS notifications for request status changes (Cloud Functions)
-- [ ] Push notifications via FCM for helpers when new requests match their area
-- [ ] In-app messaging between helpers and requesters (privacy-preserving)
+`npm run test:e2e:emulator` starts fresh Auth and Firestore emulators on free ports, resets Firestore, seeds the platform collections, then runs Playwright against that isolated environment. It does not need your live Firebase project credentials for the test run.
 
-### Authentication & Trust
-- [ ] Phone OTP authentication (optional, cost-aware)
-- [ ] Verified organization badges for NGOs and established helpers
-- [ ] Social login (Google, Facebook) for faster helper onboarding
+`npm run seed:platform:emulator` is available if you want to seed just the emulator data without running Playwright.
 
-### Data & Analytics
-- [ ] Admin analytics dashboard with charts (requests over time, response rates, coverage gaps)
-- [ ] Exportable reports for NGOs and government coordination
-- [ ] Shelter occupancy tracking (live capacity data from field updates)
-- [ ] Request search by reference code for status tracking
+### Default Users (Development Only)
 
-### UX & Offline
-- [ ] Offline draft saving for request form (IndexedDB)
-- [ ] Progressive Web App enhancements (background sync, offline shelter browsing)
-- [ ] Image upload for requests to show damage/conditions (Firebase Storage)
-- [ ] Voice input for request descriptions (accessibility for elderly users)
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@relief.lb` | `admin123` |
+| Helper | `helper@example.com` | `helper123` |
+| Shabaka Platform Admin | `platformadmin@shabaka.lb` | `platform123` |
+| Shabaka Actor Admin | `actor.a1@shabaka.lb` | `platform123` |
 
-### Operations
-- [ ] Soft delete with audit trail for data retention compliance
-- [ ] Multi-language expansion (French, Turkish) for cross-border coordination
-- [ ] Automated shelter data sync (Cloud Functions scheduled trigger instead of first-request)
+Shabaka users sign in at `/en/platform/login`. The platform admin lands in `/en/platform/review`, and the actor account lands in `/en/platform/me`.
+
+> **Change all default passwords before production deployment.**
 
 ## Contributing
 
@@ -348,4 +497,6 @@ To report a vulnerability, please see [SECURITY.md](SECURITY.md).
 
 ---
 
-Built with care for Lebanon.
+*A network built on trust, not authority. For the people on the ground, by the people on the ground.*
+
+*شبكة مبنية على الثقة، لا على السلطة. من الناس على الأرض، للناس على الأرض.*

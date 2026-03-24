@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createLogger } from "@/lib/logger";
 
+const log = createLogger("api:recaptcha");
 const SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || "";
 const SCORE_THRESHOLD = 0.5;
 
@@ -28,6 +30,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
 
     if (!data.success || data.score < SCORE_THRESHOLD) {
+      log.warn("recaptcha verification failed", undefined, { score: data.score, success: data.success });
       return NextResponse.json(
         { success: false, score: data.score, error: "Failed verification" },
         { status: 403 }
@@ -35,7 +38,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, score: data.score });
-  } catch {
+  } catch (err) {
+    log.error("recaptcha verification error", err);
     return NextResponse.json({ success: false, error: "Verification error" }, { status: 500 });
   }
 }

@@ -21,8 +21,11 @@ import {
   isHelperAtCapacity,
   getActiveClaimCount,
 } from "@/lib/utils/matching";
+import { createLogger } from "@/lib/logger";
 import type { HelpRequest, Helper, Claim, RequestFilters, ScoredRequest, Governorate } from "@/lib/types";
 import type { DocumentSnapshot } from "firebase/firestore";
+
+const log = createLogger("page:browse");
 
 type SortMode = "newest" | "priority";
 type ViewMode = "list" | "clustered";
@@ -66,7 +69,7 @@ export default function BrowsePage() {
           if (h) setHelper(h);
           setClaims(c);
         })
-        .catch(() => {});
+        .catch((err) => log.warn("failed to load helper profile for matching", err));
     }
   }, []);
 
@@ -162,7 +165,7 @@ export default function BrowsePage() {
                 {t(`request.governorates.${filters.governorate}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, governorate: undefined })}
-                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
+                  className="hover:text-primary-dark ms-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
@@ -174,7 +177,7 @@ export default function BrowsePage() {
                 {t(`request.categories.${filters.category}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, category: undefined })}
-                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
+                  className="hover:text-primary-dark ms-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
@@ -183,10 +186,10 @@ export default function BrowsePage() {
             )}
             {filters.urgency && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                {t(`request.urgency.${filters.urgency}`)}
+                {t(`urgency.${filters.urgency}`)}
                 <button
                   onClick={() => handleFilterChange({ ...filters, urgency: undefined })}
-                  className="hover:text-primary-dark ml-0.5 text-base leading-none"
+                  className="hover:text-primary-dark ms-0.5 text-base leading-none"
                   aria-label="Remove"
                 >
                   &times;
