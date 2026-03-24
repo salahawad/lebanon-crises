@@ -1,10 +1,5 @@
 # Lebanon Relief — Humanitarian Coordination App
 
-[![GitHub stars](https://img.shields.io/github/stars/salahawad/lebanon-crises?style=social)](https://github.com/salahawad/lebanon-crises/stargazers)
-[![Clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsalahawad%2Flebanon-crises%2Fmain%2Fbadges%2Fclones.json&query=%24.message&label=clones&color=blue)](https://github.com/salahawad/lebanon-crises/graphs/traffic)
-
-> **Clone count** is sourced from GitHub Traffic (last 14 days, aggregated). It is refreshed daily by a scheduled workflow and reflects the rolling total clones reported by GitHub.
-
 A mobile-first web app connecting displaced people with volunteers and organizations who can help. Built for low-bandwidth, low-end devices, and stressful conditions.
 
 > **Demo mode:** The deployed application currently uses synthetic data for demonstration purposes.
