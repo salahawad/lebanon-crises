@@ -53,6 +53,9 @@ test.describe('Shabaka platform access pages', () => {
     await page.goto(`${PLATFORM_BASE_AR}/login`);
 
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.getByTestId('platform-header-account-link')).toContainText(
+      'تسجيل الدخول'
+    );
     await expect(page.getByTestId('platform-login-email')).toHaveAttribute('dir', 'ltr');
     await expect(page.getByTestId('platform-login-password')).toHaveAttribute('dir', 'ltr');
 
@@ -63,5 +66,15 @@ test.describe('Shabaka platform access pages', () => {
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     await expect(page.getByText('+961 1 300 005')).toHaveAttribute('dir', 'ltr');
     await expect(page.getByText('info@amel.org')).toHaveAttribute('dir', 'ltr');
+  });
+
+  test('arabic more page translates static navigation labels', async ({ page }) => {
+    await page.goto('/ar/more');
+
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.getByTestId('platform-more-heading')).toHaveText('المزيد');
+    await expect(page.getByText('البنية التحتية')).toBeVisible();
+    await expect(page.getByRole('link', { name: /تسجيل الدخول إلى شبكة/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /الخصوصية والإعدادات/i })).toBeVisible();
   });
 });

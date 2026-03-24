@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import {
   LayoutDashboard,
   Map,
@@ -13,16 +13,46 @@ import {
   LogIn,
   Building2,
 } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { getPlatformUser, onAuthChange } from "@/lib/firebase/auth";
 import type { PlatformUser } from "@/lib/types/platform";
 
-const NAV_ITEMS = [
-  { href: "/platform", label: "Dashboard", labelAr: "لوحة التحكم", icon: LayoutDashboard },
-  { href: "/map", label: "Map", labelAr: "خريطة", icon: Map },
-  { href: "/needs", label: "Needs", labelAr: "احتياجات", icon: AlertCircle },
-  { href: "/actors", label: "Actors", labelAr: "الجهات", icon: Users },
-  { href: "/more", label: "More", labelAr: "المزيد", icon: MoreHorizontal },
+type NavItemKey = "dashboard" | "map" | "needs" | "actors" | "more";
+
+const NAV_ITEMS: Array<{ href: string; key: NavItemKey; icon: typeof LayoutDashboard }> = [
+  { href: "/platform", key: "dashboard", icon: LayoutDashboard },
+  { href: "/map", key: "map", icon: Map },
+  { href: "/needs", key: "needs", icon: AlertCircle },
+  { href: "/actors", key: "actors", icon: Users },
+  { href: "/more", key: "more", icon: MoreHorizontal },
 ];
+
+const copyByLocale = {
+  en: {
+    back: "Back",
+    accountSignIn: "Sign In",
+    accountWorkspace: "My Org",
+    nav: {
+      dashboard: "Dashboard",
+      map: "Map",
+      needs: "Needs",
+      actors: "Actors",
+      more: "More",
+    },
+  },
+  ar: {
+    back: "رجوع",
+    accountSignIn: "تسجيل الدخول",
+    accountWorkspace: "منظمتي",
+    nav: {
+      dashboard: "لوحة التحكم",
+      map: "الخريطة",
+      needs: "الاحتياجات",
+      actors: "الجهات",
+      more: "المزيد",
+    },
+  },
+} as const;
 
 export default function PlatformLayout({
   children,
@@ -30,10 +60,9 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const locale = useLocale() === "ar" ? "ar" : "en";
+  const copy = copyByLocale[locale];
   const [platformUser, setPlatformUser] = useState<PlatformUser | null>(null);
-
-  // Extract locale from pathname (e.g., /en/platform -> en)
-  const locale = pathname.split("/")[1] || "en";
 
   useEffect(() => {
     return onAuthChange((user) => {
@@ -63,11 +92,11 @@ export default function PlatformLayout({
         <div className="max-w-lg mx-auto md:max-w-5xl px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              href={`/${locale}`}
+              href="/"
               className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-              aria-label="Back"
+              aria-label={copy.back}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 rtl:-scale-x-100" />
             </Link>
             <h1 className="text-lg font-bold tracking-tight truncate">
               Shabaka <span className="font-normal opacity-80">·</span>{" "}
@@ -75,18 +104,19 @@ export default function PlatformLayout({
             </h1>
           </div>
           <Link
-            href={`/${locale}${platformUser ? "/platform/me" : "/platform/login"}`}
+            href={platformUser ? "/platform/me" : "/platform/login"}
+            data-testid="platform-header-account-link"
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/15 transition-colors shrink-0"
           >
             {platformUser ? (
               <>
                 <Building2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">My Org</span>
+                <span className="hidden sm:inline">{copy.accountWorkspace}</span>
               </>
             ) : (
               <>
                 <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Sign In</span>
+                <span className="hidden sm:inline">{copy.accountSignIn}</span>
               </>
             )}
           </Link>
@@ -109,7 +139,7 @@ export default function PlatformLayout({
             return (
               <Link
                 key={item.href}
-                href={`/${locale}${item.href}`}
+                href={item.href}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors tap-target ${
                   active
                     ? "text-[#1e3a5f]"
@@ -119,7 +149,7 @@ export default function PlatformLayout({
                 <Icon
                   className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`}
                 />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[10px] font-medium">{copy.nav[item.key]}</span>
               </Link>
             );
           })}
@@ -135,7 +165,7 @@ export default function PlatformLayout({
             return (
               <Link
                 key={item.href}
-                href={`/${locale}${item.href}`}
+                href={item.href}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   active
                     ? "bg-[#1e3a5f] text-white"
@@ -143,8 +173,7 @@ export default function PlatformLayout({
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
-                <span className="text-xs opacity-70">{item.labelAr}</span>
+                <span>{copy.nav[item.key]}</span>
               </Link>
             );
           })}

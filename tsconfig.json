@@ -48,7 +48,9 @@
     ".test-artifacts/next/playwright-41927/types/**/*.ts",
     ".test-artifacts/next/playwright-41927/dev/types/**/*.ts",
     ".test-artifacts/next/playwright-38897/types/**/*.ts",
-    ".test-artifacts/next/playwright-38897/dev/types/**/*.ts"
+    ".test-artifacts/next/playwright-38897/dev/types/**/*.ts",
+    ".test-artifacts/next/playwright-43699/types/**/*.ts",
+    ".test-artifacts/next/playwright-43699/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
