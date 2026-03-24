@@ -17,6 +17,43 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/helpers/$(request.auth.uid));
     }
 
+    function isPlatformUser() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/platform_users/$(request.auth.uid));
+    }
+
+    function isPlatformAdmin() {
+      return isPlatformUser() &&
+        get(/databases/$(database)/documents/platform_users/$(request.auth.uid)).data.role == 'platform_admin';
+    }
+
+    function isPlatformCollection(collection) {
+      return collection in [
+        'actors',
+        'intake_submissions',
+        'capacity_cards',
+        'capacity_changes',
+        'vouches',
+        'needs',
+        'pattern_alerts',
+        'urgency_alerts',
+        'collaborations',
+        'joint_operations',
+        'shared_tasks',
+        'flash_assessments',
+        'assessment_snapshots',
+        'sector_plans',
+        'gap_analyses',
+        'message_threads',
+        'messages',
+        'community_feedback',
+        'outcome_reports',
+        'network_outcomes',
+        'platform_stats',
+        'zones'
+      ];
+    }
+
     // Rate limiting: check timestamp-based rules
     function isRecentWrite() {
       return request.time < resource.data.createdAt + duration.value(1, 's');
@@ -44,6 +81,14 @@ service cloud.firestore {
       }
     }
 
+    // ---- PLATFORM DATA ----
+    // Coordination platform data is public read-only in the app.
+    // Writes are performed through trusted tooling, not client SDKs.
+    match /{collection}/{docId} {
+      allow read: if isPlatformCollection(collection);
+      allow write: if false;
+    }
+
     // ---- HELPERS ----
     // Helpers can read their own profile
     // Anyone can create (registration)
@@ -53,6 +98,13 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.auth.uid == helperId;
       allow update: if (isAuthenticated() && request.auth.uid == helperId) || isAdmin();
       allow delete: if isAdmin();
+    }
+
+    // ---- PLATFORM USERS ----
+    // Platform users are private identity mappings for Shabaka org/admin accounts.
+    match /platform_users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin() || isPlatformAdmin());
+      allow write: if false;
     }
 
     // ---- CLAIMS ----

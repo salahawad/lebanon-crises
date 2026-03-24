@@ -12,7 +12,10 @@ import {
   increment,
 } from 'firebase/firestore';
 import { db } from './config';
+import { createLogger } from '../logger';
 import type { Claim, ClaimFormData, Helper } from '../types';
+
+const log = createLogger('firebase:helpers');
 
 // Get helper profile
 export async function getHelper(uid: string): Promise<Helper | null> {
@@ -65,8 +68,9 @@ export async function createClaim(
   await updateDoc(doc(db, 'stats', 'global'), {
     totalClaims: increment(1),
     lastUpdated: now,
-  }).catch(() => {});
+  }).catch((err) => log.warn('stats update failed', err, { operation: 'createClaim' }));
 
+  log.info('claim created', { operation: 'createClaim', claimId: docRef.id, requestId });
   return docRef.id;
 }
 
@@ -134,7 +138,9 @@ export async function confirmDelivery(
       fulfilledRequests: increment(1),
       openRequests: increment(-1),
       lastUpdated: now,
-    }).catch(() => {});
+    }).catch((err) => log.warn('stats update failed', err, { operation: 'confirmDelivery' }));
+
+    log.info('delivery confirmed by both parties', { operation: 'confirmDelivery', claimId, requestId });
   }
 
   return { bothConfirmed: !!otherConfirmed };

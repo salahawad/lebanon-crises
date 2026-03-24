@@ -7,6 +7,9 @@ import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { LebanonMap } from "@/components/shared/lebanon-map";
 import { getRequestCountsByGovernorate } from "@/lib/firebase/requests";
 import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelters";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("page:landing");
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -18,10 +21,10 @@ export default function LandingPage() {
   useEffect(() => {
     getRequestCountsByGovernorate()
       .then(setGovCounts)
-      .catch(() => {});
+      .catch((err) => log.warn("failed to load request counts", err));
     getShelters()
       .then((s) => setShelterGovCounts(getShelterCountsByGovernorate(s)))
-      .catch(() => {});
+      .catch((err) => log.warn("failed to load shelters for map", err));
   }, []);
 
   return (
@@ -108,6 +111,24 @@ export default function LandingPage() {
             </span>
             <span className="text-sm opacity-90 mt-1 block">
               {t("shelters.viewSheltersDesc")}
+            </span>
+          </Link>
+        </div>
+
+        {/* Coordination Platform Link */}
+        <div className="mb-8">
+          <Link
+            href="/platform"
+            className="block w-full p-5 rounded-2xl bg-primary text-white text-center shadow-lg hover:bg-primary-light transition-colors"
+          >
+            <span className="text-3xl block mb-2" aria-hidden="true">
+              🌐
+            </span>
+            <span className="text-xl font-bold block">
+              {t("landing.platformName")}
+            </span>
+            <span className="text-sm opacity-90 mt-1 block">
+              {t("landing.platformDesc")}
             </span>
           </Link>
         </div>

@@ -8,11 +8,16 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './config';
+import { createLogger } from '../logger';
 import type { AdminUser, Helper } from '../types';
+import type { PlatformUser } from '../types/platform';
+
+const log = createLogger('firebase:auth');
 
 // Anonymous sign-in for requesters (free, no phone needed)
 export async function signInAnonymous(): Promise<User> {
   const result = await signInAnonymously(auth);
+  log.info('anonymous sign-in', { operation: 'signInAnonymous' });
   return result.user;
 }
 
@@ -25,10 +30,12 @@ export async function signInAdmin(
   const adminDoc = await getDoc(doc(db, 'admins', result.user.uid));
 
   if (!adminDoc.exists()) {
+    log.warn('admin auth rejected: not in admins collection', undefined, { operation: 'signInAdmin', uid: result.user.uid });
     await firebaseSignOut(auth);
     throw new Error('Not authorized as admin');
   }
 
+  log.info('admin sign-in', { operation: 'signInAdmin' });
   return {
     user: result.user,
     admin: adminDoc.data() as AdminUser,
@@ -53,6 +60,7 @@ export async function registerHelper(
   };
 
   await setDoc(doc(db, 'helpers', result.user.uid), helper);
+  log.info('helper registered', { operation: 'registerHelper' });
   return { user: result.user, helper };
 }
 
@@ -64,10 +72,55 @@ export async function signInHelper(
   const result = await signInWithEmailAndPassword(auth, email, password);
   const helperDoc = await getDoc(doc(db, 'helpers', result.user.uid));
 
+  log.info('helper sign-in', { operation: 'signInHelper' });
   return {
     user: result.user,
     helper: helperDoc.exists() ? (helperDoc.data() as Helper) : null,
   };
+}
+
+export async function getPlatformUser(uid: string): Promise<PlatformUser | null> {
+  const platformUserDoc = await getDoc(doc(db, 'platform_users', uid));
+  if (!platformUserDoc.exists()) return null;
+
+  return {
+    id: platformUserDoc.id,
+    ...(platformUserDoc.data() as Omit<PlatformUser, 'id'>),
+  };
+}
+
+export async function signInPlatformUser(
+  email: string,
+  password: string
+): Promise<{ user: User; platformUser: PlatformUser }> {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  const platformUser = await getPlatformUser(result.user.uid);
+
+  if (!platformUser) {
+    log.warn(
+      'platform auth rejected: not in platform_users collection',
+      undefined,
+      { operation: 'signInPlatformUser', uid: result.user.uid }
+    );
+    await firebaseSignOut(auth);
+    throw new Error('Not authorized as platform user');
+  }
+
+  log.info('platform sign-in', {
+    operation: 'signInPlatformUser',
+    role: platformUser.role,
+    actorId: platformUser.actorId,
+  });
+
+  return {
+    user: result.user,
+    platformUser,
+  };
+}
+
+export async function checkIsPlatformAdmin(uid: string): Promise<boolean> {
+  const platformUser = await getPlatformUser(uid);
+  return platformUser?.role === 'platform_admin';
 }
 
 // Sign out

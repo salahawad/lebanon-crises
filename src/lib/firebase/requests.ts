@@ -28,7 +28,9 @@ import type {
   ModerationFlag,
 } from '../types';
 import { generateReferenceCode } from '../utils/helpers';
+import { createLogger } from '../logger';
 
+const log = createLogger('firebase:requests');
 const REQUESTS_COLLECTION = 'requests';
 const PAGE_SIZE = 20;
 
@@ -81,8 +83,8 @@ export async function createHelpRequest(
     totalRequests: increment(1),
     openRequests: increment(1),
     lastUpdated: now,
-  }).catch(() => {
-    // Stats doc may not exist yet; create it
+  }).catch((err) => {
+    log.warn('stats update failed, initializing', err, { operation: 'createHelpRequest' });
     setDoc(doc(db, 'stats', 'global'), {
       totalRequests: 1,
       openRequests: 1,
@@ -93,6 +95,7 @@ export async function createHelpRequest(
     });
   });
 
+  log.info('help request created', { operation: 'createHelpRequest', requestId: docRef.id, referenceCode });
   return { id: docRef.id, referenceCode };
 }
 
@@ -215,7 +218,7 @@ export async function updateRequestStatus(
       fulfilledRequests: increment(1),
       openRequests: increment(-1),
       lastUpdated: now,
-    }).catch(() => {});
+    }).catch((err) => log.warn('stats update failed', err, { operation: 'updateRequestStatus' }));
   }
 
   // Audit log
@@ -226,6 +229,8 @@ export async function updateRequestStatus(
     performedBy: adminUid,
     createdAt: now,
   });
+
+  log.info('request status updated', { operation: 'updateRequestStatus', requestId: id, status });
 }
 
 // Flag request
@@ -318,7 +323,9 @@ export async function getAppStats() {
   };
 
   // Cache the computed stats
-  setDoc(doc(db, 'stats', 'global'), stats).catch(() => {});
+  setDoc(doc(db, 'stats', 'global'), stats).catch((err) =>
+    log.warn('stats cache write failed', err, { operation: 'getAppStats' })
+  );
 
   return stats;
 }

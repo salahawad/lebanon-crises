@@ -32,6 +32,8 @@
     "offerHelp": "I want to help",
     "offerHelpDesc": "Browse open requests and offer your support",
     "safeNotice": "Your privacy and safety are our priority. Personal information is protected.",
+    "platformName": "Shabaka",
+    "platformDesc": "Crisis Coordination Platform — for organizations",
     "openRequests": "Open requests",
     "helpersRegistered": "Helpers registered",
     "requestsFulfilled": "Requests fulfilled"
@@ -172,7 +174,8 @@
     "alreadyHaveAccount": "Already have an account?",
     "signIn": "Sign in",
     "loginTitle": "Helper Sign In",
-    "loginSubtitle": "Sign in to your helper account"
+    "loginSubtitle": "Sign in to your helper account",
+    "emailAlreadyRegistered": "This email is already registered. Try signing in."
   },
   "admin": {
     "login": "Admin Login",
@@ -210,7 +213,12 @@
     "verified": "Verified",
     "unverified": "Unverified",
     "deliveries": "{count} deliveries",
-    "pendingReview": "Pending Review"
+    "pendingReview": "Pending Review",
+    "all": "All",
+    "contactName": "Name: {name}",
+    "contactPhone": "Phone: {phone}",
+    "noContactInfo": "No contact info provided",
+    "noHelpers": "No helpers registered"
   },
   "urgency": {
     "critical": "Critical",
@@ -255,11 +263,38 @@
   },
   "privacy": {
     "title": "Privacy Notice",
-    "content": "This platform collects minimal personal data to coordinate humanitarian assistance. Your information is shared only with verified helpers and administrators. Phone numbers are stored securely and never displayed publicly. You may request deletion of your data at any time by contacting an administrator. This service is provided on a volunteer basis with no guarantees."
+    "content": "This platform collects minimal personal data to coordinate humanitarian assistance. Your information is shared only with verified helpers and administrators. Phone numbers are stored securely and never displayed publicly. You may request deletion of your data at any time by contacting an administrator. This service is provided on a volunteer basis with no guarantees.",
+    "dataWeCollect": "Data We Collect",
+    "dataItem1": "Help request details (category, area, description)",
+    "dataItem2": "Optional contact information (phone number, name)",
+    "dataItem3": "Helper registration details (name, email, organization)",
+    "howWeProtect": "How We Protect Your Data",
+    "protectItem1": "Phone numbers are stored in a separate, access-controlled collection",
+    "protectItem2": "Exact addresses are never collected or displayed",
+    "protectItem3": "Public request listings show only general area information",
+    "protectItem4": "Contact details are shared only with verified helpers and administrators",
+    "yourRights": "Your Rights",
+    "rightsItem1": "Request deletion of your data at any time",
+    "rightsItem2": "Submit requests anonymously",
+    "rightsItem3": "Choose your preferred contact method or opt out of direct contact"
   },
   "terms": {
     "title": "Terms of Use & Humanitarian Notice",
-    "content": "This platform is a volunteer-operated humanitarian coordination tool. It is NOT an emergency service. If you are in immediate danger, contact local emergency services. By using this platform, you acknowledge that: (1) This is a best-effort volunteer service; (2) We cannot guarantee any specific response time or outcome; (3) Information shared is used solely for coordinating humanitarian assistance; (4) You will not misuse this platform for fraudulent requests or harmful purposes."
+    "content": "This platform is a volunteer-operated humanitarian coordination tool. It is NOT an emergency service. If you are in immediate danger, contact local emergency services. By using this platform, you acknowledge that: (1) This is a best-effort volunteer service; (2) We cannot guarantee any specific response time or outcome; (3) Information shared is used solely for coordinating humanitarian assistance; (4) You will not misuse this platform for fraudulent requests or harmful purposes.",
+    "emergencyWarning": "This is NOT an emergency service. If you are in immediate danger, call your local emergency number.",
+    "aboutPlatform": "About This Platform",
+    "aboutContent": "This platform is a volunteer-operated humanitarian coordination tool designed to connect displaced people with individuals and organizations who can provide assistance. It is not operated by any government or official agency.",
+    "acceptableUse": "Acceptable Use",
+    "useItem1": "Submit only genuine requests for help",
+    "useItem2": "Do not submit false or misleading information",
+    "useItem3": "Do not misuse the platform for commercial purposes",
+    "useItem4": "Treat all users with respect and dignity",
+    "useItem5": "Report suspicious activity to administrators",
+    "limitations": "Limitations",
+    "limitItem1": "We cannot guarantee response times or outcomes",
+    "limitItem2": "Volunteer availability varies by area and time",
+    "limitItem3": "We are not responsible for the actions of individual helpers",
+    "limitItem4": "The platform may experience downtime during high-usage periods"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -268,10 +303,12 @@
     "notFound": "Page not found",
     "unauthorized": "You are not authorized to access this page",
     "captchaFailed": "Verification failed. Please try again.",
-    "duplicateRequest": "You recently submitted a similar request. Please wait before submitting again."
+    "duplicateRequest": "You recently submitted a similar request. Please wait before submitting again.",
+    "tryAgain": "Try again"
   },
   "disclaimer": {
-    "banner": "This platform is in demo mode. All data shown is for demonstration purposes only."
+    "banner": "This platform is in demo mode. All data shown is for demonstration purposes only.",
+    "notReady": "Settings functionality is not ready yet. Changes are not saved."
   },
   "empty": {
     "noRequests": "No requests yet",

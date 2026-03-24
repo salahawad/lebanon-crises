@@ -18,36 +18,32 @@ export default function TermsPage() {
           <div className="prose prose-sm text-slate-700 leading-relaxed">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <p className="font-bold text-yellow-800">
-                This is NOT an emergency service. If you are in immediate danger,
-                call your local emergency number.
+                {t("terms.emergencyWarning")}
               </p>
             </div>
 
             <p>{t("terms.content")}</p>
 
-            <h2 className="text-base font-bold mt-6 mb-2">About This Platform</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("terms.aboutPlatform")}</h2>
             <p className="text-sm">
-              This platform is a volunteer-operated humanitarian coordination
-              tool designed to connect displaced people with individuals and
-              organizations who can provide assistance. It is not operated by any
-              government or official agency.
+              {t("terms.aboutContent")}
             </p>
 
-            <h2 className="text-base font-bold mt-6 mb-2">Acceptable Use</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("terms.acceptableUse")}</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Submit only genuine requests for help</li>
-              <li>Do not submit false or misleading information</li>
-              <li>Do not misuse the platform for commercial purposes</li>
-              <li>Treat all users with respect and dignity</li>
-              <li>Report suspicious activity to administrators</li>
+              <li>{t("terms.useItem1")}</li>
+              <li>{t("terms.useItem2")}</li>
+              <li>{t("terms.useItem3")}</li>
+              <li>{t("terms.useItem4")}</li>
+              <li>{t("terms.useItem5")}</li>
             </ul>
 
-            <h2 className="text-base font-bold mt-6 mb-2">Limitations</h2>
+            <h2 className="text-base font-bold mt-6 mb-2">{t("terms.limitations")}</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>We cannot guarantee response times or outcomes</li>
-              <li>Volunteer availability varies by area and time</li>
-              <li>We are not responsible for the actions of individual helpers</li>
-              <li>The platform may experience downtime during high-usage periods</li>
+              <li>{t("terms.limitItem1")}</li>
+              <li>{t("terms.limitItem2")}</li>
+              <li>{t("terms.limitItem3")}</li>
+              <li>{t("terms.limitItem4")}</li>
             </ul>
           </div>
         </Card>

@@ -6,6 +6,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
+    exclude: ['e2e/**', 'node_modules/**'],
+    coverage: {
+      reportsDirectory: './.test-artifacts/vitest/coverage',
+    },
   },
   resolve: {
     alias: {

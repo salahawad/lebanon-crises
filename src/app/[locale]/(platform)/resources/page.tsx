@@ -1,0 +1,286 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  BarChart3,
+  Package,
+  MapPin,
+} from "lucide-react";
+import { getResources } from "@/lib/data/platform-api";
+import type { ZoneResource } from "@/lib/types/platform";
+import { ZONES, getZoneName } from "@/lib/data/zones";
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// Resource category display config
+const RESOURCE_CATEGORIES: Record<string, { label: string; maxCapacity: number; icon: string }> = {
+  "Available Beds": { label: "Hospital Beds", maxCapacity: 100, icon: "beds" },
+  Beds: { label: "Hospital Beds", maxCapacity: 100, icon: "beds" },
+  "Medical Staff": { label: "Medical Staff", maxCapacity: 20, icon: "staff" },
+  "Food Parcels": { label: "Food Parcels", maxCapacity: 200, icon: "food" },
+  Vehicles: { label: "Transport", maxCapacity: 10, icon: "transport" },
+  Drivers: { label: "Transport", maxCapacity: 10, icon: "transport" },
+  Volunteers: { label: "Volunteers", maxCapacity: 50, icon: "volunteers" },
+  "Consultation Slots": { label: "Medical Staff", maxCapacity: 20, icon: "staff" },
+};
+
+function getResourceLevel(count: number, maxCapacity: number): "green" | "amber" | "red" {
+  const ratio = count / maxCapacity;
+  if (ratio >= 0.5) return "green";
+  if (ratio >= 0.2) return "amber";
+  return "red";
+}
+
+const LEVEL_COLORS = {
+  green: { bar: "#22c55e", bg: "bg-green-50", text: "text-green-700", label: "Adequate" },
+  amber: { bar: "#f59e0b", bg: "bg-amber-50", text: "text-amber-700", label: "Moderate" },
+  red: { bar: "#ef4444", bg: "bg-red-50", text: "text-red-700", label: "Low" },
+};
+
+// Group resources by a display label
+function groupByCategory(resources: ZoneResource[]): Map<string, ZoneResource[]> {
+  const grouped = new Map<string, ZoneResource[]>();
+  for (const r of resources) {
+    const config = RESOURCE_CATEGORIES[r.category];
+    const groupLabel = config?.label ?? r.category;
+    if (!grouped.has(groupLabel)) grouped.set(groupLabel, []);
+    grouped.get(groupLabel)!.push(r);
+  }
+  return grouped;
+}
+
+export default function ResourceTrackerPage() {
+  const [resources, setResources] = useState<ZoneResource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [zoneFilter, setZoneFilter] = useState<string>("all");
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getResources();
+        setResources(data);
+      } catch (err) {
+        console.error("Failed to load resources:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const toggleExpanded = (key: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const filteredResources = zoneFilter === "all"
+    ? resources
+    : resources.filter((r) => r.zone === zoneFilter);
+
+  // Unique zones present in resources
+  const activeZones = [...new Set(resources.map((r) => r.zone))];
+
+  // Zone summary data
+  const zoneSummaries = activeZones
+    .filter((z) => zoneFilter === "all" || z === zoneFilter)
+    .map((zoneId) => {
+      const zoneResources = resources.filter((r) => r.zone === zoneId);
+      const totalCount = zoneResources.reduce((sum, r) => sum + r.totalCount, 0);
+      const categories = zoneResources.length;
+      return { zoneId, totalCount, categories };
+    });
+
+  // Grouped for display
+  const grouped = groupByCategory(filteredResources);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-3">
+          <Package className="w-8 h-8 text-primary" />
+          <p className="text-slate-500 text-sm">Loading resources...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+        <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center gap-3">
+          <BarChart3 className="w-5 h-5" />
+          <h1 className="text-base font-bold">Resource Tracker</h1>
+          <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">
+            {filteredResources.length} resources
+          </span>
+        </div>
+      </header>
+
+      <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-4 space-y-4">
+        {/* Zone filter */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3">
+          <div className="relative">
+            <select
+              value={zoneFilter}
+              onChange={(e) => setZoneFilter(e.target.value)}
+              className="appearance-none w-full bg-slate-100 text-sm rounded-lg px-3 py-2 pe-8 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+            >
+              <option value="all">All Zones</option>
+              {ZONES.map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.nameEn}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-slate-400 absolute end-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Zone Summary Cards */}
+        {zoneSummaries.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {zoneSummaries.map((zs) => (
+              <button
+                key={zs.zoneId}
+                onClick={() => setZoneFilter(zs.zoneId === zoneFilter ? "all" : zs.zoneId)}
+                className={`rounded-2xl border p-3 text-left transition-colors ${
+                  zoneFilter === zs.zoneId
+                    ? "bg-[#1e3a5f] text-white border-[#1e3a5f]"
+                    : "bg-white border-slate-200 shadow-sm hover:border-[#1e3a5f]/30"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" />
+                  <p className={`text-xs font-medium truncate ${zoneFilter === zs.zoneId ? "text-white/80" : "text-slate-500"}`}>
+                    {getZoneName(zs.zoneId, "en")}
+                  </p>
+                </div>
+                <p className={`text-lg font-bold ${zoneFilter === zs.zoneId ? "" : "text-[#1e3a5f]"}`}>
+                  {zs.totalCount}
+                </p>
+                <p className={`text-xs ${zoneFilter === zs.zoneId ? "text-white/60" : "text-slate-400"}`}>
+                  {zs.categories} resource type{zs.categories !== 1 ? "s" : ""}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Resource Categories */}
+        {grouped.size === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+            <Package className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <p className="text-slate-500 text-sm">No resources found for this zone.</p>
+          </div>
+        ) : (
+          [...grouped.entries()].map(([categoryLabel, categoryResources]) => {
+            const totalCount = categoryResources.reduce((s, r) => s + r.totalCount, 0);
+            const latestUpdate = Math.max(...categoryResources.map((r) => r.lastUpdated));
+            const config = Object.values(RESOURCE_CATEGORIES).find((c) => c.label === categoryLabel);
+            const maxCapacity = config?.maxCapacity ?? 100;
+            const level = getResourceLevel(totalCount, maxCapacity);
+            const levelConfig = LEVEL_COLORS[level];
+            const progressPct = Math.min((totalCount / maxCapacity) * 100, 100);
+
+            // Flatten actor breakdowns across all zone resources in this category
+            const allActors = categoryResources.flatMap((r) =>
+              r.actorBreakdown.map((ab) => ({
+                ...ab,
+                zone: r.zone,
+              }))
+            );
+
+            const rowKey = categoryLabel;
+            const isExpanded = expandedRows.has(rowKey);
+
+            return (
+              <div key={categoryLabel} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                {/* Category header */}
+                <button
+                  onClick={() => toggleExpanded(rowKey)}
+                  className="w-full p-4 text-left"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-[#1e3a5f]">{categoryLabel}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${levelConfig.bg} ${levelConfig.text}`}>
+                        {levelConfig.label}
+                      </span>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl font-bold text-slate-900">{totalCount}</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Updated {timeAgo(latestUpdate)}
+                    </span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${progressPct}%`, backgroundColor: levelConfig.bar }}
+                    />
+                  </div>
+                </button>
+
+                {/* Expanded actor breakdown */}
+                {isExpanded && allActors.length > 0 && (
+                  <div className="border-t border-slate-100 px-4 pb-3">
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide py-2">
+                      Breakdown by Actor
+                    </p>
+                    <div className="space-y-2">
+                      {allActors.map((actor, i) => (
+                        <div key={`${actor.actorId}-${i}`} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-slate-700 truncate">{actor.actorName}</span>
+                            {zoneFilter === "all" && (
+                              <span className="text-xs text-slate-400">
+                                {getZoneName(actor.zone, "en")}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-semibold text-slate-900">{actor.count}</span>
+                            <span className="text-xs text-slate-400">
+                              {timeAgo(actor.updatedAt)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </main>
+    </div>
+  );
+}

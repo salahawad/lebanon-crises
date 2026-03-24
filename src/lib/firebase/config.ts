@@ -14,12 +14,19 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
+const authEmulatorUrl =
+  process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_URL ?? 'http://127.0.0.1:9099';
+const firestoreEmulatorHost =
+  process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST ?? '127.0.0.1';
+const firestoreEmulatorPort = Number(
+  process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_PORT ?? '8080'
+);
 
 // Connect to emulators in development
 if (process.env.NEXT_PUBLIC_USE_EMULATORS === 'true') {
   try {
-    connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-    connectFirestoreEmulator(db, 'localhost', 8080);
+    connectAuthEmulator(auth, authEmulatorUrl, { disableWarnings: true });
+    connectFirestoreEmulator(db, firestoreEmulatorHost, firestoreEmulatorPort);
   } catch {
     // Already connected
   }
