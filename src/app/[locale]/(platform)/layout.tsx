@@ -124,14 +124,14 @@ export default function PlatformLayout({
       </header>
 
       {/* Main content */}
-      <main className="flex-1 pb-20 md:pb-6">
+      <main className="flex-1 pb-32 md:pb-20">
         <div className="max-w-lg mx-auto md:max-w-5xl px-4 py-6">
           {children}
         </div>
       </main>
 
       {/* Bottom navigation (mobile) */}
-      <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-40 md:hidden">
+      <nav className="fixed bottom-11 inset-x-0 bg-white border-t border-slate-200 z-40 md:hidden">
         <div className="max-w-lg mx-auto flex items-center justify-around h-16">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
@@ -157,7 +157,7 @@ export default function PlatformLayout({
       </nav>
 
       {/* Desktop sidebar nav (shown on md+) */}
-      <nav className="hidden md:block fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-40">
+      <nav className="hidden md:block fixed bottom-11 inset-x-0 bg-white border-t border-slate-200 z-40">
         <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 h-14 px-4">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
