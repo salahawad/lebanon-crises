@@ -7,7 +7,6 @@ import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { LebanonMap } from "@/components/shared/lebanon-map";
 import { getRequestCountsByGovernorate } from "@/lib/firebase/requests";
 import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelters";
-import { NewsFeed } from "@/components/shared/news-feed";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("page:landing");
@@ -132,11 +131,6 @@ export default function LandingPage() {
               {t("landing.platformDesc")}
             </span>
           </Link>
-        </div>
-
-        {/* Live News */}
-        <div className="mb-8">
-          <NewsFeed />
         </div>
 
         {/* Map */}

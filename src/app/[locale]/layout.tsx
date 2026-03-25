@@ -5,6 +5,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { DemoBanner } from "@/components/shared/demo-banner";
+import { NewsTicker } from "@/components/shared/news-feed";
 import "../globals.css";
 
 const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -81,6 +82,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <DemoBanner />
           {children}
+          <NewsTicker />
         </NextIntlClientProvider>
       </body>
     </html>
