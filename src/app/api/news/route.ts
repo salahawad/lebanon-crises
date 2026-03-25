@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
-const RSS_URL =
-  "https://www.lebanonfiles.com/topics/%d8%a3%d8%ae%d8%a8%d8%a7%d8%b1-%d8%a7%d9%84%d8%b3%d8%a7%d8%b9%d8%a9/feed/";
+const RSS_FEEDS = [
+  "https://www.lebanonfiles.com/topics/%d8%a3%d8%ae%d8%a8%d8%a7%d8%b1-%d8%a7%d9%84%d8%b3%d8%a7%d8%b9%d8%a9/feed/",
+  "https://www.lebanon24.com/Rss/News/1/%D9%84%D8%A8%D9%86%D8%A7%D9%86",
+];
 
 export interface NewsItem {
   title: string;
@@ -50,20 +52,39 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const res = await fetch(RSS_URL, {
-      headers: { "User-Agent": "LebanonRelief/1.0" },
-      cache: "no-store",
-    });
+    const results = await Promise.allSettled(
+      RSS_FEEDS.map((url) =>
+        fetch(url, {
+          headers: { "User-Agent": "LebanonRelief/1.0" },
+          cache: "no-store",
+        }).then((r) => (r.ok ? r.text() : ""))
+      )
+    );
 
-    if (!res.ok) {
+    const allItems: NewsItem[] = [];
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value) {
+        allItems.push(...parseItems(result.value));
+      }
+    }
+
+    if (allItems.length === 0) {
       return NextResponse.json(
-        { items: [], error: "Feed unavailable" },
+        { items: [], error: "Feeds unavailable" },
         { status: 502 }
       );
     }
 
-    const xml = await res.text();
-    const items = parseItems(xml).slice(0, 20);
+    // Sort newest first and deduplicate by link
+    allItems.sort(
+      (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+    );
+    const seen = new Set<string>();
+    const items = allItems.filter((item) => {
+      if (seen.has(item.link)) return false;
+      seen.add(item.link);
+      return true;
+    }).slice(0, 30);
 
     return NextResponse.json(
       { items },
@@ -75,7 +96,7 @@ export async function GET() {
     );
   } catch {
     return NextResponse.json(
-      { items: [], error: "Failed to fetch feed" },
+      { items: [], error: "Failed to fetch feeds" },
       { status: 502 }
     );
   }

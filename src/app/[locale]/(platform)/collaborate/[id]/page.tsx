@@ -20,9 +20,9 @@ import {
 import type { JointOperation, SharedTask, TaskStatus } from "@/lib/types/platform";
 
 const STATUS_COLUMNS: { key: TaskStatus; label: string; color: string }[] = [
-  { key: "todo", label: "To Do", color: "#94a3b8" },
-  { key: "in_progress", label: "In Progress", color: "#e8913a" },
-  { key: "completed", label: "Done", color: "#22c55e" },
+  { key: "todo", label: "To Do", color: "var(--color-muted)" },
+  { key: "in_progress", label: "In Progress", color: "var(--color-accent)" },
+  { key: "completed", label: "Done", color: "var(--color-success)" },
 ];
 
 function formatDate(ts: number): string {
@@ -40,13 +40,13 @@ function TaskCard({ task }: { task: SharedTask }) {
     <div
       className={`rounded-xl border-2 bg-white p-3 ${
         isBlocked
-          ? "border-[#ef4444]"
+          ? "border-danger"
           : "border-slate-200"
       } ${isDone ? "opacity-70" : ""}`}
     >
       {/* Blocked badge */}
       {isBlocked && (
-        <div className="flex items-center gap-1 text-xs font-medium text-[#ef4444] mb-1.5">
+        <div className="flex items-center gap-1 text-xs font-medium text-danger mb-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
           Blocked
         </div>
@@ -57,7 +57,7 @@ function TaskCard({ task }: { task: SharedTask }) {
         className={`text-sm font-medium mb-2 ${
           isDone
             ? "line-through text-slate-400"
-            : "text-[#1e3a5f]"
+            : "text-primary"
         }`}
       >
         {task.title}
@@ -160,7 +160,7 @@ export default function TaskBoardPage({
           <p className="text-slate-500 text-sm mb-4">Operation not found</p>
           <Link
             href={`/${locale}/collaborate`}
-            className="text-sm font-medium text-[#1e3a5f] hover:text-[#e8913a] transition-colors"
+            className="text-sm font-medium text-primary hover:text-accent transition-colors"
           >
             Back to Collaborations
           </Link>
@@ -174,16 +174,16 @@ export default function TaskBoardPage({
       {/* Back link */}
       <Link
         href={`/${locale}/collaborate`}
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#1e3a5f] transition-colors mb-4"
+        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Collaborations
       </Link>
 
       {/* Operation header */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-6">
+      <div className="bg-white rounded-lg border border-slate-200 p-5 mb-6">
         <div className="flex items-start justify-between gap-3 mb-3">
-          <h1 className="text-lg font-bold text-[#1e3a5f]">
+          <h1 className="text-lg font-bold text-primary">
             {operation.title}
           </h1>
           <span
@@ -216,12 +216,12 @@ export default function TaskBoardPage({
 
       {/* Add Task button */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-[#1e3a5f] uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider">
           Task Board
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-[#1e3a5f] text-white hover:bg-[#2a4f7f] transition-colors"
+          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Task
@@ -274,9 +274,9 @@ export default function TaskBoardPage({
       {/* Add task modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-end md:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-5 shadow-xl">
+          <div className="bg-white rounded-lg w-full max-w-lg p-5 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#1e3a5f]">
+              <h3 className="text-lg font-bold text-primary">
                 Add New Task
               </h3>
               <button
@@ -297,7 +297,7 @@ export default function TaskBoardPage({
                 setNewTaskTitle(e.target.value.slice(0, 100))
               }
               placeholder="What needs to be done?"
-              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 focus:border-[#1e3a5f]"
+              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
             />
             <p className="text-xs text-slate-400 mt-1 text-right">
               {newTaskTitle.length}/100
@@ -306,7 +306,7 @@ export default function TaskBoardPage({
             <button
               onClick={handleAddTask}
               disabled={!newTaskTitle.trim()}
-              className="w-full mt-3 bg-[#1e3a5f] hover:bg-[#2a4f7f] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full mt-3 bg-primary hover:bg-primary-dark disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Add Task

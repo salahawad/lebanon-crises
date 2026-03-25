@@ -185,7 +185,7 @@ export default function MorePage() {
     <div>
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
           <MoreHorizontal className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -203,7 +203,7 @@ export default function MorePage() {
             <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1">
               {category.label[locale]}
             </h2>
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden">
+            <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100 overflow-hidden">
               {category.items.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -212,8 +212,8 @@ export default function MorePage() {
                     href={item.href}
                     className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors group"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-[#1e3a5f]/5 flex items-center justify-center shrink-0 group-hover:bg-[#1e3a5f]/10 transition-colors">
-                      <Icon className="w-[18px] h-[18px] text-[#1e3a5f]" />
+                    <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+                      <Icon className="w-[18px] h-[18px] text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-900">

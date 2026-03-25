@@ -24,14 +24,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary tap-target disabled:opacity-50 disabled:pointer-events-none";
+      "inline-flex items-center justify-center font-semibold rounded-lg transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary tap-target disabled:opacity-50 disabled:pointer-events-none";
 
     const variants = {
-      primary: "bg-primary text-white hover:bg-primary-light active:bg-primary-dark",
-      secondary: "bg-accent text-white hover:bg-accent-light",
-      outline: "border-2 border-primary text-primary hover:bg-primary hover:text-white",
-      ghost: "text-primary hover:bg-slate-100",
-      danger: "bg-danger text-white hover:bg-red-600",
+      primary: "bg-primary text-white hover:bg-primary-dark active:bg-primary-dark",
+      secondary: "bg-white text-primary border-2 border-primary hover:bg-primary/5",
+      outline: "border border-border text-heading hover:border-primary hover:text-primary",
+      ghost: "text-primary hover:bg-primary/5",
+      danger: "bg-danger-dark text-white hover:bg-danger-dark",
     };
 
     const sizes = {

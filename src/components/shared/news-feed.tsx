@@ -112,10 +112,10 @@ export function NewsTicker() {
   if (loading || items.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-[#1e3a5f] text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)]" dir="ltr">
+    <div className="fixed bottom-0 inset-x-0 z-50 bg-primary text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)]" dir="ltr">
       <div className="flex items-center h-11">
         {/* Live badge */}
-        <div className="flex-shrink-0 flex items-center gap-1.5 px-3 h-full bg-[#b91c1c] border-e border-white/10">
+        <div className="flex-shrink-0 flex items-center gap-1.5 px-3 h-full bg-danger-dark border-e border-white/10">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
@@ -147,7 +147,7 @@ export function NewsTicker() {
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 hover:text-[#e8913a] transition-colors"
+                  className="inline-flex items-center gap-2 px-4 hover:text-accent transition-colors"
                 >
                   <span className="text-[11px] text-white/40">
                     {timeAgo(item.pubDate)}
@@ -156,7 +156,7 @@ export function NewsTicker() {
                     {item.title}
                   </span>
                   {Date.now() - new Date(item.pubDate).getTime() < 600_000 && (
-                    <span className="text-[8px] font-bold uppercase bg-[#e8913a] text-white px-1 py-px rounded">
+                    <span className="text-[8px] font-bold uppercase bg-accent text-white px-1 py-px rounded">
                       new
                     </span>
                   )}

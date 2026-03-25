@@ -12,7 +12,7 @@ import { getShelters, getShelterCountsByGovernorate } from "@/lib/firebase/shelt
 import type { Shelter, Governorate } from "@/lib/types";
 
 const GOVERNORATES: { id: Governorate; letterEn: string; letterAr: string; color: string }[] = [
-  { id: "beirut", letterEn: "B", letterAr: "ب", color: "#1e3a5f" },
+  { id: "beirut", letterEn: "B", letterAr: "ب", color: "#1E3A8A" },
   { id: "mount_lebanon", letterEn: "ML", letterAr: "ج.ل", color: "#2d6a4f" },
   { id: "north", letterEn: "N", letterAr: "ش", color: "#7c3aed" },
   { id: "akkar", letterEn: "AK", letterAr: "ع", color: "#b45309" },

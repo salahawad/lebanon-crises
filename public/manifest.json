@@ -4,8 +4,8 @@
   "description": "Connecting displaced people with volunteers who can help",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#1e3a5f",
+  "background_color": "#F9FAFB",
+  "theme_color": "#1E3A8A",
   "orientation": "portrait-primary",
   "icons": [
     {

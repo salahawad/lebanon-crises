@@ -34,7 +34,7 @@ test.describe('Needs Board Interactions', () => {
     await foodChip.click();
 
     // If results remain, each need card should have a "Food" category badge
-    const needCards = page.locator('main .space-y-3 > div.bg-white.rounded-2xl');
+    const needCards = page.locator('main .space-y-3 > div.bg-white.rounded-lg');
     const count = await needCards.count();
     if (count > 0) {
       // Check that at least the first card has a Food badge (the colored rounded-full span)
@@ -70,7 +70,7 @@ test.describe('Needs Board Interactions', () => {
 
   test('modal shows actor name context', async ({ page }) => {
     // Read the actor name from the first need card
-    const firstCard = page.locator('main .space-y-3 > div.bg-white.rounded-2xl').first();
+    const firstCard = page.locator('main .space-y-3 > div.bg-white.rounded-lg').first();
     const actorName = await firstCard.locator('p.font-semibold').first().textContent();
 
     // Click "I Can Help" on that card
@@ -406,7 +406,7 @@ test.describe('Messaging Interactions', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 10000 });
 
     // Other-sender messages show sender name in a text-xs font-semibold element
-    const senderNames = page.locator('.text-xs.font-semibold.text-\\[\\#1e3a5f\\]');
+    const senderNames = page.locator('.text-xs.font-semibold.text-primary');
     await expect(senderNames.first()).not.toBeEmpty();
   });
 
@@ -427,7 +427,7 @@ test.describe('Messaging Interactions', () => {
     await input.fill('Test message');
 
     // Click the send button (the round button next to input)
-    const sendBtn = page.locator('button.rounded-full.bg-\\[\\#1e3a5f\\]');
+    const sendBtn = page.locator('button.rounded-full.bg-primary');
     await sendBtn.click();
 
     await expect(input).toHaveValue('');
@@ -437,9 +437,9 @@ test.describe('Messaging Interactions', () => {
     await page.goto(`${BASE}/messages/mt1`);
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 10000 });
 
-    // Own messages use bg-[#1e3a5f] text-white, others use bg-white
-    const ownMessages = page.locator('.bg-\\[\\#1e3a5f\\].text-white.rounded-2xl');
-    const otherMessages = page.locator('.bg-white.border.border-slate-200.text-slate-900.rounded-2xl');
+    // Own messages use bg-[#1E3A8A] text-white, others use bg-white
+    const ownMessages = page.locator('.bg-primary.text-white.rounded-lg');
+    const otherMessages = page.locator('.bg-white.border.border-slate-200.text-slate-900.rounded-lg');
 
     // The mt1 thread has both own (a1/Amel Association) and other messages
     await expect(ownMessages.first()).toBeVisible();

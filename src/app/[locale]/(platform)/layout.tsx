@@ -88,7 +88,7 @@ export default function PlatformLayout({
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="bg-[#1e3a5f] text-white sticky top-0 z-40">
+      <header className="bg-primary text-white sticky top-0 z-40">
         <div className="max-w-lg mx-auto md:max-w-5xl px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <Link
@@ -142,7 +142,7 @@ export default function PlatformLayout({
                 href={item.href}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors tap-target ${
                   active
-                    ? "text-[#1e3a5f]"
+                    ? "text-primary"
                     : "text-slate-400 hover:text-slate-600"
                 }`}
               >
@@ -168,7 +168,7 @@ export default function PlatformLayout({
                 href={item.href}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#1e3a5f] text-white"
+                    ? "bg-primary text-white"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                 }`}
               >

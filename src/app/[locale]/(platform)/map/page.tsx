@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { getActors, getMapData, getUrgencyAlerts } from "@/lib/data/platform-api";
 import {
   getSectorName,
@@ -40,10 +41,17 @@ const ZONE_TO_GOV: Record<string, GovernorateId> = {
   akkar_town: "akkar", halba: "akkar", mina: "north",
 };
 
-const GOV_NAMES: Record<GovernorateId, string> = {
-  akkar: "Akkar", north: "North", baalbek_hermel: "Baalbek-Hermel",
-  mount_lebanon: "Mt. Lebanon", beirut: "Beirut", bekaa: "Bekaa",
-  south: "South", nabatieh: "Nabatieh",
+const GOV_NAMES: Record<string, Record<GovernorateId, string>> = {
+  en: {
+    akkar: "Akkar", north: "North", baalbek_hermel: "Baalbek-Hermel",
+    mount_lebanon: "Mt. Lebanon", beirut: "Beirut", bekaa: "Bekaa",
+    south: "South", nabatieh: "Nabatieh",
+  },
+  ar: {
+    akkar: "عكار", north: "الشمال", baalbek_hermel: "بعلبك-الهرمل",
+    mount_lebanon: "جبل لبنان", beirut: "بيروت", bekaa: "البقاع",
+    south: "الجنوب", nabatieh: "النبطية",
+  },
 };
 
 // Project lat/lng to SVG coordinates (calibrated from known governorate positions)
@@ -55,19 +63,19 @@ function latLngToSvg(lat: number, lng: number): { x: number; y: number } {
 }
 
 function getGovColor(actors: number, gaps: number): string {
-  if (actors === 0) return "#e2e8f0";
-  if (gaps >= 7) return "#fecaca";
-  if (gaps >= 5) return "#fed7aa";
-  if (gaps >= 3) return "#fde68a";
-  return "#bbf7d0";
+  if (actors === 0) return "var(--color-heatmap-none)";
+  if (gaps >= 7) return "var(--color-heatmap-critical)";
+  if (gaps >= 5) return "var(--color-heatmap-high)";
+  if (gaps >= 3) return "var(--color-heatmap-mid)";
+  return "var(--color-heatmap-low)";
 }
 
 function getGovBorder(actors: number, gaps: number): string {
-  if (actors === 0) return "#94a3b8";
-  if (gaps >= 7) return "#dc2626";
-  if (gaps >= 5) return "#ea580c";
-  if (gaps >= 3) return "#d97706";
-  return "#16a34a";
+  if (actors === 0) return "var(--color-muted)";
+  if (gaps >= 7) return "var(--color-danger-dark)";
+  if (gaps >= 5) return "var(--color-high)";
+  if (gaps >= 3) return "var(--color-warning)";
+  return "var(--color-success-dark)";
 }
 
 type DisplayZoneData = MapZoneData & {
@@ -75,6 +83,9 @@ type DisplayZoneData = MapZoneData & {
 };
 
 export default function MapPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
+  const govNames = GOV_NAMES[locale] || GOV_NAMES.en;
   const [zoneData, setZoneData] = useState<MapZoneData[]>([]);
   const [actors, setActors] = useState<Actor[]>([]);
   const [alerts, setAlerts] = useState<UrgencyAlert[]>([]);
@@ -183,26 +194,26 @@ export default function MapPage() {
     <div className="py-2 space-y-3">
       {/* Sector filter */}
       <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Filter by Sector</p>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{t("map.filterBySector")}</p>
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setActiveSector(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${!activeSector ? "bg-primary text-white" : "bg-white border border-slate-200 text-slate-600"}`}
-          >All</button>
+          >{t("map.all")}</button>
           {SECTORS_META.map((s) => (
             <button key={s.id} onClick={() => setActiveSector(activeSector === s.id as Sector ? null : s.id as Sector)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${activeSector === s.id ? "text-white" : "bg-white border border-slate-200 text-slate-600"}`}
               style={activeSector === s.id ? { backgroundColor: s.color } : undefined}
-            >{s.nameEn}</button>
+            >{locale === "ar" ? s.nameAr : s.nameEn}</button>
           ))}
         </div>
       </div>
 
       {/* SVG Map — full width */}
       {loading ? (
-        <div className="h-[500px] bg-slate-100 rounded-2xl animate-pulse" />
+        <div className="h-[500px] bg-slate-100 rounded-lg animate-pulse" />
       ) : (
-        <div className="relative bg-white rounded-2xl border border-slate-200 p-2">
+        <div className="relative bg-white rounded-lg border border-slate-200 p-2">
           <svg viewBox="-10 30 520 640" className="w-full" style={{ maxHeight: "70vh" }}>
             <defs>
               <filter id="mshadow" x="-10%" y="-10%" width="120%" height="120%">
@@ -223,23 +234,23 @@ export default function MapPage() {
               const filteredHasUnderlyingData = overallActors > 0;
               const fillColor = activeSector
                 ? filteredHasCoverage
-                  ? "#bbf7d0"
+                  ? "var(--color-heatmap-low)"
                   : filteredHasUnderlyingData
-                    ? "#fecaca"
-                    : "#e2e8f0"
+                    ? "var(--color-heatmap-critical)"
+                    : "var(--color-heatmap-none)"
                 : getGovColor(totalActors, gaps.length);
               const borderColor = activeSector
                 ? filteredHasCoverage
-                  ? "#16a34a"
+                  ? "var(--color-success-dark)"
                   : filteredHasUnderlyingData
-                    ? "#dc2626"
-                    : "#94a3b8"
+                    ? "var(--color-danger-dark)"
+                    : "var(--color-muted)"
                 : getGovBorder(totalActors, gaps.length);
               return (
                 <path key={govId} d={d}
                   data-testid={`gov-${govId}`}
                   fill={fillColor}
-                  stroke={isHovered || isSelected ? "#1e3a5f" : borderColor}
+                  stroke={isHovered || isSelected ? "var(--color-primary)" : borderColor}
                   strokeWidth={isHovered || isSelected ? 2.5 : 1}
                   strokeLinejoin="round"
                   filter={isHovered ? "url(#mshadow)" : undefined}
@@ -259,8 +270,8 @@ export default function MapPage() {
               return (
                 <text key={`lbl-${govId}`} x={labelX} y={labelY + (totalActors > 0 ? 24 : 5)}
                   textAnchor="middle" fontSize={govId === "beirut" ? "8" : "10"} fontWeight="600"
-                  fill="#334155" opacity={0.4} className="pointer-events-none select-none"
-                >{GOV_NAMES[govId]}</text>
+                  fill="var(--color-sub)" opacity={0.4} className="pointer-events-none select-none"
+                >{govNames[govId]}</text>
               );
             })}
 
@@ -271,11 +282,11 @@ export default function MapPage() {
               const { labelX, labelY } = GOVERNORATE_PATHS[govId];
               const badgeColor = activeSector
                 ? totalActors > 0
-                  ? "#1e3a5f"
-                  : "#ef4444"
+                  ? "var(--color-primary)"
+                  : "var(--color-danger)"
                 : gaps.length > 3
-                  ? "#ef4444"
-                  : "#1e3a5f";
+                  ? "var(--color-danger)"
+                  : "var(--color-primary)";
               return (
                 <g key={`badge-${govId}`} data-testid={`gov-badge-${govId}`} className="pointer-events-none">
                   <circle cx={labelX} cy={labelY} r={govId === "beirut" ? 11 : 14} fill={badgeColor} opacity={0.9} />
@@ -292,7 +303,7 @@ export default function MapPage() {
                   </text>
                   {hasAlert && (
                     <>
-                      <circle cx={labelX + (govId === "beirut" ? 12 : 16)} cy={labelY - 12} r={6} fill="#ef4444" />
+                      <circle cx={labelX + (govId === "beirut" ? 12 : 16)} cy={labelY - 12} r={6} fill="var(--color-danger)" />
                       <text x={labelX + (govId === "beirut" ? 12 : 16)} y={labelY - 9} textAnchor="middle" fontSize="8" fontWeight="700" fill="white">!</text>
                     </>
                   )}
@@ -312,15 +323,15 @@ export default function MapPage() {
               const hasGaps = zd.gaps.length > 0;
               const pinColor = activeSector
                 ? zd.actorCount > 0
-                  ? "#22c55e"
+                  ? "var(--color-success)"
                   : zd.overallActorCount > 0
-                    ? "#f97316"
-                    : "#94a3b8"
+                    ? "var(--color-high)"
+                    : "var(--color-muted)"
                 : zd.actorCount === 0
-                  ? "#94a3b8"
+                  ? "var(--color-muted)"
                   : hasGaps
-                    ? "#f97316"
-                    : "#22c55e";
+                    ? "var(--color-high)"
+                    : "var(--color-success)";
 
               return (
                 <g key={`pin-${zone.id}`}
@@ -330,7 +341,7 @@ export default function MapPage() {
                 >
                   {/* Outer ring for alert */}
                   {zd.hasUrgencyAlert && (
-                    <circle cx={x} cy={y} r={pinSize + 4} fill="none" stroke="#ef4444" strokeWidth={1.5} opacity={0.6}>
+                    <circle cx={x} cy={y} r={pinSize + 4} fill="none" stroke="var(--color-danger)" strokeWidth={1.5} opacity={0.6}>
                       <animate attributeName="r" values={`${pinSize + 3};${pinSize + 6};${pinSize + 3}`} dur="2s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
                     </circle>
@@ -348,8 +359,8 @@ export default function MapPage() {
                   {/* Zone label (when gov selected or hovered) */}
                   {(selectedGov || isZoneHovered) && (
                     <text x={x} y={y + pinSize + 12} textAnchor="middle" fontSize="8" fontWeight="600"
-                      fill="#1e3a5f" className="pointer-events-none select-none"
-                    >{zone.nameEn}</text>
+                      fill="var(--color-primary)" className="pointer-events-none select-none"
+                    >{locale === "ar" ? zone.nameAr : zone.nameEn}</text>
                   )}
                 </g>
               );
@@ -358,24 +369,24 @@ export default function MapPage() {
 
           {/* Hover tooltip for zones */}
           {hoveredZone && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs rounded-lg px-3 py-2 pointer-events-none shadow-lg z-10 max-w-[240px]">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs rounded-lg px-3 py-2 pointer-events-none z-10 max-w-[240px]">
               {(() => {
                 const zone = ZONES.find((z) => z.id === hoveredZone);
                 const zd = displayZoneDataById.get(hoveredZone);
                 if (!zone || !zd) return null;
                 return (
                   <div>
-                    <div className="font-bold">{zone.nameEn} · <span className="font-normal opacity-80">{zone.nameAr}</span></div>
+                    <div className="font-bold">{locale === "ar" ? zone.nameAr : zone.nameEn}</div>
                     <div className="flex gap-3 mt-1">
-                      <span>{zd.actorCount} orgs</span>
-                      <span>{zd.activeSectors.length} sectors</span>
-                      {zd.gaps.length > 0 && <span className="text-red-300">{zd.gaps.length} gaps</span>}
+                      <span>{zd.actorCount} {t("map.orgs")}</span>
+                      <span>{zd.activeSectors.length} {t("map.sectors")}</span>
+                      {zd.gaps.length > 0 && <span className="text-red-300">{zd.gaps.length} {t("map.gaps")}</span>}
                     </div>
                     {zd.activeSectors.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {zd.activeSectors.map((s) => (
                           <span key={s} className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ backgroundColor: getSectorColor(s), color: "white" }}>
-                            {getSectorName(s, "en")}
+                            {getSectorName(s, locale)}
                           </span>
                         ))}
                       </div>
@@ -388,86 +399,86 @@ export default function MapPage() {
 
           {/* Hover tooltip for governorates */}
           {hovered && !hoveredZone && !selectedGov && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs rounded-lg px-3 py-1.5 pointer-events-none shadow-lg z-10">
-              {GOV_NAMES[hovered]} — <span className="font-bold">{govData.find((g) => g.govId === hovered)?.totalActors || 0}</span> orgs
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs rounded-lg px-3 py-1.5 pointer-events-none z-10">
+              {govNames[hovered]} — <span className="font-bold">{govData.find((g) => g.govId === hovered)?.totalActors || 0}</span> {t("map.orgs")}
               {(govData.find((g) => g.govId === hovered)?.gaps.length || 0) > 0 && (
-                <span className="text-red-300 ms-1">· {govData.find((g) => g.govId === hovered)?.gaps.length} gaps</span>
+                <span className="text-red-300 ms-1">· {govData.find((g) => g.govId === hovered)?.gaps.length} {t("map.gaps")}</span>
               )}
-              <span className="text-slate-400 ms-2">Click to zoom</span>
+              <span className="text-slate-400 ms-2">{t("map.clickToZoom")}</span>
             </div>
           )}
 
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-center gap-2 mt-2 text-[10px] text-slate-500">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-[#bbf7d0] border border-green-400" /> Good</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-[#fde68a] border border-amber-400" /> Gaps</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-[#fecaca] border border-red-400" /> Critical</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-heatmap-low border border-green-400" /> {t("map.legendGood")}</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-heatmap-mid border border-amber-400" /> {t("map.legendGaps")}</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-heatmap-critical border border-red-400" /> {t("map.legendCritical")}</span>
             <span className="text-slate-300">|</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" /> Zone OK</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#f97316]" /> Zone gaps</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#ef4444] animate-pulse" /> Alert</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-success" /> {t("map.legendZoneOk")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-high" /> {t("map.legendZoneGaps")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-danger animate-pulse" /> {t("map.legendAlert")}</span>
           </div>
         </div>
       )}
 
       {/* Selected governorate detail panel */}
       {selectedDetail && (
-        <div className="bg-white rounded-2xl border-2 border-primary/30 p-4 shadow-sm">
+        <div className="bg-white rounded-lg border-2 border-primary/30 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-lg">{GOV_NAMES[selectedDetail.govId]}</h3>
+            <h3 className="font-bold text-lg">{govNames[selectedDetail.govId]}</h3>
             <button onClick={() => setSelectedGov(null)} className="p-1.5 rounded-lg hover:bg-slate-100"><X className="w-4 h-4 text-slate-400" /></button>
           </div>
           <div className="flex gap-4 text-sm text-slate-600 mb-3">
-            <span className="flex items-center gap-1" data-testid="gov-detail-actors"><Users className="w-4 h-4" /> {selectedDetail.totalActors} orgs</span>
-            <span className="flex items-center gap-1"><Layers className="w-4 h-4" /> {selectedDetail.sectors.length} sectors</span>
+            <span className="flex items-center gap-1" data-testid="gov-detail-actors"><Users className="w-4 h-4" /> {selectedDetail.totalActors} {t("map.orgs")}</span>
+            <span className="flex items-center gap-1"><Layers className="w-4 h-4" /> {selectedDetail.sectors.length} {t("map.sectors")}</span>
             <span className="flex items-center gap-1">
               {selectedDetail.gaps.length > 0 ? <ShieldAlert className="w-4 h-4 text-danger" /> : <CheckCircle2 className="w-4 h-4 text-success" />}
-              {selectedDetail.gaps.length} gaps
+              {selectedDetail.gaps.length} {t("map.gaps")}
             </span>
           </div>
           {selectedDetail.sectors.length > 0 && (
             <div className="mb-3">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Active Sectors</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1">{t("map.activeSectors")}</p>
               <div className="flex flex-wrap gap-1">
                 {selectedDetail.sectors.map((s) => (
-                  <span key={s} data-testid={`gov-detail-sector-${s}`} className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: getSectorColor(s) }}>{getSectorName(s, "en")}</span>
+                  <span key={s} data-testid={`gov-detail-sector-${s}`} className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: getSectorColor(s) }}>{getSectorName(s, locale)}</span>
                 ))}
               </div>
             </div>
           )}
           {selectedDetail.gaps.length > 0 && (
             <div className="mb-3">
-              <p className="text-xs font-semibold text-danger flex items-center gap-1 mb-1"><XCircle className="w-3.5 h-3.5" /> No Coverage</p>
+              <p className="text-xs font-semibold text-danger flex items-center gap-1 mb-1"><XCircle className="w-3.5 h-3.5" /> {t("map.noCoverage")}</p>
               <div className="flex flex-wrap gap-1">
                 {selectedDetail.gaps.map((s) => (
-                  <span key={s} data-testid={`gov-detail-gap-${s}`} className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">{getSectorName(s, "en")}</span>
+                  <span key={s} data-testid={`gov-detail-gap-${s}`} className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">{getSectorName(s, locale)}</span>
                 ))}
               </div>
             </div>
           )}
           {selectedDetail.hasAlert && (
             <div className="mb-3 flex items-center gap-1.5 text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2">
-              <AlertTriangle className="w-4 h-4" /> Active urgency alert in this region
+              <AlertTriangle className="w-4 h-4" /> {t("map.activeUrgencyAlert")}
             </div>
           )}
           {/* Zone breakdown */}
           <div className="pt-3 border-t border-slate-100">
-            <p className="text-xs font-semibold text-slate-500 mb-2">Zones in {GOV_NAMES[selectedDetail.govId]}</p>
+            <p className="text-xs font-semibold text-slate-500 mb-2">{t("map.zonesIn", { name: govNames[selectedDetail.govId] })}</p>
             <div className="space-y-2">
               {selectedDetail.zones.filter((z) => z.actorCount > 0).map((z) => {
                 const zone = ZONES.find((zz) => zz.id === z.zoneId);
                 return (
                   <div key={z.zoneId} className="bg-slate-50 rounded-xl p-2.5">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">{zone?.nameEn} · <span className="text-slate-400">{zone?.nameAr}</span></span>
-                      <span className="text-xs text-slate-500">{z.actorCount} orgs</span>
+                      <span className="text-sm font-medium">{locale === "ar" ? zone?.nameAr : zone?.nameEn}</span>
+                      <span className="text-xs text-slate-500">{z.actorCount} {t("map.orgs")}</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {z.activeSectors.map((s) => (
-                        <span key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: getSectorColor(s) }} title={getSectorName(s, "en")} />
+                        <span key={s} className="w-2 h-2 rounded-full" style={{ backgroundColor: getSectorColor(s) }} title={getSectorName(s, locale)} />
                       ))}
                       {z.gaps.length > 0 && (
-                        <span className="text-[10px] text-red-600 ms-1">{z.gaps.length} gaps</span>
+                        <span className="text-[10px] text-red-600 ms-1">{z.gaps.length} {t("map.gaps")}</span>
                       )}
                     </div>
                   </div>

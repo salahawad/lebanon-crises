@@ -77,7 +77,7 @@ test.describe('Collaboration System', () => {
     await page.goto(`${BASE}/collaborate`);
     // Collaboration cards show actor names connected by an arrow icon
     // Check that at least one card has two font-semibold spans (from/to actors)
-    const cards = page.locator('.rounded-2xl.border.border-slate-200.bg-white.p-4');
+    const cards = page.locator('.rounded-lg.border.border-slate-200.bg-white.p-4');
     const firstCard = cards.first();
     await expect(firstCard).toBeVisible();
     // Each card should have at least two bold actor name spans
@@ -365,7 +365,7 @@ test.describe('Sector Planning', () => {
     const actorName = page.locator('span.font-semibold.text-slate-900').first();
     await expect(actorName).toBeVisible();
     // Zones are shown as text next to MapPin icons
-    const planCards = page.locator('.rounded-2xl.border.border-slate-200.p-4');
+    const planCards = page.locator('.rounded-lg.border.border-slate-200.p-4');
     await expect(planCards.first()).toBeVisible();
   });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   Activity,
@@ -10,13 +11,13 @@ import {
   Clock,
 } from "lucide-react";
 import { getCapacityCards } from "@/lib/data/platform-api";
-import { ZONES, getSectorColor } from "@/lib/data/zones";
+import { ZONES, getSectorColor, getZoneName } from "@/lib/data/zones";
 import type { CapacityCard, StockLevel } from "@/lib/types/platform";
 
 const STOCK_BAR_COLORS: Record<StockLevel, string> = {
-  good: "bg-[#22c55e]",
-  some: "bg-[#e8913a]",
-  low: "bg-[#ef4444]",
+  good: "bg-success",
+  some: "bg-accent",
+  low: "bg-danger",
 };
 
 const STOCK_LABELS: Record<StockLevel, string> = {
@@ -37,12 +38,9 @@ function relativeTime(timestamp: number): string {
   return `${weeks}w ago`;
 }
 
-function getZoneName(id: string): string {
-  const zone = ZONES.find((z) => z.id === id);
-  return zone ? zone.nameEn : id;
-}
-
 export default function CapacityCardsPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [cards, setCards] = useState<CapacityCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [zoneFilter, setZoneFilter] = useState<string>("");
@@ -56,7 +54,7 @@ export default function CapacityCardsPage() {
   const uniqueZones = useMemo(() => {
     const zoneIds = [...new Set(cards.map((c) => c.zone))];
     return zoneIds
-      .map((id) => ({ id, name: getZoneName(id) }))
+      .map((id) => ({ id, name: getZoneName(id, locale) }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [cards]);
 
@@ -68,13 +66,13 @@ export default function CapacityCardsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#e8913a]" />
-            <h1 className="text-base font-bold">Capacity Cards</h1>
+            <Activity className="w-5 h-5 text-accent" />
+            <h1 className="text-base font-bold">{t("capacity.title")}</h1>
           </div>
-          <span className="text-sm text-white/70">{cards.length} cards</span>
+          <span className="text-sm text-white/70">{t("capacity.cardsCount", { count: cards.length })}</span>
         </div>
       </header>
 
@@ -85,9 +83,9 @@ export default function CapacityCardsPage() {
           <select
             value={zoneFilter}
             onChange={(e) => setZoneFilter(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 focus:border-[#1e3a5f]"
+            className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           >
-            <option value="">All Zones</option>
+            <option value="">{t("common.allZones")}</option>
             {uniqueZones.map((z) => (
               <option key={z.id} value={z.id}>
                 {z.name}
@@ -102,7 +100,7 @@ export default function CapacityCardsPage() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse shadow-lg"
+                className="bg-white rounded-lg border border-slate-200 p-5 animate-pulse"
               >
                 <div className="h-5 bg-slate-200 rounded w-2/3 mb-3" />
                 <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -113,9 +111,9 @@ export default function CapacityCardsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
             <Activity className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No capacity cards found</p>
+            <p className="text-slate-500 font-medium">{t("capacity.noCards")}</p>
             <p className="text-sm text-slate-400 mt-1">
-              {zoneFilter ? "Try selecting a different zone" : "No data available"}
+              {zoneFilter ? t("capacity.tryDifferentZone") : t("capacity.noData")}
             </p>
           </div>
         ) : (
@@ -132,7 +130,7 @@ export default function CapacityCardsPage() {
                   className="block"
                 >
                   <div
-                    className={`bg-white rounded-2xl border p-5 shadow-lg hover:shadow-xl transition-shadow ${
+                    className={`bg-white rounded-lg border p-5 hover:shadow-xl transition-shadow ${
                       hasUrgentNeeds
                         ? "border-red-200"
                         : "border-slate-200"
@@ -147,7 +145,7 @@ export default function CapacityCardsPage() {
                         <div className="flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3 text-slate-400" />
                           <span className="text-xs text-slate-500">
-                            {getZoneName(card.zone)}
+                            {getZoneName(card.zone, locale)}
                           </span>
                         </div>
                       </div>
@@ -160,7 +158,7 @@ export default function CapacityCardsPage() {
                     {/* Active services */}
                     <div className="mb-3">
                       <p className="text-xs font-medium text-slate-500 mb-1.5">
-                        Active Services
+                        {t("capacity.activeServices")}
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {activeServices.map((svc) => (
@@ -168,13 +166,13 @@ export default function CapacityCardsPage() {
                             key={svc.serviceId}
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-green-50 text-green-700"
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-success" />
                             {svc.label}
                           </span>
                         ))}
                         {activeServices.length === 0 && (
                           <span className="text-xs text-slate-400">
-                            No active services
+                            {t("capacity.noActiveServices")}
                           </span>
                         )}
                       </div>
@@ -184,7 +182,7 @@ export default function CapacityCardsPage() {
                     {Object.keys(card.stockLevels).length > 0 && (
                       <div className="mb-3">
                         <p className="text-xs font-medium text-slate-500 mb-1.5">
-                          Stock Levels
+                          {t("capacity.stockLevels")}
                         </p>
                         <div className="space-y-1.5">
                           {Object.entries(card.stockLevels).map(
@@ -207,7 +205,7 @@ export default function CapacityCardsPage() {
                                   />
                                 </div>
                                 <span className="text-xs text-slate-400 w-10 text-right">
-                                  {STOCK_LABELS[level]}
+                                  {t(`stockLevels.${level}`)}
                                 </span>
                               </div>
                             )
@@ -219,7 +217,7 @@ export default function CapacityCardsPage() {
                     {/* Urgent needs */}
                     {hasUrgentNeeds && (
                       <div className="flex flex-wrap gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-[#ef4444] shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-3.5 h-3.5 text-danger shrink-0 mt-0.5" />
                         {card.urgentNeeds.map((need) => (
                           <span
                             key={need}

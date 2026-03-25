@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   getFlashAssessments,
   getAssessmentSnapshot,
@@ -37,6 +38,8 @@ function timeAgo(ts: number): string {
 }
 
 export default function AssessmentPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [assessments, setAssessments] = useState<FlashAssessment[]>([]);
   const [snapshots, setSnapshots] = useState<Record<string, AssessmentSnapshot>>({});
   const [loading, setLoading] = useState(true);
@@ -78,18 +81,18 @@ export default function AssessmentPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5" />
-            <h1 className="text-base font-bold">Flash Assessment</h1>
+            <h1 className="text-base font-bold">{t("assessment.title")}</h1>
           </div>
           <button
             onClick={() => setShowTrigger(!showTrigger)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#e8913a] text-white text-sm font-medium hover:bg-[#e8913a]/90 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Trigger New
+            {t("assessment.triggerNew")}
           </button>
         </div>
       </header>
@@ -97,31 +100,31 @@ export default function AssessmentPage() {
       <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-4">
         {/* Trigger new assessment panel */}
         {showTrigger && (
-          <div className="bg-white rounded-2xl border border-[#e8913a]/30 p-4 mb-4">
+          <div className="bg-white rounded-lg border border-accent/30 p-4 mb-4">
             <h3 className="font-semibold text-slate-900 mb-3">
-              Trigger New Assessment
+              {t("assessment.triggerNewAssessment")}
             </h3>
             <label className="block text-sm text-slate-600 mb-1.5">
-              Select Zone
+              {t("assessment.selectZone")}
             </label>
             <select
               value={selectedZone}
               onChange={(e) => setSelectedZone(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
-              <option value="">Choose a zone...</option>
+              <option value="">{t("assessment.chooseZone")}</option>
               {ZONES.map((z) => (
                 <option key={z.id} value={z.id}>
-                  {z.nameEn}
+                  {locale === "ar" ? z.nameAr : z.nameEn}
                 </option>
               ))}
             </select>
             <div className="flex gap-2 mt-3">
               <button
                 disabled={!selectedZone}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#1e3a5f] text-white text-sm font-medium disabled:opacity-40 hover:bg-[#1e3a5f]/90 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
               >
-                Send Assessment
+                {t("assessment.sendAssessment")}
               </button>
               <button
                 onClick={() => {
@@ -130,11 +133,11 @@ export default function AssessmentPage() {
                 }}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
             </div>
             <p className="text-xs text-slate-400 mt-2">
-              Demo mode — assessment will not actually be sent
+              {t("assessment.demoMode")}
             </p>
           </div>
         )}
@@ -145,7 +148,7 @@ export default function AssessmentPage() {
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse"
+                className="bg-white rounded-lg border border-slate-200 p-4 animate-pulse"
               >
                 <div className="h-5 bg-slate-200 rounded w-1/3 mb-3" />
                 <div className="h-4 bg-slate-100 rounded w-2/3 mb-2" />
@@ -156,9 +159,9 @@ export default function AssessmentPage() {
         ) : assessments.length === 0 ? (
           <div className="text-center py-12">
             <ClipboardCheck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No assessments yet</p>
+            <p className="text-slate-500 font-medium">{t("assessment.noAssessments")}</p>
             <p className="text-sm text-slate-400 mt-1">
-              Trigger a flash assessment to gather rapid situation reports
+              {t("assessment.triggerDescription")}
             </p>
           </div>
         ) : (
@@ -170,16 +173,16 @@ export default function AssessmentPage() {
               return (
                 <div
                   key={assessment.id}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden"
+                  className="bg-white rounded-lg border border-slate-200 overflow-hidden"
                 >
                   {/* Assessment card header */}
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <MapPin className="w-4 h-4 text-[#1e3a5f]" />
+                          <MapPin className="w-4 h-4 text-primary" />
                           <h3 className="font-semibold text-slate-900">
-                            {getZoneName(assessment.zone, "en")}
+                            {getZoneName(assessment.zone, locale)}
                           </h3>
                           <span
                             className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusColor(
@@ -187,15 +190,12 @@ export default function AssessmentPage() {
                             )}`}
                           >
                             {assessment.status === "active"
-                              ? "Active"
-                              : "Closed"}
+                              ? t("status.active")
+                              : t("status.closed")}
                           </span>
                         </div>
                         <p className="text-sm text-slate-500 mb-2">
-                          Triggered by{" "}
-                          <span className="font-medium text-slate-700">
-                            {assessment.triggeredByName}
-                          </span>
+                          {t("assessment.triggeredBy", { name: assessment.triggeredByName })}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-slate-500">
                           <span className="flex items-center gap-1">
@@ -217,10 +217,10 @@ export default function AssessmentPage() {
                         onClick={() =>
                           setExpandedId(isExpanded ? null : assessment.id)
                         }
-                        className="flex items-center gap-1 mt-3 text-sm font-medium text-[#1e3a5f] hover:text-[#1e3a5f]/80 transition-colors"
+                        className="flex items-center gap-1 mt-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                       >
                         <BarChart3 className="w-4 h-4" />
-                        {isExpanded ? "Hide Results" : "View Results"}
+                        {isExpanded ? t("assessment.hideResults") : t("assessment.viewResults")}
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4" />
                         ) : (
@@ -237,7 +237,7 @@ export default function AssessmentPage() {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="bg-white rounded-xl p-3 border border-slate-200">
                           <p className="text-xs text-slate-500 mb-0.5">
-                            Avg Displaced
+                            {t("assessment.avgDisplaced")}
                           </p>
                           <p className="text-xl font-bold text-slate-900">
                             {snapshot.avgDisplaced.toLocaleString()}
@@ -245,9 +245,9 @@ export default function AssessmentPage() {
                         </div>
                         <div className="bg-white rounded-xl p-3 border border-slate-200">
                           <p className="text-xs text-slate-500 mb-0.5">
-                            Families Reached
+                            {t("outcomes.familiesReached")}
                           </p>
-                          <p className="text-xl font-bold text-[#22c55e]">
+                          <p className="text-xl font-bold text-success">
                             {snapshot.totalFamiliesReached.toLocaleString()}
                           </p>
                         </div>
@@ -256,8 +256,8 @@ export default function AssessmentPage() {
                       {/* Top unmet needs — horizontal bars */}
                       <div>
                         <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
-                          <AlertTriangle className="w-4 h-4 text-[#e8913a]" />
-                          Top Unmet Needs
+                          <AlertTriangle className="w-4 h-4 text-accent" />
+                          {t("assessment.topUnmetNeeds")}
                         </h4>
                         <div className="space-y-2">
                           {snapshot.topNeeds.map((need) => {
@@ -269,10 +269,10 @@ export default function AssessmentPage() {
                               <div key={need.sector}>
                                 <div className="flex items-center justify-between text-xs mb-0.5">
                                   <span className="text-slate-700 font-medium">
-                                    {getSectorName(need.sector, "en")}
+                                    {getSectorName(need.sector, locale)}
                                   </span>
                                   <span className="text-slate-500">
-                                    {need.count} reports
+                                    {t("assessment.reports", { count: need.count })}
                                   </span>
                                 </div>
                                 <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -296,16 +296,16 @@ export default function AssessmentPage() {
                       {snapshot.zeroCoverage.length > 0 && (
                         <div>
                           <h4 className="text-sm font-semibold text-slate-700 mb-2">
-                            Zero Coverage Sectors
+                            {t("assessment.zeroCoverageSectors")}
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {snapshot.zeroCoverage.map((zc) => (
                               <span
                                 key={zc.sector}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-xs font-medium"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-danger/10 text-danger text-xs font-medium"
                               >
-                                {getSectorName(zc.sector, "en")}
-                                <span className="text-[#ef4444]/60">
+                                {getSectorName(zc.sector, locale)}
+                                <span className="text-danger/60">
                                   ({zc.count})
                                 </span>
                               </span>
@@ -318,20 +318,20 @@ export default function AssessmentPage() {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="bg-white rounded-xl p-3 border border-slate-200">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <TrendingDown className="w-4 h-4 text-[#ef4444]" />
+                            <TrendingDown className="w-4 h-4 text-danger" />
                             <p className="text-xs text-slate-500">
-                              Reduced Capacity
+                              {t("assessment.reducedCapacity")}
                             </p>
                           </div>
-                          <p className="text-xl font-bold text-[#ef4444]">
+                          <p className="text-xl font-bold text-danger">
                             {snapshot.reducedCapacityPct}%
                           </p>
                         </div>
                         <div className="bg-white rounded-xl p-3 border border-slate-200">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Package className="w-4 h-4 text-[#22c55e]" />
+                            <Package className="w-4 h-4 text-success" />
                             <p className="text-xs text-slate-500">
-                              Surplus Sectors
+                              {t("assessment.surplusSectors")}
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-1 mt-1">
@@ -339,14 +339,14 @@ export default function AssessmentPage() {
                               snapshot.surplusSectors.map((s) => (
                                 <span
                                   key={s.sector}
-                                  className="text-xs px-2 py-0.5 rounded-full bg-[#22c55e]/10 text-[#22c55e] font-medium"
+                                  className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-medium"
                                 >
-                                  {getSectorName(s.sector, "en")}
+                                  {getSectorName(s.sector, locale)}
                                 </span>
                               ))
                             ) : (
                               <span className="text-sm text-slate-400">
-                                None
+                                {t("common.none")}
                               </span>
                             )}
                           </div>

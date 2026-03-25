@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   getSectorPlans,
   getGapAnalyses,
@@ -37,6 +38,8 @@ function timeAgo(ts: number): string {
 type Tab = "plans" | "gaps";
 
 export default function PlanningPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [plans, setPlans] = useState<SectorPlan[]>([]);
   const [gaps, setGaps] = useState<GapAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,23 +74,23 @@ export default function PlanningPage() {
   );
 
   function getCoverageColor(count: number): string {
-    if (count === 0) return "bg-[#ef4444] text-white";
+    if (count === 0) return "bg-danger text-white";
     if (count <= 2) return "bg-amber-400 text-amber-900";
-    return "bg-[#22c55e] text-white";
+    return "bg-success text-white";
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5" />
-            <h1 className="text-base font-bold">Sector Planning</h1>
+            <h1 className="text-base font-bold">{t("planning.title")}</h1>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#e8913a] text-white text-sm font-medium hover:bg-[#e8913a]/90 transition-colors">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors">
             <Plus className="w-4 h-4" />
-            Add Plan
+            {t("planning.addPlan")}
           </button>
         </div>
       </header>
@@ -99,23 +102,23 @@ export default function PlanningPage() {
             onClick={() => setActiveTab("plans")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               activeTab === "plans"
-                ? "bg-[#1e3a5f] text-white"
+                ? "bg-primary text-white"
                 : "bg-white text-slate-600 hover:bg-slate-50"
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
-            Coverage Plans
+            {t("planning.coveragePlans")}
           </button>
           <button
             onClick={() => setActiveTab("gaps")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               activeTab === "gaps"
-                ? "bg-[#1e3a5f] text-white"
+                ? "bg-primary text-white"
                 : "bg-white text-slate-600 hover:bg-slate-50"
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            Gap Analysis
+            {t("planning.gapAnalysis")}
           </button>
         </div>
 
@@ -124,7 +127,7 @@ export default function PlanningPage() {
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse"
+                className="bg-white rounded-lg border border-slate-200 p-4 animate-pulse"
               >
                 <div className="h-5 bg-slate-200 rounded w-1/4 mb-3" />
                 <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -139,10 +142,10 @@ export default function PlanningPage() {
               <div className="text-center py-12">
                 <LayoutGrid className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">
-                  No coverage plans yet
+                  {t("planning.noCoveragePlans")}
                 </p>
                 <p className="text-sm text-slate-400 mt-1">
-                  Add a coverage plan to coordinate sector activities
+                  {t("planning.addCoveragePlanHint")}
                 </p>
               </div>
             ) : (
@@ -155,7 +158,7 @@ export default function PlanningPage() {
                       style={{ backgroundColor: getSectorColor(sector) }}
                     />
                     <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                      {getSectorName(sector, "en")}
+                      {getSectorName(sector, locale)}
                     </h2>
                   </div>
 
@@ -163,7 +166,7 @@ export default function PlanningPage() {
                     {sectorPlans.map((plan) => (
                       <div
                         key={plan.id}
-                        className="bg-white rounded-2xl border border-slate-200 p-4"
+                        className="bg-white rounded-lg border border-slate-200 p-4"
                       >
                         <div className="flex items-start gap-3">
                           <div
@@ -182,13 +185,13 @@ export default function PlanningPage() {
                             <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
                               <MapPin className="w-3.5 h-3.5" />
                               <span>
-                                {getZoneName(plan.zone, "en")}
+                                {getZoneName(plan.zone, locale)}
                               </span>
                               {plan.plannedStart && (
                                 <>
                                   <span className="text-slate-300">|</span>
                                   <Calendar className="w-3.5 h-3.5" />
-                                  <span>Start: {plan.plannedStart}</span>
+                                  <span>{t("planning.start", { date: plan.plannedStart })}</span>
                                 </>
                               )}
                             </div>
@@ -211,7 +214,7 @@ export default function PlanningPage() {
               <div className="text-center py-12">
                 <BarChart3 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-medium">
-                  No gap analysis data
+                  {t("planning.noGapData")}
                 </p>
               </div>
             ) : (
@@ -219,29 +222,29 @@ export default function PlanningPage() {
                 <div key={gap.zone} className="space-y-4">
                   {/* Zone header */}
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#1e3a5f]" />
+                    <MapPin className="w-4 h-4 text-primary" />
                     <h2 className="text-base font-bold text-slate-900">
-                      {getZoneName(gap.zone, "en")}
+                      {getZoneName(gap.zone, locale)}
                     </h2>
                     <span className="text-xs text-slate-400">
-                      Updated {timeAgo(gap.generatedAt)}
+                      {t("planning.updated", { time: timeAgo(gap.generatedAt) })}
                     </span>
                   </div>
 
                   {/* Coverage matrix table */}
-                  <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-slate-100">
                             <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                              Sector
+                              {t("planning.sector")}
                             </th>
                             <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                              Actors
+                              {t("planning.actors")}
                             </th>
                             <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                              Status
+                              {t("planning.status")}
                             </th>
                           </tr>
                         </thead>
@@ -268,7 +271,7 @@ export default function PlanningPage() {
                                       }}
                                     />
                                     <span className="font-medium text-slate-700">
-                                      {getSectorName(sc.sector, "en")}
+                                      {getSectorName(sc.sector, locale)}
                                     </span>
                                     {isPersistent && (
                                       <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
@@ -286,16 +289,16 @@ export default function PlanningPage() {
                                 </td>
                                 <td className="px-4 py-2.5 text-center">
                                   {sc.actorCount === 0 ? (
-                                    <span className="text-xs font-medium text-[#ef4444]">
-                                      No coverage
+                                    <span className="text-xs font-medium text-danger">
+                                      {t("planning.noCoverage")}
                                     </span>
                                   ) : sc.actorCount <= 2 ? (
                                     <span className="text-xs font-medium text-amber-600">
-                                      Low
+                                      {t("planning.low")}
                                     </span>
                                   ) : (
-                                    <span className="text-xs font-medium text-[#22c55e]">
-                                      Good
+                                    <span className="text-xs font-medium text-success">
+                                      {t("planning.good")}
                                     </span>
                                   )}
                                 </td>
@@ -309,10 +312,10 @@ export default function PlanningPage() {
 
                   {/* Persistent needs */}
                   {gap.persistentNeeds.length > 0 && (
-                    <div className="bg-amber-50 rounded-2xl border border-amber-200 p-4">
+                    <div className="bg-amber-50 rounded-lg border border-amber-200 p-4">
                       <h4 className="text-sm font-semibold text-amber-800 flex items-center gap-1.5 mb-2">
                         <AlertTriangle className="w-4 h-4" />
-                        Persistent Needs
+                        {t("planning.persistentNeeds")}
                       </h4>
                       <div className="space-y-1.5">
                         {gap.persistentNeeds.map((pn) => (
@@ -321,10 +324,10 @@ export default function PlanningPage() {
                             className="flex items-center justify-between text-sm"
                           >
                             <span className="text-amber-700">
-                              {getSectorName(pn.sector, "en")}
+                              {getSectorName(pn.sector, locale)}
                             </span>
                             <span className="text-xs text-amber-600 font-medium">
-                              {pn.daysFlagged} days flagged
+                              {t("planning.daysFlagged", { count: pn.daysFlagged })}
                             </span>
                           </div>
                         ))}
@@ -334,10 +337,10 @@ export default function PlanningPage() {
 
                   {/* Collective shortfalls */}
                   {gap.collectiveShortfalls.length > 0 && (
-                    <div className="bg-red-50 rounded-2xl border border-red-200 p-4">
+                    <div className="bg-red-50 rounded-lg border border-red-200 p-4">
                       <h4 className="text-sm font-semibold text-red-800 flex items-center gap-1.5 mb-2">
                         <TrendingUp className="w-4 h-4 rotate-180" />
-                        Collective Shortfalls
+                        {t("planning.collectiveShortfalls")}
                       </h4>
                       <div className="space-y-1.5">
                         {gap.collectiveShortfalls.map((cs, i) => (
@@ -347,7 +350,7 @@ export default function PlanningPage() {
                           >
                             <span className="text-red-700">{cs.resource}</span>
                             <span className="text-xs text-red-600 font-medium">
-                              {cs.actorsFlagged} actors flagged
+                              {t("planning.actorsFlagged", { count: cs.actorsFlagged })}
                             </span>
                           </div>
                         ))}
@@ -357,10 +360,10 @@ export default function PlanningPage() {
 
                   {/* Surpluses */}
                   {gap.surpluses.length > 0 && (
-                    <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4">
+                    <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-4">
                       <h4 className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5 mb-2">
                         <Package className="w-4 h-4" />
-                        Surplus Detected
+                        {t("planning.surplusDetected")}
                       </h4>
                       <div className="space-y-1.5">
                         {gap.surpluses.map((s, i) => (
@@ -372,7 +375,7 @@ export default function PlanningPage() {
                               {s.resource}
                             </span>
                             <span className="text-xs text-emerald-600 font-medium">
-                              {s.actorsWithSurplus} actors within {s.withinKm}km
+                              {t("planning.actorsWithSurplus", { actorCount: s.actorsWithSurplus, km: s.withinKm })}
                             </span>
                           </div>
                         ))}

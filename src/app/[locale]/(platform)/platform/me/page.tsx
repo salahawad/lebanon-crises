@@ -234,7 +234,7 @@ export default function PlatformMePage() {
 
   if (hasLoadError) {
     return (
-      <div className="rounded-3xl border border-red-200 bg-red-50 p-6 shadow-sm">
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
         <h2 className="text-xl font-bold text-red-900">{copy.loadErrorTitle}</h2>
         <p className="mt-2 text-sm text-red-800">{copy.loadErrorBody}</p>
       </div>
@@ -243,7 +243,7 @@ export default function PlatformMePage() {
 
   if (!platformUser) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6">
         <h2
           className="text-xl font-bold text-slate-900"
           data-testid="platform-me-heading"
@@ -254,7 +254,7 @@ export default function PlatformMePage() {
         <Link
           href="/platform/login"
           data-testid="platform-me-sign-in-cta"
-          className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#2d5a8e]"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
         >
           <UserCircle2 className="h-4 w-4" />
           {copy.goToSignIn}
@@ -266,7 +266,7 @@ export default function PlatformMePage() {
   if (platformUser.role === "platform_admin") {
     return (
       <div className="space-y-4" data-testid="platform-me-admin-workspace">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2
@@ -292,9 +292,9 @@ export default function PlatformMePage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-3xl border border-slate-200 bg-white p-5">
             <div className="flex items-center gap-2 text-slate-900">
-              <ShieldCheck className="h-5 w-5 text-[#1e3a5f]" />
+              <ShieldCheck className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">{copy.reviewIntakeQueue}</h3>
             </div>
             <p className="mt-2 text-sm text-slate-500">{copy.reviewIntakeQueueBody}</p>
@@ -308,9 +308,9 @@ export default function PlatformMePage() {
             </Link>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-3xl border border-slate-200 bg-white p-5">
             <div className="flex items-center gap-2 text-slate-900">
-              <Building2 className="h-5 w-5 text-[#e8913a]" />
+              <Building2 className="h-5 w-5 text-accent" />
               <h3 className="font-semibold">{copy.publicPlatformView}</h3>
             </div>
             <p className="mt-2 text-sm text-slate-500">{copy.publicPlatformViewBody}</p>
@@ -334,7 +334,7 @@ export default function PlatformMePage() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2
@@ -362,7 +362,7 @@ export default function PlatformMePage() {
       {actor ? (
         <>
           <div
-            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+            className="rounded-3xl border border-slate-200 bg-white p-6"
             data-testid="platform-me-actor-card"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -398,9 +398,9 @@ export default function PlatformMePage() {
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <MapPin className="h-4 w-4 text-[#1e3a5f]" />
+                  <MapPin className="h-4 w-4 text-primary" />
                   {copy.zones}
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -415,9 +415,9 @@ export default function PlatformMePage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <Layers3 className="h-4 w-4 text-[#e8913a]" />
+                  <Layers3 className="h-4 w-4 text-accent" />
                   {copy.sectors}
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -434,7 +434,7 @@ export default function PlatformMePage() {
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                   {copy.contact}
                 </p>
@@ -448,7 +448,7 @@ export default function PlatformMePage() {
                   </p>
                 ) : null}
               </div>
-              <div className="rounded-2xl border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                   {copy.freshness}
                 </p>
@@ -457,7 +457,7 @@ export default function PlatformMePage() {
                   {formatPlatformDate(actor.lastUpdated, locale)}
                 </p>
               </div>
-              <div className="rounded-2xl border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                   {copy.notifications}
                 </p>
@@ -470,7 +470,7 @@ export default function PlatformMePage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5">
               <h3 className="text-base font-semibold text-slate-900">
                 {copy.workspaceShortcuts}
               </h3>
@@ -496,20 +496,20 @@ export default function PlatformMePage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5">
               <h3 className="text-base font-semibold text-slate-900">
                 {copy.capacitySnapshot}
               </h3>
               {capacityCard ? (
                 <div className="mt-4 grid grid-cols-3 gap-3">
-                  <div className="rounded-2xl bg-slate-50 p-4 text-center">
-                    <p className="text-xl font-bold text-[#1e3a5f]">
+                  <div className="rounded-lg bg-slate-50 p-4 text-center">
+                    <p className="text-xl font-bold text-primary">
                       {capacityCard.services.filter((service) => service.active).length}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">{copy.activeServices}</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-4 text-center">
-                    <p className="text-xl font-bold text-[#e8913a]">
+                  <div className="rounded-lg bg-slate-50 p-4 text-center">
+                    <p className="text-xl font-bold text-accent">
                       {capacityCard.resources.reduce(
                         (total, resource) => total + resource.count,
                         0
@@ -517,8 +517,8 @@ export default function PlatformMePage() {
                     </p>
                     <p className="mt-1 text-xs text-slate-500">{copy.trackedResources}</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-4 text-center">
-                    <p className="text-xl font-bold text-[#ef4444]">
+                  <div className="rounded-lg bg-slate-50 p-4 text-center">
+                    <p className="text-xl font-bold text-danger">
                       {capacityCard.urgentNeeds.length}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">{copy.urgentNeeds}</p>
@@ -532,7 +532,7 @@ export default function PlatformMePage() {
         </>
       ) : (
         <div
-          className="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm"
+          className="rounded-3xl border border-amber-200 bg-amber-50 p-6"
           data-testid="platform-me-mapping-missing"
         >
           <h3 className="text-lg font-bold text-amber-900">{copy.actorMappingMissing}</h3>

@@ -62,21 +62,21 @@ const GOVERNORATE_PATHS: Record<GovernorateId, { d: string; labelX: number; labe
 };
 
 function getHeatColor(count: number, maxCount: number): string {
-  if (count === 0) return "#e2e8f0"; // slate-200
+  if (count === 0) return "var(--color-heatmap-none)";
   const ratio = Math.min(count / Math.max(maxCount, 1), 1);
-  if (ratio < 0.25) return "#bbf7d0"; // green-200
-  if (ratio < 0.5) return "#fde68a";  // amber-200
-  if (ratio < 0.75) return "#fed7aa"; // orange-200
-  return "#fecaca";                    // red-200
+  if (ratio < 0.25) return "var(--color-heatmap-low)";
+  if (ratio < 0.5) return "var(--color-heatmap-mid)";
+  if (ratio < 0.75) return "var(--color-heatmap-high)";
+  return "var(--color-heatmap-critical)";
 }
 
 function getHeatBorder(count: number, maxCount: number): string {
-  if (count === 0) return "#94a3b8"; // slate-400
+  if (count === 0) return "var(--color-muted)";
   const ratio = Math.min(count / Math.max(maxCount, 1), 1);
-  if (ratio < 0.25) return "#16a34a"; // green-600
-  if (ratio < 0.5) return "#d97706";  // amber-600
-  if (ratio < 0.75) return "#ea580c"; // orange-600
-  return "#dc2626";                    // red-600
+  if (ratio < 0.25) return "var(--color-success-dark)";
+  if (ratio < 0.5) return "var(--color-warning)";
+  if (ratio < 0.75) return "var(--color-high)";
+  return "var(--color-danger-dark)";
 }
 
 export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: LebanonMapProps) {
@@ -112,7 +112,7 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
               key={id}
               d={d}
               fill={getHeatColor(count, maxCount)}
-              stroke={isHovered ? "#1e3a5f" : getHeatBorder(count, maxCount)}
+              stroke={isHovered ? "var(--color-primary)" : getHeatBorder(count, maxCount)}
               strokeWidth={isHovered ? 2.5 : 1}
               strokeLinejoin="round"
               filter={isHovered ? "url(#shadow)" : undefined}
@@ -136,7 +136,7 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
               textAnchor="middle"
               fontSize={id === "beirut" ? "8" : "10"}
               fontWeight="600"
-              fill="#334155"
+              fill="var(--color-sub)"
               opacity={0.5}
               className="pointer-events-none"
             >
@@ -162,12 +162,12 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
             return (
               <g key={`badge-${id}`} className="pointer-events-none">
                 {/* Request badge */}
-                <circle cx={labelX - oX} cy={labelY - oY} r={r} fill="#1e3a5f" opacity={0.9} />
+                <circle cx={labelX - oX} cy={labelY - oY} r={r} fill="var(--color-primary)" opacity={0.9} />
                 <text x={labelX - oX} y={labelY - oY + 4} textAnchor="middle" fontSize={fs} fontWeight="700" fill="white">
                   {count}
                 </text>
                 {/* Shelter badge */}
-                <circle cx={labelX + oX} cy={labelY + oY} r={r} fill="#047857" opacity={0.9} />
+                <circle cx={labelX + oX} cy={labelY + oY} r={r} fill="var(--color-success-dark)" opacity={0.9} />
                 <text x={labelX + oX} y={labelY + oY + 4} textAnchor="middle" fontSize={fs} fontWeight="700" fill="white">
                   {sCount}
                 </text>
@@ -177,7 +177,7 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
 
           // Single badge
           const badgeCount = count || sCount;
-          const badgeColor = count > 0 ? "#1e3a5f" : "#047857";
+          const badgeColor = count > 0 ? "var(--color-primary)" : "var(--color-success-dark)";
           return (
             <g key={`badge-${id}`} className="pointer-events-none">
               <circle cx={labelX} cy={labelY} r={14} fill={badgeColor} opacity={0.9} />
@@ -209,30 +209,30 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-3 text-[10px] text-slate-500">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-[#e2e8f0] border border-slate-300 inline-block" />
+          <span className="w-3 h-3 rounded-sm bg-heatmap-none border border-slate-300 inline-block" />
           0
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-[#bbf7d0] border border-green-400 inline-block" />
+          <span className="w-3 h-3 rounded-sm bg-heatmap-low border border-green-400 inline-block" />
           Low
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-[#fde68a] border border-amber-400 inline-block" />
+          <span className="w-3 h-3 rounded-sm bg-heatmap-mid border border-amber-400 inline-block" />
           Med
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-[#fecaca] border border-red-400 inline-block" />
+          <span className="w-3 h-3 rounded-sm bg-heatmap-critical border border-red-400 inline-block" />
           High
         </span>
         {shelterCounts && (
           <>
             <span className="text-slate-300">|</span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-[#1e3a5f] inline-block" />
+              <span className="w-3 h-3 rounded-full bg-primary inline-block" />
               {t("landing.openRequests")}
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-[#047857] inline-block" />
+              <span className="w-3 h-3 rounded-full bg-success-dark inline-block" />
               {t("shelters.viewShelters")}
             </span>
           </>

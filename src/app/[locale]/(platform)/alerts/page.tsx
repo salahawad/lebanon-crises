@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   AlertTriangle,
   Clock,
@@ -57,17 +58,19 @@ function AlertCard({
   alert: UrgencyAlert;
   zoneActorCount: number;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const isActive = alert.status === "active";
   const isEscalated = alert.escalated;
   const sectorColor = getSectorColor(alert.category);
 
   return (
     <div
-      className={`rounded-2xl border-2 p-4 transition-all ${
+      className={`rounded-lg border-2 p-4 transition-all ${
         isActive
           ? isEscalated
-            ? "border-[#ef4444] bg-red-50"
-            : "border-[#e8913a] bg-orange-50"
+            ? "border-danger bg-red-50"
+            : "border-accent bg-orange-50"
           : "border-slate-200 bg-slate-50 opacity-60"
       }`}
     >
@@ -78,12 +81,12 @@ function AlertCard({
             className={`w-5 h-5 flex-shrink-0 ${
               isActive
                 ? isEscalated
-                  ? "text-[#ef4444]"
-                  : "text-[#e8913a]"
+                  ? "text-danger"
+                  : "text-accent"
                 : "text-slate-400"
             }`}
           />
-          <span className="font-semibold text-[#1e3a5f] text-sm truncate">
+          <span className="font-semibold text-primary text-sm truncate">
             {alert.actorName}
           </span>
         </div>
@@ -94,7 +97,7 @@ function AlertCard({
             color: sectorColor,
           }}
         >
-          {getSectorName(alert.category, "en")}
+          {getSectorName(alert.category, locale)}
         </span>
       </div>
 
@@ -104,27 +107,26 @@ function AlertCard({
       {/* Zone */}
       <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
         <MapPin className="w-3.5 h-3.5" />
-        <span>{getZoneName(alert.zone, "en")}</span>
+        <span>{getZoneName(alert.zone, locale)}</span>
       </div>
 
       {/* SMS note */}
       <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
         <MessageSquare className="w-3.5 h-3.5" />
         <span>
-          Sent to {zoneActorCount} actors in zone via SMS
+          {t("alerts.sentToActors", { count: zoneActorCount })}
         </span>
       </div>
 
       {/* Escalation indicator */}
       {isEscalated && (
-        <div className="flex items-center gap-1.5 text-xs font-medium text-[#ef4444] bg-red-100 rounded-lg px-2.5 py-1.5 mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-danger bg-red-100 rounded-lg px-2.5 py-1.5 mb-2">
           <AlertTriangle className="w-3.5 h-3.5" />
           <span>
-            Escalated — 2+ actors flagged this need
+            {t("alerts.escalated")}
             {alert.relatedAlerts.length > 0 && (
               <span className="text-red-400 ms-1">
-                ({alert.relatedAlerts.length} connected alert
-                {alert.relatedAlerts.length !== 1 ? "s" : ""})
+                {t("alerts.connectedAlerts", { count: alert.relatedAlerts.length })}
               </span>
             )}
           </span>
@@ -137,13 +139,13 @@ function AlertCard({
           {timeAgo(alert.createdAt)}
         </span>
         {isActive && (
-          <div className="flex items-center gap-1 text-xs font-medium text-[#e8913a]">
+          <div className="flex items-center gap-1 text-xs font-medium text-accent">
             <Clock className="w-3.5 h-3.5" />
             <span>{countdown(alert.expiresAt)}</span>
           </div>
         )}
         {!isActive && (
-          <span className="text-xs text-slate-400 font-medium">Expired</span>
+          <span className="text-xs text-slate-400 font-medium">{t("status.expired")}</span>
         )}
       </div>
     </div>
@@ -151,6 +153,8 @@ function AlertCard({
 }
 
 export default function AlertsPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [allAlerts, setAllAlerts] = useState<UrgencyAlert[]>([]);
   const [activeAlerts, setActiveAlerts] = useState<UrgencyAlert[]>([]);
   const [expiredAlerts, setExpiredAlerts] = useState<UrgencyAlert[]>([]);
@@ -209,7 +213,7 @@ export default function AlertsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border p-4 animate-pulse"
+              className="bg-white rounded-lg border p-4 animate-pulse"
             >
               <div className="h-4 bg-slate-200 rounded w-3/4 mb-3" />
               <div className="h-3 bg-slate-100 rounded w-full mb-2" />
@@ -226,21 +230,20 @@ export default function AlertsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-[#1e3a5f]">Urgency Alerts</h1>
+          <h1 className="text-xl font-bold text-primary">{t("alerts.title")}</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            {activeAlerts.length} active alert
-            {activeAlerts.length !== 1 ? "s" : ""}
+            {t("alerts.activeCount", { count: activeAlerts.length })}
           </p>
         </div>
-        <Megaphone className="w-6 h-6 text-[#e8913a]" />
+        <Megaphone className="w-6 h-6 text-accent" />
       </div>
 
       {/* Active alerts */}
       {activeAlerts.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-sm font-semibold text-[#ef4444] uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#ef4444] animate-pulse" />
-            Active Alerts
+          <h2 className="text-sm font-semibold text-danger uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-danger animate-pulse" />
+            {t("alerts.activeAlerts")}
           </h2>
           <div className="space-y-3">
             {activeAlerts.map((alert) => (
@@ -255,9 +258,9 @@ export default function AlertsPage() {
       )}
 
       {activeAlerts.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 mb-6">
+        <div className="text-center py-12 bg-white rounded-lg border border-slate-200 mb-6">
           <AlertTriangle className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">No active alerts right now</p>
+          <p className="text-slate-500 text-sm">{t("alerts.noActiveAlerts")}</p>
         </div>
       )}
 
@@ -273,7 +276,7 @@ export default function AlertsPage() {
             ) : (
               <ChevronDown className="w-4 h-4" />
             )}
-            Expired Alerts ({expiredAlerts.length})
+            {t("alerts.expiredAlerts", { count: expiredAlerts.length })}
           </button>
           {showExpired && (
             <div className="space-y-3">
@@ -294,10 +297,10 @@ export default function AlertsPage() {
         <div className="max-w-lg mx-auto md:max-w-4xl">
           <button
             onClick={() => setShowFlagModal(true)}
-            className="w-full bg-[#ef4444] hover:bg-red-600 text-white font-semibold py-3.5 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-danger hover:bg-red-600 text-white font-semibold py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <AlertTriangle className="w-5 h-5" />
-            Flag Urgent Need
+            {t("alerts.flagUrgentNeed")}
           </button>
         </div>
       </div>
@@ -305,10 +308,10 @@ export default function AlertsPage() {
       {/* Flag modal */}
       {showFlagModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-end md:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-5 shadow-xl">
+          <div className="bg-white rounded-lg w-full max-w-lg p-5 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#1e3a5f]">
-                Flag Urgent Need
+              <h3 className="text-lg font-bold text-primary">
+                {t("alerts.flagUrgentNeed")}
               </h3>
               <button
                 onClick={() => setShowFlagModal(false)}
@@ -320,7 +323,7 @@ export default function AlertsPage() {
 
             {/* Category selector */}
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
-              Category
+              {t("common.category")}
             </label>
             <div className="flex flex-wrap gap-1.5 mb-4">
               {SECTORS.map((s) => (
@@ -338,23 +341,23 @@ export default function AlertsPage() {
                       : undefined
                   }
                 >
-                  {getSectorName(s, "en")}
+                  {getSectorName(s, locale)}
                 </button>
               ))}
             </div>
 
             {/* Description */}
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
-              Description
+              {t("common.description")}
             </label>
             <textarea
               value={flagDescription}
               onChange={(e) =>
                 setFlagDescription(e.target.value.slice(0, 140))
               }
-              placeholder="Describe the urgent need..."
+              placeholder={t("alerts.describeUrgentNeed")}
               rows={3}
-              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 focus:border-[#1e3a5f] resize-none"
+              className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"
             />
             <p className="text-xs text-slate-400 mt-1 text-right">
               {flagDescription.length}/140
@@ -364,10 +367,10 @@ export default function AlertsPage() {
             <button
               onClick={handleFlagSubmit}
               disabled={!flagDescription.trim()}
-              className="w-full mt-3 bg-[#ef4444] hover:bg-red-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full mt-3 bg-danger hover:bg-red-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
-              Send Alert
+              {t("alerts.sendAlert")}
             </button>
           </div>
         </div>

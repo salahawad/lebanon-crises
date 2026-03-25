@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   ArrowLeft,
@@ -16,15 +17,15 @@ import {
   getCapacityCard,
   getCapacityChanges,
 } from "@/lib/data/platform-api";
-import { ZONES } from "@/lib/data/zones";
+import { ZONES, getZoneName } from "@/lib/data/zones";
 import type { CapacityCard, CapacityChange, StockLevel } from "@/lib/types/platform";
 
 const STOCK_LEVELS: StockLevel[] = ["low", "some", "good"];
 
 const STOCK_COLORS: Record<StockLevel, { active: string; label: string }> = {
-  low: { active: "bg-[#ef4444] text-white", label: "Low" },
-  some: { active: "bg-[#e8913a] text-white", label: "Some" },
-  good: { active: "bg-[#22c55e] text-white", label: "Good" },
+  low: { active: "bg-danger text-white", label: "Low" },
+  some: { active: "bg-accent text-white", label: "Some" },
+  good: { active: "bg-success text-white", label: "Good" },
 };
 
 const AVAILABLE_NEEDS = [
@@ -54,17 +55,14 @@ function relativeTime(timestamp: number): string {
   return `${weeks}w ago`;
 }
 
-function getZoneName(id: string): string {
-  const zone = ZONES.find((z) => z.id === id);
-  return zone ? zone.nameEn : id;
-}
-
 export default function CapacityEditPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const locale = useLocale();
+  const t = useTranslations("platform");
 
   const [card, setCard] = useState<CapacityCard | null>(null);
   const [changes, setChanges] = useState<CapacityChange[]>([]);
@@ -146,7 +144,7 @@ export default function CapacityEditPage({
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+        <header className="sticky top-0 z-40 bg-primary text-white">
           <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center">
             <div className="h-5 bg-white/20 rounded w-40 animate-pulse" />
           </div>
@@ -155,7 +153,7 @@ export default function CapacityEditPage({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse shadow-lg"
+              className="bg-white rounded-lg border border-slate-200 p-5 animate-pulse"
             >
               <div className="h-5 bg-slate-200 rounded w-1/2 mb-3" />
               <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -170,21 +168,21 @@ export default function CapacityEditPage({
   if (!card) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+        <header className="sticky top-0 z-40 bg-primary text-white">
           <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center">
             <Link href="/capacity" className="flex items-center gap-2 text-sm">
               <ArrowLeft className="w-4 h-4" />
-              Back to Capacity
+              {t("capacity.backToCapacity")}
             </Link>
           </div>
         </header>
         <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-12 text-center">
           <AlertTriangle className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-lg font-medium text-slate-700">
-            No capacity card found
+            {t("capacity.noCapacityCard")}
           </p>
           <p className="text-sm text-slate-500 mt-1">
-            This actor may not have a capacity card yet.
+            {t("capacity.noCapacityCardHint")}
           </p>
         </main>
       </div>
@@ -194,11 +192,11 @@ export default function CapacityEditPage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <Link href="/capacity" className="flex items-center gap-2 text-sm">
             <ArrowLeft className="w-4 h-4" />
-            Capacity
+            {t("capacity.capacity")}
           </Link>
           <span className="text-sm text-white/70">{card.actorName}</span>
         </div>
@@ -206,16 +204,15 @@ export default function CapacityEditPage({
 
       <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-4 space-y-4">
         {/* Auto-save notice */}
-        <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-2.5">
+        <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5">
           <Info className="w-4 h-4 text-blue-500 shrink-0" />
           <p className="text-xs text-blue-700">
-            All changes save instantly. Your capacity card is visible to other
-            platform actors.
+            {t("capacity.autoSaveNotice")}
           </p>
         </div>
 
         {/* Card header */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-lg font-bold text-slate-900">{card.actorName}</h1>
@@ -227,14 +224,14 @@ export default function CapacityEditPage({
             </div>
             <span className="text-xs text-slate-400 flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {getZoneName(card.zone)}
+              {getZoneName(card.zone, locale)}
             </span>
           </div>
         </div>
 
         {/* Service toggles */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">Services</h2>
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
+          <h2 className="text-sm font-bold text-slate-900 mb-4">{t("capacity.services")}</h2>
           <div className="space-y-3">
             {services.map((svc) => (
               <div
@@ -255,7 +252,7 @@ export default function CapacityEditPage({
                     onChange={() => toggleService(svc.serviceId)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:ring-2 peer-focus:ring-[#1e3a5f]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#22c55e]" />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success" />
                 </label>
               </div>
             ))}
@@ -263,9 +260,9 @@ export default function CapacityEditPage({
         </div>
 
         {/* Resource quantities */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-4">
-            Resource Quantities
+            {t("capacity.resourceQuantities")}
           </h2>
           <div className="space-y-3">
             {resources.map((r) => (
@@ -297,8 +294,8 @@ export default function CapacityEditPage({
         </div>
 
         {/* Stock levels */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">Stock Levels</h2>
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
+          <h2 className="text-sm font-bold text-slate-900 mb-4">{t("capacity.stockLevels")}</h2>
           <div className="space-y-3">
             {Object.entries(stockLevels).map(([item, currentLevel]) => (
               <div key={item}>
@@ -316,7 +313,7 @@ export default function CapacityEditPage({
                           : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                       }`}
                     >
-                      {STOCK_COLORS[level].label}
+                      {t(`stockLevels.${level}`)}
                     </button>
                   ))}
                 </div>
@@ -326,14 +323,14 @@ export default function CapacityEditPage({
         </div>
 
         {/* Urgent needs */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-slate-900">Urgent Needs</h2>
+            <h2 className="text-sm font-bold text-slate-900">{t("capacity.urgentNeeds")}</h2>
             <button
               onClick={() => setShowNeedSelector(!showNeedSelector)}
-              className="text-xs text-[#1e3a5f] font-medium hover:underline"
+              className="text-xs text-primary font-medium hover:underline"
             >
-              {showNeedSelector ? "Done" : "+ Add Need"}
+              {showNeedSelector ? t("capacity.done") : t("capacity.addNeed")}
             </button>
           </div>
 
@@ -356,14 +353,14 @@ export default function CapacityEditPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400 mb-3">No urgent needs flagged</p>
+            <p className="text-sm text-slate-400 mb-3">{t("capacity.noUrgentNeeds")}</p>
           )}
 
           {/* Need selector */}
           {showNeedSelector && (
             <div className="border border-slate-200 rounded-xl p-3">
               <p className="text-xs text-slate-500 mb-2">
-                Tap to toggle urgent needs
+                {t("capacity.tapToToggle")}
               </p>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_NEEDS.map((need) => (
@@ -385,21 +382,21 @@ export default function CapacityEditPage({
         </div>
 
         {/* Notes */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
-          <h2 className="text-sm font-bold text-slate-900 mb-3">Notes</h2>
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
+          <h2 className="text-sm font-bold text-slate-900 mb-3">{t("capacity.notes")}</h2>
           <textarea
             value={note}
             onChange={(e) => {
               if (e.target.value.length <= 140) setNote(e.target.value);
             }}
-            placeholder="Add a short note about your current capacity..."
+            placeholder={t("capacity.notesPlaceholder")}
             rows={3}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 focus:border-[#1e3a5f]"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           />
           <div className="flex justify-end mt-1">
             <span
               className={`text-xs ${
-                note.length > 120 ? "text-[#e8913a]" : "text-slate-400"
+                note.length > 120 ? "text-accent" : "text-slate-400"
               }`}
             >
               {note.length}/140
@@ -408,10 +405,10 @@ export default function CapacityEditPage({
         </div>
 
         {/* Recent changes timeline */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
             <Clock className="w-4 h-4 text-slate-400" />
-            Recent Changes
+            {t("capacity.recentChanges")}
           </h2>
           {changes.length > 0 ? (
             <div className="space-y-0">
@@ -419,7 +416,7 @@ export default function CapacityEditPage({
                 <div key={change.id} className="flex gap-3">
                   {/* Timeline line */}
                   <div className="flex flex-col items-center">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#1e3a5f] shrink-0 mt-1" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1" />
                     {idx < changes.length - 1 && (
                       <div className="w-0.5 flex-1 bg-slate-200" />
                     )}
@@ -443,7 +440,7 @@ export default function CapacityEditPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400">No recent changes recorded</p>
+            <p className="text-sm text-slate-400">{t("capacity.noRecentChanges")}</p>
           )}
         </div>
       </main>

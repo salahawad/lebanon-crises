@@ -215,7 +215,7 @@ export default function PlatformReviewPage() {
 
   if (hasLoadError) {
     return (
-      <div className="rounded-3xl border border-red-200 bg-red-50 p-6 shadow-sm">
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
         <h2 className="text-xl font-bold text-red-900">{copy.loadErrorTitle}</h2>
         <p className="mt-2 text-sm text-red-800">{copy.loadErrorBody}</p>
       </div>
@@ -224,7 +224,7 @@ export default function PlatformReviewPage() {
 
   if (!platformUser) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6">
         <h2
           className="text-xl font-bold text-slate-900"
           data-testid="platform-review-heading"
@@ -235,7 +235,7 @@ export default function PlatformReviewPage() {
         <Link
           href="/platform/login"
           data-testid="platform-review-sign-in-cta"
-          className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#2d5a8e]"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
         >
           {copy.goToSignIn}
         </Link>
@@ -246,7 +246,7 @@ export default function PlatformReviewPage() {
   if (platformUser.role !== "platform_admin") {
     return (
       <div
-        className="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm"
+        className="rounded-3xl border border-amber-200 bg-amber-50 p-6"
         data-testid="platform-review-access-denied"
       >
         <div className="flex items-center gap-2 text-amber-900">
@@ -267,11 +267,11 @@ export default function PlatformReviewPage() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-slate-900">
-              <ClipboardList className="h-5 w-5 text-[#1e3a5f]" />
+              <ClipboardList className="h-5 w-5 text-primary" />
               <h2
                 className="text-xl font-bold"
                 data-testid="platform-review-heading"
@@ -293,26 +293,26 @@ export default function PlatformReviewPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5">
           <p className="text-sm font-medium text-slate-500">{copy.pendingSubmissions}</p>
-          <p className="mt-2 text-3xl font-bold text-[#1e3a5f]">
+          <p className="mt-2 text-3xl font-bold text-primary">
             {pendingSubmissions.length}
           </p>
         </div>
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5">
           <p className="text-sm font-medium text-slate-500">{copy.mappedActors}</p>
-          <p className="mt-2 text-3xl font-bold text-[#e8913a]">{actors.length}</p>
+          <p className="mt-2 text-3xl font-bold text-accent">{actors.length}</p>
         </div>
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5">
           <p className="text-sm font-medium text-slate-500">{copy.reviewActions}</p>
           <p className="mt-2 text-sm text-slate-700">{copy.reviewActionsBody}</p>
         </div>
       </div>
 
       {pendingSubmissions.length === 0 ? (
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6">
           <div className="flex items-center gap-2 text-slate-900">
-            <CheckCircle2 className="h-5 w-5 text-[#22c55e]" />
+            <CheckCircle2 className="h-5 w-5 text-success" />
             <h3 className="text-lg font-semibold">{copy.noPending}</h3>
           </div>
           <p className="mt-2 text-sm text-slate-500">{copy.noPendingBody}</p>
@@ -328,7 +328,7 @@ export default function PlatformReviewPage() {
               <div
                 key={submission.id}
                 data-testid={`platform-review-card-${submission.id}`}
-                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-3xl border border-slate-200 bg-white p-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -351,9 +351,9 @@ export default function PlatformReviewPage() {
                 </div>
 
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-lg bg-slate-50 p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <Users className="h-4 w-4 text-[#1e3a5f]" />
+                      <Users className="h-4 w-4 text-primary" />
                       {copy.sectors}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -368,9 +368,9 @@ export default function PlatformReviewPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-lg bg-slate-50 p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <MapPin className="h-4 w-4 text-[#e8913a]" />
+                      <MapPin className="h-4 w-4 text-accent" />
                       {copy.operationalZones}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -387,7 +387,7 @@ export default function PlatformReviewPage() {
                 </div>
 
                 {duplicate ? (
-                  <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                     <div className="flex items-center gap-2 font-medium">
                       <AlertTriangle className="h-4 w-4" />
                       {copy.possibleDuplicate}

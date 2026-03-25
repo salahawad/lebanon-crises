@@ -61,7 +61,7 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5" />
@@ -72,7 +72,7 @@ export default function MessagesPage() {
 
       <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-4">
         {/* E2E encryption badge */}
-        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-2xl">
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
           <Lock className="w-4 h-4 text-emerald-600" />
           <span className="text-sm text-emerald-700 font-medium">
             End-to-end encrypted
@@ -85,7 +85,7 @@ export default function MessagesPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse"
+                className="bg-white rounded-lg border border-slate-200 p-4 animate-pulse"
               >
                 <div className="h-4 bg-slate-200 rounded w-1/3 mb-3" />
                 <div className="h-3 bg-slate-100 rounded w-2/3" />
@@ -114,12 +114,12 @@ export default function MessagesPage() {
                   href={`/messages/${thread.id}`}
                   className="block"
                 >
-                  <div className="bg-white rounded-2xl border border-slate-200 p-4 hover:border-[#1e3a5f]/30 hover:shadow-sm transition-all">
+                  <div className="bg-white rounded-lg border border-slate-200 p-4 hover:border-primary/30 hover:shadow-sm transition-all">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         {/* Group label */}
                         {thread.type === "group" && (
-                          <span className="inline-block text-xs font-medium text-[#e8913a] mb-1">
+                          <span className="inline-block text-xs font-medium text-accent mb-1">
                             Group
                             {opNames[thread.id]
                               ? ` · ${opNames[thread.id]}`

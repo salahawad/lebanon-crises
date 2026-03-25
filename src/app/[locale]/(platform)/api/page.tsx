@@ -196,12 +196,12 @@ function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50 transition-colors"
       >
-        <span className="shrink-0 px-2 py-0.5 rounded-md bg-[#22c55e]/10 text-[#22c55e] text-xs font-bold font-mono">
+        <span className="shrink-0 px-2 py-0.5 rounded-md bg-success/10 text-success text-xs font-bold font-mono">
           {endpoint.method}
         </span>
         <code className="text-sm font-mono text-slate-800 flex-1 truncate">
@@ -252,7 +252,7 @@ export default function ApiDocsPage() {
     <div>
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
           <Code className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -262,10 +262,10 @@ export default function ApiDocsPage() {
       </div>
 
       {/* Rate limit info */}
-      <div className="bg-[#e8913a]/5 border border-[#e8913a]/20 rounded-2xl p-4 mb-6 flex items-start gap-3">
-        <Zap className="w-5 h-5 text-[#e8913a] shrink-0 mt-0.5" />
+      <div className="bg-accent/5 border border-accent/20 rounded-lg p-4 mb-6 flex items-start gap-3">
+        <Zap className="w-5 h-5 text-accent shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-[#e8913a]">Rate Limits</p>
+          <p className="text-sm font-semibold text-accent">Rate Limits</p>
           <div className="text-xs text-slate-600 mt-1 space-y-0.5">
             <p>
               <span className="font-medium">v0 (Public):</span> 100 requests/hour per IP
@@ -280,12 +280,12 @@ export default function ApiDocsPage() {
       {/* v0 Public Endpoints */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
-          <Globe className="w-5 h-5 text-[#22c55e]" />
+          <Globe className="w-5 h-5 text-success" />
           <h2 className="text-base font-bold text-slate-900">v0 — Public API</h2>
         </div>
-        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-[#22c55e]/5 rounded-xl w-fit">
-          <Globe className="w-4 h-4 text-[#22c55e]" />
-          <span className="text-sm font-medium text-[#22c55e]">
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-success/5 rounded-xl w-fit">
+          <Globe className="w-4 h-4 text-success" />
+          <span className="text-sm font-medium text-success">
             Public API — No Authentication Required
           </span>
         </div>
@@ -299,18 +299,18 @@ export default function ApiDocsPage() {
       {/* v1 Authenticated Endpoints */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
-          <Lock className="w-5 h-5 text-[#1e3a5f]" />
+          <Lock className="w-5 h-5 text-primary" />
           <h2 className="text-base font-bold text-slate-900">v1 — Authenticated API</h2>
         </div>
-        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-[#1e3a5f]/5 rounded-xl w-fit">
-          <Lock className="w-4 h-4 text-[#1e3a5f]" />
-          <span className="text-sm font-medium text-[#1e3a5f]">
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-primary/5 rounded-xl w-fit">
+          <Lock className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-primary">
             Authenticated — API Key Required
           </span>
         </div>
 
         {/* Auth usage */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-4">
+        <div className="bg-white rounded-lg border border-slate-200 p-4 mb-4">
           <p className="text-sm font-semibold text-slate-800 mb-2">Authentication</p>
           <p className="text-xs text-slate-600 mb-2">
             Include your API key in the request header:
@@ -328,10 +328,10 @@ export default function ApiDocsPage() {
       </div>
 
       {/* Base URL */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
         <p className="text-xs text-slate-500">
           <span className="font-semibold">Base URL:</span>{" "}
-          <code className="text-[#1e3a5f] font-mono">https://shabaka.app</code>
+          <code className="text-primary font-mono">https://shabaka.app</code>
         </p>
         <p className="text-xs text-slate-400 mt-1">
           All endpoints return JSON. Timestamps are in ISO 8601 format.

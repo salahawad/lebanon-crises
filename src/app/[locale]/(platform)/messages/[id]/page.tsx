@@ -75,7 +75,7 @@ export default function MessageThreadPage({
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center gap-3">
           <Link
             href="/messages"
@@ -107,7 +107,7 @@ export default function MessageThreadPage({
                 key={i}
                 className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}
               >
-                <div className="bg-white rounded-2xl p-3 animate-pulse w-2/3">
+                <div className="bg-white rounded-lg p-3 animate-pulse w-2/3">
                   <div className="h-3 bg-slate-200 rounded w-1/4 mb-2" />
                   <div className="h-4 bg-slate-100 rounded w-full" />
                 </div>
@@ -130,9 +130,9 @@ export default function MessageThreadPage({
                   className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    className={`max-w-[80%] rounded-lg px-4 py-3 ${
                       isOwn
-                        ? "bg-[#1e3a5f] text-white"
+                        ? "bg-primary text-white"
                         : "bg-white border border-slate-200 text-slate-900"
                     }`}
                   >
@@ -140,7 +140,7 @@ export default function MessageThreadPage({
                     {!isOwn && (
                       <p
                         className={`text-xs font-semibold mb-1 ${
-                          isOwn ? "text-blue-200" : "text-[#1e3a5f]"
+                          isOwn ? "text-blue-200" : "text-primary"
                         }`}
                       >
                         {msg.senderName}
@@ -190,12 +190,12 @@ export default function MessageThreadPage({
                 if (e.key === "Enter") handleSend();
               }}
               placeholder="Type a message..."
-              className="flex-1 px-4 py-2.5 bg-slate-100 rounded-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+              className="flex-1 px-4 py-2.5 bg-slate-100 rounded-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
             <button
               onClick={handleSend}
               disabled={!inputValue.trim()}
-              className="p-2.5 rounded-full bg-[#1e3a5f] text-white disabled:opacity-40 hover:bg-[#1e3a5f]/90 transition-colors"
+              className="p-2.5 rounded-full bg-primary text-white disabled:opacity-40 hover:bg-primary/90 transition-colors"
             >
               <Send className="w-4 h-4" />
             </button>

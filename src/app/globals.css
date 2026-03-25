@@ -1,31 +1,104 @@
+/* Google Fonts: Inter (EN) + Cairo (AR) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap");
+
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #1e3a5f;
-  --color-primary-light: #2d5a8e;
-  --color-primary-dark: #152a45;
+  /* Fonts */
+  --font-sans: "Inter", "Roboto", system-ui, sans-serif;
+  --font-arabic: "Cairo", "Tajawal", "Noto Sans Arabic", system-ui, sans-serif;
+
+  /* Primary — deep blue */
+  --color-primary: #1E3A8A;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1e2f6a;
+
+  /* Accent — Shabaka brand */
   --color-accent: #e8913a;
   --color-accent-light: #f0a85c;
+
+  /* Semantic status */
   --color-success: #22c55e;
+  --color-success-dark: #16A34A;
   --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-  --color-critical: #dc2626;
+  --color-danger-dark: #DC2626;
+  --color-warning: #F59E0B;
+  --color-info: #2563EB;
+
+  /* Urgency levels */
+  --color-critical: #DC2626;
   --color-high: #f97316;
-  --color-medium: #eab308;
-  --color-low: #3b82f6;
+  --color-medium: #F59E0B;
+  --color-low: #3B82F6;
+
+  /* Surfaces & borders */
+  --color-page: #F9FAFB;
+  --color-border: #E5E7EB;
+
+  /* Text */
+  --color-heading: #111827;
+  --color-sub: #374151;
+  --color-muted: #9CA3AF;
+
+  /* Heatmap (lebanon-map) */
+  --color-heatmap-none: #e2e8f0;
+  --color-heatmap-low: #bbf7d0;
+  --color-heatmap-mid: #fde68a;
+  --color-heatmap-high: #fed7aa;
+  --color-heatmap-critical: #fecaca;
 }
 
+/* Typography */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans Arabic", sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-heading);
+  background-color: var(--color-page);
 }
 
-/* Large tap targets for mobile */
+/* Arabic typography — Cairo with 1.1x sizing and 1.6 line-height */
+[dir="rtl"] body,
+[dir="rtl"] {
+  font-family: var(--font-arabic);
+  line-height: 1.6;
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  font-family: var(--font-arabic);
+}
+
+/* Scale Arabic text 1.1x */
+[dir="rtl"] .text-xs  { font-size: 0.825rem; }
+[dir="rtl"] .text-sm  { font-size: 0.96rem; }
+[dir="rtl"] .text-base { font-size: 1.1rem; }
+[dir="rtl"] .text-lg  { font-size: 1.23rem; }
+[dir="rtl"] .text-xl  { font-size: 1.375rem; }
+[dir="rtl"] .text-2xl { font-size: 1.65rem; }
+
+/* Large tap targets for mobile — 44px minimum */
 .tap-target {
   min-height: 44px;
   min-width: 44px;
+}
+
+/* All interactive elements get 44px min touch target */
+button, a, input, select, textarea, [role="button"] {
+  min-height: 44px;
+}
+
+/* Except inline text links */
+p a, span a, li a {
+  min-height: auto;
+}
+
+/* Cards — clean, no shadow, subtle border */
+.card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }
 
 /* RTL support utilities */
@@ -33,16 +106,42 @@ body {
   transform: scaleX(-1);
 }
 
-/* Smooth focus styles for accessibility */
+/* Force LTR for phone/email fields */
+input[type="tel"],
+input[type="email"],
+input[inputmode="numeric"],
+input[inputmode="tel"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Focus — high contrast ring */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Reduce motion for accessibility */
+/* Minimal animations */
+* {
+  transition-duration: 150ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Emergency CTA */
+.cta-emergency {
+  background-color: var(--color-danger-dark);
+  color: #FFFFFF;
+  font-weight: 700;
+  min-height: 56px;
+  border-radius: 8px;
+}
+
+.cta-emergency:hover {
+  background-color: color-mix(in srgb, var(--color-danger-dark) 85%, black);
 }

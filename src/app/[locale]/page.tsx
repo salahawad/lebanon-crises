@@ -28,9 +28,9 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-page">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white border-b border-border">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img src="/icon.svg" alt="" width={28} height={28} className="rounded" />
@@ -43,120 +43,150 @@ export default function LandingPage() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-8">
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-6">
         {/* Hero */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+        <div className="text-center mb-6">
+          <h2 className="text-[22px] font-bold text-heading mb-2">
             {t("landing.title")}
           </h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
+          <p className="text-sub text-sm leading-relaxed">
             {t("landing.subtitle")}
           </p>
         </div>
 
-        {/* Two big action buttons */}
-        <div className="space-y-4 mb-8">
-          <Link
-            href="/request-help"
-            className="block w-full p-5 rounded-2xl bg-primary text-white text-center shadow-lg hover:bg-primary-light active:bg-primary-dark transition-colors"
-          >
-            <span className="text-3xl block mb-2" aria-hidden="true">
-              🆘
-            </span>
-            <span className="text-xl font-bold block">
+        {/* Emergency CTA — max 3 steps to help */}
+        <Link
+          href="/request-help"
+          className="cta-emergency flex items-center justify-center gap-3 w-full p-4 rounded-lg text-white text-center mb-4"
+        >
+          <svg className="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <span className="text-base font-bold block">
               {t("landing.needHelp")}
             </span>
-            <span className="text-sm opacity-90 mt-1 block">
+            <span className="text-xs opacity-90 block">
               {t("landing.needHelpDesc")}
             </span>
-          </Link>
+          </div>
+        </Link>
 
+        {/* Action cards — clean, no shadow, high contrast */}
+        <div className="space-y-3 mb-6">
           <Link
             href="/browse"
-            className="block w-full p-5 rounded-2xl bg-accent text-white text-center shadow-lg hover:bg-accent-light transition-colors"
+            className="flex items-center gap-4 w-full p-4 rounded-lg bg-white border border-border hover:border-primary transition-colors"
           >
-            <span className="text-3xl block mb-2" aria-hidden="true">
-              🤝
-            </span>
-            <span className="text-xl font-bold block">
-              {t("landing.offerHelp")}
-            </span>
-            <span className="text-sm opacity-90 mt-1 block">
-              {t("landing.offerHelpDesc")}
-            </span>
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-base font-semibold text-heading block">
+                {t("landing.offerHelp")}
+              </span>
+              <span className="text-sm text-sub block">
+                {t("landing.offerHelpDesc")}
+              </span>
+            </div>
+            <svg className="w-5 h-5 text-muted flex-shrink-0 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
+
           <Link
             href="/contacts"
-            className="block w-full p-5 rounded-2xl bg-slate-700 text-white text-center shadow-lg hover:bg-slate-600 transition-colors"
+            className="flex items-center gap-4 w-full p-4 rounded-lg bg-white border border-border hover:border-primary transition-colors"
           >
-            <span className="text-3xl block mb-2" aria-hidden="true">
-              📞
-            </span>
-            <span className="text-xl font-bold block">
-              {t("contacts.title")}
-            </span>
-            <span className="text-sm opacity-90 mt-1 block">
-              {t("contacts.subtitle")}
-            </span>
+            <div className="w-10 h-10 rounded-lg bg-success-dark/10 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-success-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-base font-semibold text-heading block">
+                {t("contacts.title")}
+              </span>
+              <span className="text-sm text-sub block">
+                {t("contacts.subtitle")}
+              </span>
+            </div>
+            <svg className="w-5 h-5 text-muted flex-shrink-0 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
+
           <Link
             href="/shelters"
-            className="block w-full p-5 rounded-2xl bg-emerald-700 text-white text-center shadow-lg hover:bg-emerald-600 transition-colors"
+            className="flex items-center gap-4 w-full p-4 rounded-lg bg-white border border-border hover:border-primary transition-colors"
           >
-            <span className="text-3xl block mb-2" aria-hidden="true">
-              🏫
-            </span>
-            <span className="text-xl font-bold block">
-              {t("shelters.viewShelters")}
-            </span>
-            <span className="text-sm opacity-90 mt-1 block">
-              {t("shelters.viewSheltersDesc")}
-            </span>
+            <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-base font-semibold text-heading block">
+                {t("shelters.viewShelters")}
+              </span>
+              <span className="text-sm text-sub block">
+                {t("shelters.viewSheltersDesc")}
+              </span>
+            </div>
+            <svg className="w-5 h-5 text-muted flex-shrink-0 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
 
-        {/* Coordination Platform Link */}
-        <div className="mb-8">
-          <Link
-            href="/platform"
-            className="block w-full p-5 rounded-2xl bg-primary text-white text-center shadow-lg hover:bg-primary-light transition-colors"
-          >
-            <span className="text-3xl block mb-2" aria-hidden="true">
-              🌐
-            </span>
-            <span className="text-xl font-bold block">
+        {/* Shabaka Platform */}
+        <Link
+          href="/platform"
+          className="flex items-center gap-4 w-full p-4 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors mb-6"
+        >
+          <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="text-base font-bold block">
               {t("landing.platformName")}
             </span>
-            <span className="text-sm opacity-90 mt-1 block">
+            <span className="text-xs opacity-80 block">
               {t("landing.platformDesc")}
             </span>
-          </Link>
-        </div>
+          </div>
+          <svg className="w-5 h-5 opacity-60 flex-shrink-0 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
 
         {/* Map */}
         {(Object.keys(govCounts).length > 0 || Object.keys(shelterGovCounts).length > 0) && (
-          <div className="mb-8">
-            {/* Map mode toggle */}
-            <div className="flex items-center justify-center gap-1 mb-3 bg-slate-100 rounded-full p-1 max-w-xs mx-auto">
+          <div className="mb-6">
+            <div className="flex items-center justify-center gap-1 mb-3 bg-white border border-border rounded-lg p-1 max-w-xs mx-auto">
               <button
                 onClick={() => setMapMode("requests")}
-                className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
                   mapMode === "requests"
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-800"
+                    ? "bg-primary text-white"
+                    : "text-sub hover:text-heading"
                 }`}
               >
-                🆘 {t("landing.openRequests")}
+                {t("landing.openRequests")}
               </button>
               <button
                 onClick={() => setMapMode("shelters")}
-                className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
                   mapMode === "shelters"
-                    ? "bg-emerald-600 text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-800"
+                    ? "bg-success-dark text-white"
+                    : "text-sub hover:text-heading"
                 }`}
               >
-                🏫 {t("shelters.viewShelters")}
+                {t("shelters.viewShelters")}
               </button>
             </div>
 
@@ -177,16 +207,16 @@ export default function LandingPage() {
         )}
 
         {/* Safety notice */}
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
-          <p className="text-sm text-blue-800">
-            🔒 {t("landing.safeNotice")}
+        <div className="bg-info/5 border border-info/20 rounded-lg p-4 text-center">
+          <p className="text-sm text-primary font-medium">
+            {t("landing.safeNotice")}
           </p>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-4">
-        <div className="max-w-lg mx-auto px-4 flex justify-center gap-4 text-xs text-slate-500">
+      <footer className="bg-white border-t border-border py-4">
+        <div className="max-w-lg mx-auto px-4 flex justify-center gap-4 text-xs text-sub">
           <Link href="/privacy" className="hover:text-primary">
             {t("privacy.title")}
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   Search,
@@ -12,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { getActors } from "@/lib/data/platform-api";
-import { ZONES, SECTORS_META, getSectorColor } from "@/lib/data/zones";
+import { ZONES, SECTORS_META, getSectorColor, getZoneName } from "@/lib/data/zones";
 import type { Actor, Sector, ActorType } from "@/lib/types/platform";
 
 const ACTOR_TYPE_LABELS: Record<ActorType, string> = {
@@ -51,12 +52,9 @@ function relativeTime(timestamp: number): string {
   return `${weeks}w ago`;
 }
 
-function getZoneName(id: string): string {
-  const zone = ZONES.find((z) => z.id === id);
-  return zone ? zone.nameEn : id;
-}
-
 export default function ActorsPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [actors, setActors] = useState<Actor[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -74,7 +72,7 @@ export default function ActorsPage() {
   const uniqueZones = useMemo(() => {
     const zoneIds = new Set(actors.flatMap((a) => a.operationalZones));
     return Array.from(zoneIds)
-      .map((id) => ({ id, name: getZoneName(id) }))
+      .map((id) => ({ id, name: getZoneName(id, locale) }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [actors]);
 
@@ -104,10 +102,10 @@ export default function ActorsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
-          <h1 className="text-base font-bold">Actor Registry</h1>
-          <span className="text-sm text-white/70">{actors.length} organizations</span>
+          <h1 className="text-base font-bold">{t("actors.title")}</h1>
+          <span className="text-sm text-white/70">{t("actors.organizationCount", { count: actors.length })}</span>
         </div>
       </header>
 
@@ -117,16 +115,16 @@ export default function ActorsPage() {
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search actors..."
+            placeholder={t("actors.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full ps-9 pe-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30 focus:border-[#1e3a5f]"
+            className="w-full ps-9 pe-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           />
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`absolute end-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${
               showFilters || typeFilter || zoneFilter
-                ? "bg-[#1e3a5f] text-white"
+                ? "bg-primary text-white"
                 : "text-slate-400 hover:text-slate-600"
             }`}
           >
@@ -140,11 +138,11 @@ export default function ActorsPage() {
             onClick={() => setSectorFilter(null)}
             className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               !sectorFilter
-                ? "bg-[#1e3a5f] text-white"
+                ? "bg-primary text-white"
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            All Sectors
+            {t("common.allSectors")}
           </button>
           {SECTORS_META.map((s) => (
             <button
@@ -165,17 +163,17 @@ export default function ActorsPage() {
                 className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: s.color }}
               />
-              {s.nameEn}
+              {locale === "ar" ? s.nameAr : s.nameEn}
             </button>
           ))}
         </div>
 
         {/* Extended filters */}
         {showFilters && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 shadow-lg space-y-3">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 mb-4 space-y-3">
             <div>
               <label className="text-xs font-medium text-slate-500 mb-1 block">
-                Organization Type
+                {t("common.organizationType")}
               </label>
               <div className="flex gap-2 flex-wrap">
                 {(Object.keys(ACTOR_TYPE_LABELS) as ActorType[]).map((type) => (
@@ -184,23 +182,23 @@ export default function ActorsPage() {
                     onClick={() => setTypeFilter(typeFilter === type ? null : type)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                       typeFilter === type
-                        ? "bg-[#1e3a5f] text-white"
+                        ? "bg-primary text-white"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
-                    {ACTOR_TYPE_LABELS[type]}
+                    {t(`actorTypes.${type}`)}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-500 mb-1 block">Zone</label>
+              <label className="text-xs font-medium text-slate-500 mb-1 block">{t("common.zone")}</label>
               <select
                 value={zoneFilter || ""}
                 onChange={(e) => setZoneFilter(e.target.value || null)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
-                <option value="">All Zones</option>
+                <option value="">{t("common.allZones")}</option>
                 {uniqueZones.map((z) => (
                   <option key={z.id} value={z.id}>
                     {z.name}
@@ -216,7 +214,7 @@ export default function ActorsPage() {
                 }}
                 className="text-xs text-slate-500 hover:text-slate-700 underline"
               >
-                Clear filters
+                {t("common.clearFilters")}
               </button>
             )}
           </div>
@@ -235,7 +233,7 @@ export default function ActorsPage() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse shadow-lg"
+                className="bg-white rounded-lg border border-slate-200 p-4 animate-pulse"
               >
                 <div className="h-5 bg-slate-200 rounded w-1/3 mb-3" />
                 <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -246,8 +244,8 @@ export default function ActorsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
             <Search className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No actors found</p>
-            <p className="text-sm text-slate-400 mt-1">Try adjusting your filters</p>
+            <p className="text-slate-500 font-medium">{t("actors.noActors")}</p>
+            <p className="text-sm text-slate-400 mt-1">{t("actors.tryAdjustingFilters")}</p>
           </div>
         ) : (
           /* Actor cards */
@@ -261,24 +259,19 @@ export default function ActorsPage() {
                   href={`/actors/${actor.id}`}
                   className="block"
                 >
-                  <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="bg-white rounded-lg border border-slate-200 p-4 hover:shadow-xl transition-shadow">
                     {/* Top row: name + verification */}
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="min-w-0">
                         <h3 className="font-semibold text-slate-900 truncate">
-                          {actor.name}
+                          {locale === "ar" && actor.nameAr ? actor.nameAr : actor.name}
                         </h3>
-                        {actor.nameAr && (
-                          <p className="text-sm text-slate-500 truncate" dir="rtl">
-                            {actor.nameAr}
-                          </p>
-                        )}
                       </div>
                       <span
                         className={`shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${verification.color}`}
                       >
                         <VerifIcon className="w-3 h-3" />
-                        {verification.label}
+                        {t(`verification.${actor.verificationStatus}`)}
                       </span>
                     </div>
 
@@ -287,7 +280,7 @@ export default function ActorsPage() {
                       <span
                         className={`px-2 py-0.5 rounded-full text-xs font-medium ${ACTOR_TYPE_COLORS[actor.type]}`}
                       >
-                        {ACTOR_TYPE_LABELS[actor.type]}
+                        {t(`actorTypes.${actor.type}`)}
                       </span>
                       <span className="text-xs text-slate-400">
                         {relativeTime(actor.lastUpdated)}
@@ -301,12 +294,12 @@ export default function ActorsPage() {
                           key={s}
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: getSectorColor(s) }}
-                          title={SECTORS_META.find((m) => m.id === s)?.nameEn || s}
+                          title={(() => { const meta = SECTORS_META.find((m) => m.id === s); return meta ? (locale === "ar" ? meta.nameAr : meta.nameEn) : s; })()}
                         />
                       ))}
                       <span className="text-xs text-slate-400 ms-1">
                         {actor.sectors
-                          .map((s) => SECTORS_META.find((m) => m.id === s)?.nameEn || s)
+                          .map((s) => { const meta = SECTORS_META.find((m) => m.id === s); return meta ? (locale === "ar" ? meta.nameAr : meta.nameEn) : s; })
                           .join(", ")}
                       </span>
                     </div>
@@ -316,7 +309,7 @@ export default function ActorsPage() {
                       <MapPin className="w-3.5 h-3.5 shrink-0" />
                       <span className="truncate">
                         {actor.operationalZones
-                          .map((z) => getZoneName(z))
+                          .map((z) => getZoneName(z, locale))
                           .join(", ")}
                       </span>
                       <ChevronRight className="w-4 h-4 shrink-0 ms-auto text-slate-300 rtl:-scale-x-100" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   MessageSquare,
   Send,
@@ -14,12 +15,12 @@ import { getCommunityFeedback } from "@/lib/data/platform-api";
 import type { CommunityFeedback, FeedbackType } from "@/lib/types/platform";
 import { getZoneName, ZONES } from "@/lib/data/zones";
 
-const SERVICE_TYPES: { value: FeedbackType; label: string }[] = [
-  { value: "food", label: "Food" },
-  { value: "medical", label: "Medical" },
-  { value: "shelter", label: "Shelter" },
-  { value: "psychosocial", label: "Psychosocial" },
-  { value: "other", label: "Other" },
+const SERVICE_TYPE_KEYS: { value: FeedbackType; key: string }[] = [
+  { value: "food", key: "food" },
+  { value: "medical", key: "medical" },
+  { value: "shelter", key: "shelter" },
+  { value: "psychosocial", key: "psychosocial" },
+  { value: "other", key: "other" },
 ];
 
 const MAX_CHARS = 300;
@@ -34,6 +35,8 @@ function timeAgo(ts: number): string {
 }
 
 export default function FeedbackPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [feedbackList, setFeedbackList] = useState<CommunityFeedback[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,12 +78,12 @@ export default function FeedbackPage() {
     <div>
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
           <MessageSquare className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Community Feedback</h1>
-          <p className="text-sm text-slate-500">Share your experience anonymously</p>
+          <h1 className="text-xl font-bold text-slate-900">{t("feedback.title")}</h1>
+          <p className="text-sm text-slate-500">{t("feedback.subtitle")}</p>
         </div>
       </div>
 
@@ -88,47 +91,47 @@ export default function FeedbackPage() {
       <div className="flex items-center gap-2 mb-6 px-3 py-2 bg-slate-100 rounded-xl w-fit">
         <UserX className="w-4 h-4 text-slate-500" />
         <span className="text-sm font-medium text-slate-600">
-          Anonymous
+          {t("feedback.anonymous")}
         </span>
         <span className="text-xs text-slate-400">|</span>
-        <span className="text-sm text-slate-500" dir="rtl">
-          لا حاجة لحساب
+        <span className="text-sm text-slate-500">
+          {t("feedback.noAccountNeeded")}
         </span>
       </div>
 
       {/* Submission form */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-8">
+      <div className="bg-white rounded-lg border border-slate-200 p-5 mb-8">
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-14 h-14 rounded-full bg-[#22c55e]/10 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-7 h-7 text-[#22c55e]" />
+            <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-7 h-7 text-success" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-1">Thank you!</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-1">{t("feedback.thankYou")}</h3>
             <p className="text-sm text-slate-500">
-              Your feedback has been submitted anonymously and will be reviewed.
+              {t("feedback.submittedMessage")}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-base font-semibold text-slate-800 mb-1">Submit Feedback</h2>
+            <h2 className="text-base font-semibold text-slate-800 mb-1">{t("feedback.submitFeedback")}</h2>
 
             {/* Service type */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Service Type
+                {t("feedback.serviceType")}
               </label>
               <div className="relative">
                 <select
                   value={serviceType}
                   onChange={(e) => setServiceType(e.target.value as FeedbackType)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base appearance-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] focus:outline-none transition-colors"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base appearance-none focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors"
                 >
                   <option value="" disabled>
-                    Select service type...
+                    {t("feedback.selectServiceType")}
                   </option>
-                  {SERVICE_TYPES.map((st) => (
+                  {SERVICE_TYPE_KEYS.map((st) => (
                     <option key={st.value} value={st.value}>
-                      {st.label}
+                      {t(`feedback.${st.key}`)}
                     </option>
                   ))}
                 </select>
@@ -139,20 +142,20 @@ export default function FeedbackPage() {
             {/* Zone */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Zone
+                {t("feedback.zone")}
               </label>
               <div className="relative">
                 <select
                   value={zone}
                   onChange={(e) => setZone(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base appearance-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] focus:outline-none transition-colors"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base appearance-none focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors"
                 >
                   <option value="" disabled>
-                    Select zone...
+                    {t("feedback.selectZone")}
                   </option>
                   {ZONES.map((z) => (
                     <option key={z.id} value={z.id}>
-                      {z.nameEn}
+                      {locale === "ar" ? z.nameAr : z.nameEn}
                     </option>
                   ))}
                 </select>
@@ -163,7 +166,7 @@ export default function FeedbackPage() {
             {/* Feedback text */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Your Feedback
+                {t("feedback.yourFeedback")}
               </label>
               <textarea
                 value={feedbackText}
@@ -172,15 +175,15 @@ export default function FeedbackPage() {
                     setFeedbackText(e.target.value);
                   }
                 }}
-                placeholder="Describe your experience or concern..."
+                placeholder={t("feedback.placeholder")}
                 rows={4}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base placeholder:text-slate-400 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] focus:outline-none transition-colors resize-none"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-base placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors resize-none"
               />
               <div className="flex justify-end mt-1">
                 <span
                   className={`text-xs ${
                     charCount > MAX_CHARS * 0.9
-                      ? "text-[#e8913a] font-medium"
+                      ? "text-accent font-medium"
                       : "text-slate-400"
                   }`}
                 >
@@ -193,7 +196,7 @@ export default function FeedbackPage() {
             <button
               type="submit"
               disabled={!isValid || submitting}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#1e3a5f] text-white font-medium text-base hover:bg-[#2a4d7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white font-medium text-base hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <>
@@ -201,12 +204,12 @@ export default function FeedbackPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Submitting...
+                  {t("feedback.submitting")}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  Submit Feedback
+                  {t("feedback.submitButton")}
                 </>
               )}
             </button>
@@ -216,14 +219,14 @@ export default function FeedbackPage() {
 
       {/* Received feedback (demo admin view) */}
       <div className="mb-2">
-        <h2 className="text-lg font-bold text-slate-900 mb-1">Received Feedback</h2>
-        <p className="text-xs text-slate-400 mb-4">Admin view — for demonstration</p>
+        <h2 className="text-lg font-bold text-slate-900 mb-1">{t("feedback.receivedFeedback")}</h2>
+        <p className="text-xs text-slate-400 mb-4">{t("feedback.adminView")}</p>
       </div>
 
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse">
+            <div key={i} className="bg-white rounded-lg border border-slate-200 p-4 animate-pulse">
               <div className="h-4 bg-slate-200 rounded w-1/3 mb-3" />
               <div className="h-3 bg-slate-200 rounded w-full mb-2" />
               <div className="h-3 bg-slate-200 rounded w-2/3" />
@@ -235,19 +238,19 @@ export default function FeedbackPage() {
           {feedbackList.map((fb) => (
             <div
               key={fb.id}
-              className={`bg-white rounded-2xl border shadow-sm p-4 ${
+              className={`bg-white rounded-lg border p-4 ${
                 fb.discrepancyFlagged
-                  ? "border-[#e8913a]/40"
+                  ? "border-accent/40"
                   : "border-slate-200"
               }`}
             >
               {/* Header row */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a5f]/10 text-[#1e3a5f] capitalize">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary capitalize">
                   {fb.serviceType}
                 </span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                  {getZoneName(fb.zone, "en")}
+                  {getZoneName(fb.zone, locale)}
                 </span>
                 <span className="text-xs text-slate-400 flex items-center gap-1 ms-auto">
                   <Clock className="w-3 h-3" />
@@ -262,14 +265,14 @@ export default function FeedbackPage() {
 
               {/* Discrepancy flag */}
               {fb.discrepancyFlagged && (
-                <div className="mt-3 flex items-start gap-2 bg-[#e8913a]/10 rounded-xl px-3 py-2">
-                  <AlertTriangle className="w-4 h-4 text-[#e8913a] shrink-0 mt-0.5" />
+                <div className="mt-3 flex items-start gap-2 bg-accent/10 rounded-xl px-3 py-2">
+                  <AlertTriangle className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs font-semibold text-[#e8913a]">
-                      Discrepancy flagged
+                    <p className="text-xs font-semibold text-accent">
+                      {t("feedback.discrepancyFlagged")}
                     </p>
-                    <p className="text-xs text-[#e8913a]/80 mt-0.5">
-                      Reported service status conflicts with actor&apos;s capacity card data. Requires review.
+                    <p className="text-xs text-accent/80 mt-0.5">
+                      {t("feedback.discrepancyMessage")}
                     </p>
                   </div>
                 </div>

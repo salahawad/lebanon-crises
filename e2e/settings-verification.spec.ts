@@ -144,15 +144,15 @@ test.describe('Privacy & Settings', () => {
     await page.goto(`${BASE}/settings`);
     // Default is "push" - Push label should have active border
     const pushLabel = page.locator('label').filter({ hasText: 'Push' }).first();
-    await expect(pushLabel).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(pushLabel).toHaveClass(/border-primary/);
 
     // Click SMS option
     const smsLabel = page.locator('label').filter({ hasText: 'SMS' });
     await smsLabel.click();
     // SMS should now be active
-    await expect(smsLabel).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(smsLabel).toHaveClass(/border-primary/);
     // Push should no longer be active
-    await expect(pushLabel).not.toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(pushLabel).not.toHaveClass(/border-primary/);
   });
 
   test('offline mode toggle switch works', async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe('Privacy & Settings', () => {
     const toggle = page.locator('button.rounded-full').filter({ hasText: '' }).first();
     const offlineSection = page.locator('section').filter({ hasText: 'Offline Mode' });
     const toggleBtn = offlineSection.locator('button.rounded-full');
-    await expect(toggleBtn).toHaveClass(/bg-\[#22c55e\]/);
+    await expect(toggleBtn).toHaveClass(/bg-success/);
 
     // Click to disable
     await toggleBtn.click();
@@ -170,7 +170,7 @@ test.describe('Privacy & Settings', () => {
 
     // Click to re-enable
     await toggleBtn.click();
-    await expect(toggleBtn).toHaveClass(/bg-\[#22c55e\]/);
+    await expect(toggleBtn).toHaveClass(/bg-success/);
   });
 
   test('"Last synced" text visible', async ({ page }) => {
@@ -181,18 +181,18 @@ test.describe('Privacy & Settings', () => {
   test('region checkboxes can be checked/unchecked', async ({ page }) => {
     await page.goto(`${BASE}/settings`);
     await expect(page.getByText('Regions', { exact: true })).toBeVisible();
-    // Beirut & Suburbs should be pre-selected (has active border class border-[#1e3a5f])
+    // Beirut & Suburbs should be pre-selected (has active border class border-[#1E3A8A])
     // The button contains child p elements with region name text
     const beirutBtn = page.locator('button').filter({ hasText: 'Beirut & Suburbs' });
-    await expect(beirutBtn).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(beirutBtn).toHaveClass(/border-primary/);
 
     // Click to uncheck
     await beirutBtn.click();
-    await expect(beirutBtn).not.toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(beirutBtn).not.toHaveClass(/border-primary/);
 
     // Click to check again
     await beirutBtn.click();
-    await expect(beirutBtn).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(beirutBtn).toHaveClass(/border-primary/);
   });
 
   test('multiple regions can be selected', async ({ page }) => {
@@ -200,16 +200,16 @@ test.describe('Privacy & Settings', () => {
     // By default, 2 regions are selected: beirut_suburbs and south_lebanon
     const beirutBtn = page.getByRole('button', { name: /Beirut & Suburbs/i });
     const southBtn = page.getByRole('button', { name: /South Lebanon/i });
-    await expect(beirutBtn).toHaveClass(/border-\[#1e3a5f\]/);
-    await expect(southBtn).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(beirutBtn).toHaveClass(/border-primary/);
+    await expect(southBtn).toHaveClass(/border-primary/);
 
     // Select a third region
     const bekaaBtn = page.getByRole('button', { name: /Bekaa Valley/i });
     await bekaaBtn.click();
-    await expect(bekaaBtn).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(bekaaBtn).toHaveClass(/border-primary/);
     // Previous selections still active
-    await expect(beirutBtn).toHaveClass(/border-\[#1e3a5f\]/);
-    await expect(southBtn).toHaveClass(/border-\[#1e3a5f\]/);
+    await expect(beirutBtn).toHaveClass(/border-primary/);
+    await expect(southBtn).toHaveClass(/border-primary/);
   });
 
   test('"Download My Data" export button visible', async ({ page }) => {
@@ -226,7 +226,7 @@ test.describe('Capacity Cards Overview', () => {
   test('cards show actor name and zone', async ({ page }) => {
     await page.goto(`${BASE}/capacity`);
     // Wait for cards to load
-    const card = page.locator('.rounded-2xl.border.shadow-lg').first();
+    const card = page.locator('.rounded-lg.border').first();
     await expect(card).toBeVisible();
     // Each card has an actor name (h3) and a zone name next to a MapPin icon
     await expect(card.locator('h3').first()).toBeVisible();
@@ -237,10 +237,8 @@ test.describe('Capacity Cards Overview', () => {
     await page.goto(`${BASE}/capacity`);
     // Stock level bars with color classes
     await expect(page.getByText('Stock Levels').first()).toBeVisible();
-    // Colored bars: bg-[#22c55e], bg-[#e8913a], or bg-[#ef4444]
-    const stockBars = page.locator('.rounded-full').filter({
-      has: page.locator('[class*="bg-[#22c55e]"], [class*="bg-[#e8913a]"], [class*="bg-[#ef4444]"]')
-    });
+    // Colored bars: bg-success, bg-accent, or bg-danger
+    const stockBars = page.locator('.rounded-full.bg-success, .rounded-full.bg-accent, .rounded-full.bg-danger');
     expect(await stockBars.count()).toBeGreaterThan(0);
   });
 
@@ -263,7 +261,7 @@ test.describe('Capacity Cards Overview', () => {
     await page.goto(`${BASE}/capacity`);
     // Wait for cards to load
     await expect(page.locator('h3').first()).toBeVisible();
-    const allCardsCount = await page.locator('.grid .rounded-2xl.border').count();
+    const allCardsCount = await page.locator('.grid .rounded-lg.border').count();
 
     // Select a specific zone from the dropdown
     const select = page.locator('select');
@@ -273,7 +271,7 @@ test.describe('Capacity Cards Overview', () => {
     if (optionValue) {
       await select.selectOption(optionValue);
       // After filtering, card count should be less than or equal to all cards
-      const filteredCount = await page.locator('.grid .rounded-2xl.border').count();
+      const filteredCount = await page.locator('.grid .rounded-lg.border').count();
       expect(filteredCount).toBeLessThanOrEqual(allCardsCount);
     }
   });
@@ -352,13 +350,13 @@ test.describe('Capacity Card Edit', () => {
 
     // Click "Low" button
     await lowButton.click();
-    await expect(lowButton).toHaveClass(/bg-\[#ef4444\]/);
+    await expect(lowButton).toHaveClass(/bg-danger/);
 
     // Click "Good" button
     await goodButton.click();
-    await expect(goodButton).toHaveClass(/bg-\[#22c55e\]/);
+    await expect(goodButton).toHaveClass(/bg-success/);
     // "Low" should no longer be active
-    await expect(lowButton).not.toHaveClass(/bg-\[#ef4444\]/);
+    await expect(lowButton).not.toHaveClass(/bg-danger/);
   });
 
   test('notes textarea accepts input', async ({ page }) => {
@@ -385,7 +383,7 @@ test.describe('Capacity Card Edit', () => {
     await expect(page.getByText('125/140')).toBeVisible();
     // The counter should have the warning color class when > 120
     const counter = page.getByText('125/140');
-    await expect(counter).toHaveClass(/text-\[#e8913a\]/);
+    await expect(counter).toHaveClass(/text-accent/);
   });
 
   test('auto-save notice banner visible', async ({ page }) => {
@@ -468,7 +466,7 @@ test.describe('Capacity Timeline', () => {
     await page.goto(`${BASE}/timeline`);
     await expect(page.getByText('Capacity Timeline')).toBeVisible();
     // Change entries show actor name and field name
-    const changeEntry = page.locator('.rounded-2xl.border.border-slate-200.shadow-sm').filter({
+    const changeEntry = page.locator('.rounded-lg.border.border-slate-200').filter({
       has: page.locator('.font-semibold')
     }).first();
     await expect(changeEntry).toBeVisible();
@@ -483,7 +481,7 @@ test.describe('Capacity Timeline', () => {
     // Old value (line-through) and arrow and new value
     await expect(page.locator('.line-through').first()).toBeVisible();
     // New value in bold blue
-    await expect(page.locator('.font-semibold.text-\\[\\#1e3a5f\\]').first()).toBeVisible();
+    await expect(page.locator('.font-semibold.text-primary').first()).toBeVisible();
   });
 
   test('pattern alert cards interspersed in timeline', async ({ page }) => {

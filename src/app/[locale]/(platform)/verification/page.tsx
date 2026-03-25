@@ -109,10 +109,10 @@ export default function VerificationPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-[#e8913a]" />
+            <Shield className="w-5 h-5 text-accent" />
             <h1 className="text-base font-bold">Peer Verification</h1>
           </div>
           <span className="text-sm text-white/70">Trust Network</span>
@@ -123,25 +123,25 @@ export default function VerificationPage() {
         {/* Stats */}
         {!loading && (
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center shadow-lg">
+            <div className="bg-white rounded-lg border border-slate-200 p-4 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <CheckCircle2 className="w-4 h-4 text-[#22c55e]" />
+                <CheckCircle2 className="w-4 h-4 text-success" />
               </div>
               <p className="text-2xl font-bold text-slate-900">
                 {verified.length}
               </p>
               <p className="text-xs text-slate-500">Verified</p>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center shadow-lg">
+            <div className="bg-white rounded-lg border border-slate-200 p-4 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Clock className="w-4 h-4 text-[#e8913a]" />
+                <Clock className="w-4 h-4 text-accent" />
               </div>
               <p className="text-2xl font-bold text-slate-900">
                 {provisional.length}
               </p>
               <p className="text-xs text-slate-500">Provisional</p>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center shadow-lg">
+            <div className="bg-white rounded-lg border border-slate-200 p-4 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 <AlertCircle className="w-4 h-4 text-slate-400" />
               </div>
@@ -159,7 +159,7 @@ export default function VerificationPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse shadow-lg"
+                className="bg-white rounded-lg border border-slate-200 p-5 animate-pulse"
               >
                 <div className="h-5 bg-slate-200 rounded w-1/3 mb-3" />
                 <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -170,13 +170,13 @@ export default function VerificationPage() {
         ) : (
           <>
             {/* Verified section */}
-            <div className="bg-white rounded-2xl border border-green-200 shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg border border-green-200 overflow-hidden">
               <button
                 onClick={() => toggleSection("verified")}
                 className="w-full flex items-center justify-between p-5"
               >
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
+                  <CheckCircle2 className="w-5 h-5 text-success" />
                   <h2 className="text-sm font-bold text-slate-900">
                     Verified Organizations
                   </h2>
@@ -222,14 +222,14 @@ export default function VerificationPage() {
                             </p>
                           )}
                         </div>
-                        <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a5f]/10 text-[#1e3a5f]">
+                        <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                           {ACTOR_TYPE_LABELS[actor.type]}
                         </span>
                       </div>
 
                       {/* Vouch count */}
                       <div className="flex items-center gap-1.5 mb-2">
-                        <Users className="w-3.5 h-3.5 text-[#22c55e]" />
+                        <Users className="w-3.5 h-3.5 text-success" />
                         <span className="text-xs font-medium text-slate-700">
                           {actor.vouchCount} vouches
                         </span>
@@ -265,13 +265,13 @@ export default function VerificationPage() {
             </div>
 
             {/* Provisional section */}
-            <div className="bg-white rounded-2xl border border-amber-200 shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg border border-amber-200 overflow-hidden">
               <button
                 onClick={() => toggleSection("provisional")}
                 className="w-full flex items-center justify-between p-5"
               >
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-[#e8913a]" />
+                  <Clock className="w-5 h-5 text-accent" />
                   <h2 className="text-sm font-bold text-slate-900">
                     Provisional
                   </h2>
@@ -314,13 +314,13 @@ export default function VerificationPage() {
                               </p>
                             )}
                           </div>
-                          <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a5f]/10 text-[#1e3a5f]">
+                          <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                             {ACTOR_TYPE_LABELS[actor.type]}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1.5 mb-2">
-                          <Users className="w-3.5 h-3.5 text-[#e8913a]" />
+                          <Users className="w-3.5 h-3.5 text-accent" />
                           <span className="text-xs font-medium text-slate-700">
                             {actor.vouchCount} vouch
                           </span>
@@ -355,7 +355,7 @@ export default function VerificationPage() {
                           </div>
                           <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#e8913a] rounded-full"
+                              className="h-full bg-accent rounded-full"
                               style={{
                                 width: `${(actor.vouchCount / 3) * 100}%`,
                               }}
@@ -370,7 +370,7 @@ export default function VerificationPage() {
             </div>
 
             {/* Pending section */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
               <button
                 onClick={() => toggleSection("pending")}
                 className="w-full flex items-center justify-between p-5"
@@ -417,7 +417,7 @@ export default function VerificationPage() {
                               </p>
                             )}
                           </div>
-                          <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a5f]/10 text-[#1e3a5f]">
+                          <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                             {ACTOR_TYPE_LABELS[actor.type]}
                           </span>
                         </div>

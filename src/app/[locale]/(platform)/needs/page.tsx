@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,12 +27,14 @@ function timeAgo(ts: number): string {
 }
 
 const URGENCY_CONFIG: Record<NeedUrgency, { label: string; color: string; dotColor: string; order: number }> = {
-  red: { label: "Critical", color: "#ef4444", dotColor: "bg-red-500", order: 0 },
-  amber: { label: "Moderate", color: "#f59e0b", dotColor: "bg-amber-500", order: 1 },
-  gray: { label: "Low", color: "#94a3b8", dotColor: "bg-slate-400", order: 2 },
+  red: { label: "Critical", color: "var(--color-danger)", dotColor: "bg-red-500", order: 0 },
+  amber: { label: "Moderate", color: "var(--color-warning)", dotColor: "bg-amber-500", order: 1 },
+  gray: { label: "Low", color: "var(--color-muted)", dotColor: "bg-slate-400", order: 2 },
 };
 
 export default function NeedsBoardPage() {
+  const locale = useLocale();
+  const t = useTranslations("platform");
   const [needs, setNeeds] = useState<NeedEntry[]>([]);
   const [alerts, setAlerts] = useState<PatternAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +92,7 @@ export default function NeedsBoardPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-3">
           <HandHelping className="w-8 h-8 text-primary" />
-          <p className="text-slate-500 text-sm">Loading needs board...</p>
+          <p className="text-slate-500 text-sm">{t("needs.loading")}</p>
         </div>
       </div>
     );
@@ -98,12 +101,12 @@ export default function NeedsBoardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center gap-3">
           <HandHelping className="w-5 h-5" />
-          <h1 className="text-base font-bold">Needs Board</h1>
+          <h1 className="text-base font-bold">{t("needs.title")}</h1>
           <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">
-            {filteredNeeds.length} open
+            {t("needs.openCount", { count: filteredNeeds.length })}
           </span>
         </div>
       </header>
@@ -115,13 +118,13 @@ export default function NeedsBoardPage() {
             {filteredAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-start gap-3"
+                className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-3"
               >
                 <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-amber-900 font-medium">{alert.message}</p>
                   <p className="text-xs text-amber-600 mt-0.5">
-                    {getSectorName(alert.category, "en")} in {getZoneName(alert.zone, "en")} &middot; {timeAgo(alert.createdAt)}
+                    {getSectorName(alert.category, locale)} in {getZoneName(alert.zone, locale)} &middot; {timeAgo(alert.createdAt)}
                   </p>
                 </div>
               </div>
@@ -130,10 +133,10 @@ export default function NeedsBoardPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 space-y-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
             <Filter className="w-4 h-4" />
-            <span>Filters</span>
+            <span>{t("common.filters")}</span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -142,12 +145,12 @@ export default function NeedsBoardPage() {
               <select
                 value={zoneFilter}
                 onChange={(e) => setZoneFilter(e.target.value)}
-                className="appearance-none bg-slate-100 text-sm rounded-lg px-3 py-1.5 pe-7 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+                className="appearance-none bg-slate-100 text-sm rounded-lg px-3 py-1.5 pe-7 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
-                <option value="all">All Zones</option>
+                <option value="all">{t("common.allZones")}</option>
                 {ZONES.map((z) => (
                   <option key={z.id} value={z.id}>
-                    {z.nameEn}
+                    {locale === "ar" ? z.nameAr : z.nameEn}
                   </option>
                 ))}
               </select>
@@ -159,12 +162,12 @@ export default function NeedsBoardPage() {
               <select
                 value={urgencyFilter}
                 onChange={(e) => setUrgencyFilter(e.target.value as NeedUrgency | "all")}
-                className="appearance-none bg-slate-100 text-sm rounded-lg px-3 py-1.5 pe-7 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+                className="appearance-none bg-slate-100 text-sm rounded-lg px-3 py-1.5 pe-7 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
-                <option value="all">All Urgency</option>
-                <option value="red">Critical</option>
-                <option value="amber">Moderate</option>
-                <option value="gray">Low</option>
+                <option value="all">{t("common.allUrgency")}</option>
+                <option value="red">{t("urgency.critical")}</option>
+                <option value="amber">{t("urgency.moderate")}</option>
+                <option value="gray">{t("urgency.low")}</option>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute end-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -185,7 +188,7 @@ export default function NeedsBoardPage() {
                     borderColor: s.color,
                   }}
                 >
-                  {s.nameEn}
+                  {locale === "ar" ? s.nameAr : s.nameEn}
                 </button>
               );
             })}
@@ -195,9 +198,9 @@ export default function NeedsBoardPage() {
         {/* Needs list */}
         <div className="space-y-3">
           {filteredNeeds.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+            <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
               <HandHelping className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">No needs match the current filters.</p>
+              <p className="text-slate-500 text-sm">{t("needs.noMatch")}</p>
             </div>
           ) : (
             filteredNeeds.map((need) => {
@@ -206,7 +209,7 @@ export default function NeedsBoardPage() {
               return (
                 <div
                   key={need.id}
-                  className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-3"
+                  className="bg-white rounded-lg border border-slate-200 p-4 space-y-3"
                 >
                   {/* Top row */}
                   <div className="flex items-start justify-between gap-2">
@@ -219,10 +222,10 @@ export default function NeedsBoardPage() {
                           className="text-xs font-medium px-2 py-0.5 rounded-full text-white"
                           style={{ backgroundColor: sectorColor }}
                         >
-                          {getSectorName(need.category, "en")}
+                          {getSectorName(need.category, locale)}
                         </span>
                         <span className="text-xs text-slate-500">
-                          {getZoneName(need.zone, "en")}
+                          {getZoneName(need.zone, locale)}
                         </span>
                         <span className="flex items-center gap-1 text-xs text-slate-400">
                           <Clock className="w-3 h-3" />
@@ -239,7 +242,7 @@ export default function NeedsBoardPage() {
                         className="text-xs font-medium"
                         style={{ color: urgency.color }}
                       >
-                        {urgency.label}
+                        {t(`urgency.${need.urgency === "red" ? "critical" : need.urgency === "amber" ? "moderate" : "low"}`)}
                       </span>
                     </div>
                   </div>
@@ -253,14 +256,14 @@ export default function NeedsBoardPage() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs text-slate-400 flex items-center gap-1">
                       <MessageCircle className="w-3.5 h-3.5" />
-                      {need.respondedCount} actor{need.respondedCount !== 1 ? "s" : ""} responded
+                      {need.respondedCount === 1 ? t("needs.oneActorResponded") : t("needs.actorsResponded", { count: need.respondedCount })}
                     </span>
                     <button
                       onClick={() => setHelpModalActor(need.actorName)}
                       className="inline-flex items-center gap-1.5 text-sm font-medium text-white px-3.5 py-1.5 rounded-xl transition-colors"
-                      style={{ backgroundColor: "#e8913a" }}
+                      style={{ backgroundColor: "var(--color-accent)" }}
                     >
-                      I Can Help
+                      {t("needs.iCanHelp")}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -278,11 +281,11 @@ export default function NeedsBoardPage() {
           onClick={() => setHelpModalActor(null)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4"
+            className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#1e3a5f]">Conversation Opened</h2>
+              <h2 className="text-lg font-bold text-primary">{t("needs.conversationOpened")}</h2>
               <button
                 onClick={() => setHelpModalActor(null)}
                 className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
@@ -292,16 +295,15 @@ export default function NeedsBoardPage() {
             </div>
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <p className="text-sm text-green-800">
-                Conversation opened with <span className="font-semibold">{helpModalActor}</span>.
-                You can now coordinate directly to address this need.
+                {t("needs.conversationMessage", { actor: helpModalActor })}
               </p>
             </div>
             <button
               onClick={() => setHelpModalActor(null)}
               className="w-full py-2.5 rounded-xl font-medium text-white transition-colors"
-              style={{ backgroundColor: "#1e3a5f" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
-              Close
+              {t("common.close")}
             </button>
           </div>
         </div>

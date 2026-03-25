@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   ArrowLeft,
@@ -20,7 +21,7 @@ import {
   Activity,
 } from "lucide-react";
 import { getActor, getCapacityCard, getVouchesForActor } from "@/lib/data/platform-api";
-import { ZONES, SECTORS_META, getSectorColor } from "@/lib/data/zones";
+import { ZONES, SECTORS_META, getSectorColor, getZoneName } from "@/lib/data/zones";
 import type { Actor, CapacityCard, Vouch, StockLevel } from "@/lib/types/platform";
 
 const DAY = 86400000;
@@ -53,11 +54,6 @@ function freshnessIndicator(timestamp: number): {
   if (days < 7) return { color: "text-green-600", dotClass: "bg-green-500", label: "Fresh" };
   if (days < 14) return { color: "text-amber-600", dotClass: "bg-amber-500", label: "Aging" };
   return { color: "text-slate-400", dotClass: "bg-slate-400", label: "Stale" };
-}
-
-function getZoneName(id: string): string {
-  const zone = ZONES.find((z) => z.id === id);
-  return zone ? zone.nameEn : id;
 }
 
 const VERIFICATION_CONFIG: Record<
@@ -103,6 +99,8 @@ export default function ActorProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const locale = useLocale();
+  const t = useTranslations("platform");
 
   const [actor, setActor] = useState<Actor | null>(null);
   const [capacity, setCapacity] = useState<CapacityCard | null>(null);
@@ -129,7 +127,7 @@ export default function ActorProfilePage({
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+        <header className="sticky top-0 z-40 bg-primary text-white">
           <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center">
             <div className="h-5 bg-white/20 rounded w-32 animate-pulse" />
           </div>
@@ -138,7 +136,7 @@ export default function ActorProfilePage({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse shadow-lg"
+              className="bg-white rounded-lg border border-slate-200 p-5 animate-pulse"
             >
               <div className="h-6 bg-slate-200 rounded w-1/2 mb-3" />
               <div className="h-4 bg-slate-100 rounded w-full mb-2" />
@@ -153,19 +151,19 @@ export default function ActorProfilePage({
   if (!actor) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+        <header className="sticky top-0 z-40 bg-primary text-white">
           <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center">
             <Link href="/actors" className="flex items-center gap-2 text-sm">
               <ArrowLeft className="w-4 h-4" />
-              Back to Registry
+              {t("actors.backToRegistry")}
             </Link>
           </div>
         </header>
         <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-12 text-center">
           <AlertCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-lg font-medium text-slate-700">Actor not found</p>
+          <p className="text-lg font-medium text-slate-700">{t("actors.actorNotFound")}</p>
           <p className="text-sm text-slate-500 mt-1">
-            This organization may have been removed or the link is incorrect.
+            {t("actors.actorNotFoundHint")}
           </p>
         </main>
       </div>
@@ -179,11 +177,11 @@ export default function ActorProfilePage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#1e3a5f] text-white">
+      <header className="sticky top-0 z-40 bg-primary text-white">
         <div className="max-w-lg mx-auto md:max-w-4xl px-4 h-14 flex items-center justify-between">
           <Link href="/actors" className="flex items-center gap-2 text-sm">
             <ArrowLeft className="w-4 h-4" />
-            Registry
+            {t("actors.registry")}
           </Link>
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${freshness.dotClass}`} />
@@ -194,32 +192,29 @@ export default function ActorProfilePage({
 
       <main className="max-w-lg mx-auto md:max-w-4xl px-4 py-4 space-y-4">
         {/* Profile header card */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <h1 className="text-xl font-bold text-slate-900">{actor.name}</h1>
-              {actor.nameAr && (
-                <p className="text-sm text-slate-500 mt-0.5" dir="rtl">
-                  {actor.nameAr}
-                </p>
-              )}
+              <h1 className="text-xl font-bold text-slate-900">
+                {locale === "ar" && actor.nameAr ? actor.nameAr : actor.name}
+              </h1>
             </div>
             <span
               className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${verification.bgColor} ${verification.color}`}
             >
               <VerifIcon className="w-3.5 h-3.5" />
-              {verification.label}
+              {t(`verification.${actor.verificationStatus}`)}
             </span>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap mb-3">
-            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#1e3a5f]/10 text-[#1e3a5f]">
-              {ACTOR_TYPE_LABELS[actor.type]}
+            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+              {t(`actorTypes.${actor.type}`)}
             </span>
             {actor.verificationStatus === "verified" && (
               <span className="flex items-center gap-1 text-xs text-slate-500">
                 <Shield className="w-3.5 h-3.5" />
-                {actor.vouchCount} vouches
+                {t("actors.vouches", { count: actor.vouchCount })}
               </span>
             )}
           </div>
@@ -228,18 +223,18 @@ export default function ActorProfilePage({
           <div className="flex items-center gap-1.5 text-xs">
             <span className={`w-2 h-2 rounded-full ${freshness.dotClass}`} />
             <span className={freshness.color}>
-              Updated {relativeTime(actor.lastUpdated)} &mdash; {freshness.label}
+              {t("actors.updated", { time: relativeTime(actor.lastUpdated) })} &mdash; {t(`actors.${freshness.label.toLowerCase()}`)}
             </span>
           </div>
         </div>
 
         {/* About section */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
-          <h2 className="text-sm font-bold text-slate-900 mb-3">About</h2>
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
+          <h2 className="text-sm font-bold text-slate-900 mb-3">{t("actors.about")}</h2>
 
           {/* Sectors */}
           <div className="mb-3">
-            <p className="text-xs font-medium text-slate-500 mb-1.5">Sectors</p>
+            <p className="text-xs font-medium text-slate-500 mb-1.5">{t("actors.sectors")}</p>
             <div className="flex flex-wrap gap-2">
               {actor.sectors.map((s) => (
                 <span
@@ -250,7 +245,7 @@ export default function ActorProfilePage({
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: getSectorColor(s) }}
                   />
-                  {SECTORS_META.find((m) => m.id === s)?.nameEn || s}
+                  {(() => { const meta = SECTORS_META.find((m) => m.id === s); return meta ? (locale === "ar" ? meta.nameAr : meta.nameEn) : s; })()}
                 </span>
               ))}
             </div>
@@ -258,7 +253,7 @@ export default function ActorProfilePage({
 
           {/* Zones */}
           <div>
-            <p className="text-xs font-medium text-slate-500 mb-1.5">Operational Zones</p>
+            <p className="text-xs font-medium text-slate-500 mb-1.5">{t("actors.operationalZones")}</p>
             <div className="flex flex-wrap gap-2">
               {actor.operationalZones.map((z) => (
                 <span
@@ -266,7 +261,7 @@ export default function ActorProfilePage({
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-700"
                 >
                   <MapPin className="w-3 h-3 text-slate-400" />
-                  {getZoneName(z)}
+                  {getZoneName(z, locale)}
                 </span>
               ))}
             </div>
@@ -275,14 +270,14 @@ export default function ActorProfilePage({
 
         {/* Capacity Card section */}
         {capacity && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
             <button
               onClick={() => setShowCapacity(!showCapacity)}
               className="w-full flex items-center justify-between p-5 text-left"
             >
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#e8913a]" />
-                <h2 className="text-sm font-bold text-slate-900">Live Capacity</h2>
+                <Activity className="w-4 h-4 text-accent" />
+                <h2 className="text-sm font-bold text-slate-900">{t("actors.liveCapacity")}</h2>
                 <span className="text-xs text-slate-400">
                   {relativeTime(capacity.lastUpdated)}
                 </span>
@@ -297,13 +292,13 @@ export default function ActorProfilePage({
               <div className="px-5 pb-5 space-y-4 border-t border-slate-100 pt-4">
                 {/* Active services */}
                 <div>
-                  <p className="text-xs font-medium text-slate-500 mb-2">Services</p>
+                  <p className="text-xs font-medium text-slate-500 mb-2">{t("actors.services")}</p>
                   <div className="space-y-1.5">
                     {capacity.services.map((svc) => (
                       <div key={svc.serviceId} className="flex items-center gap-2">
                         <span
                           className={`w-2.5 h-2.5 rounded-full ${
-                            svc.active ? "bg-[#22c55e]" : "bg-slate-300"
+                            svc.active ? "bg-success" : "bg-slate-300"
                           }`}
                         />
                         <span
@@ -321,7 +316,7 @@ export default function ActorProfilePage({
                 {/* Resources */}
                 {capacity.resources.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-slate-500 mb-2">Resources</p>
+                    <p className="text-xs font-medium text-slate-500 mb-2">{t("actors.resources")}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {capacity.resources.map((r) => (
                         <div
@@ -340,7 +335,7 @@ export default function ActorProfilePage({
                 {Object.keys(capacity.stockLevels).length > 0 && (
                   <div>
                     <p className="text-xs font-medium text-slate-500 mb-2">
-                      Stock Levels
+                      {t("actors.stockLevels")}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(capacity.stockLevels).map(([item, level]) => {
@@ -350,7 +345,7 @@ export default function ActorProfilePage({
                             key={item}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}
                           >
-                            {item.replace(/_/g, " ")}:&nbsp;{config.label}
+                            {item.replace(/_/g, " ")}:&nbsp;{t(`stockLevels.${level}`)}
                           </span>
                         );
                       })}
@@ -361,7 +356,7 @@ export default function ActorProfilePage({
                 {/* Urgent needs */}
                 {capacity.urgentNeeds.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-red-600 mb-2">Urgent Needs</p>
+                    <p className="text-xs font-medium text-red-600 mb-2">{t("actors.urgentNeeds")}</p>
                     <div className="flex flex-wrap gap-2">
                       {capacity.urgentNeeds.map((need) => (
                         <span
@@ -376,7 +371,7 @@ export default function ActorProfilePage({
                 )}
 
                 {capacity.note && (
-                  <p className="text-sm text-slate-600 italic border-s-2 border-[#e8913a] ps-3">
+                  <p className="text-sm text-slate-600 italic border-s-2 border-accent ps-3">
                     {capacity.note}
                   </p>
                 )}
@@ -386,10 +381,10 @@ export default function ActorProfilePage({
         )}
 
         {/* Vouch Chain */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#1e3a5f]" />
-            Vouch Chain
+            <Shield className="w-4 h-4 text-primary" />
+            {t("actors.vouchChain")}
           </h2>
           {vouches.length > 0 ? (
             <div className="space-y-2">
@@ -398,14 +393,14 @@ export default function ActorProfilePage({
                   key={v.id}
                   className="flex items-center gap-3 bg-slate-50 rounded-xl px-3 py-2"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-[#22c55e] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-800 truncate">
                       {v.voucherName}
                     </p>
                     <div className="flex gap-2 text-xs text-slate-500">
-                      {v.observedInField && <span>Observed in field</span>}
-                      {v.coverageAccurate && <span>Coverage verified</span>}
+                      {v.observedInField && <span>{t("actors.observedInField")}</span>}
+                      {v.coverageAccurate && <span>{t("actors.coverageVerified")}</span>}
                     </div>
                   </div>
                   <span className="text-xs text-slate-400 shrink-0 ms-auto">
@@ -416,14 +411,14 @@ export default function ActorProfilePage({
             </div>
           ) : (
             <p className="text-sm text-slate-500">
-              No vouches yet. Be the first to verify this organization.
+              {t("actors.noVouches")}
             </p>
           )}
         </div>
 
         {/* Contact section */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-lg">
-          <h2 className="text-sm font-bold text-slate-900 mb-3">Contact</h2>
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
+          <h2 className="text-sm font-bold text-slate-900 mb-3">{t("actors.contact")}</h2>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-slate-400" />
@@ -432,8 +427,8 @@ export default function ActorProfilePage({
             <div className="flex items-center gap-3 bg-slate-50 rounded-xl px-3 py-2.5">
               <Lock className="w-4 h-4 text-slate-400 shrink-0" />
               <div>
-                <p className="text-sm text-slate-500">Phone & Email</p>
-                <p className="text-xs text-slate-400">Visible to verified peers only</p>
+                <p className="text-sm text-slate-500">{t("actors.phoneEmail")}</p>
+                <p className="text-xs text-slate-400">{t("actors.visibleToVerifiedPeers")}</p>
               </div>
             </div>
           </div>
@@ -443,15 +438,15 @@ export default function ActorProfilePage({
         <div className="flex gap-3">
           <button
             onClick={() => setShowVouchModal(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#1e3a5f] text-white text-sm font-medium hover:bg-[#1e3a5f]/90 transition-colors shadow-lg"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             <Heart className="w-4 h-4" />
-            Vouch for this Organization
+            {t("actors.vouchFor")}
           </button>
           {capacity && capacity.urgentNeeds.length > 0 && (
-            <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#e8913a] text-white text-sm font-medium hover:bg-[#e8913a]/90 transition-colors shadow-lg">
+            <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors">
               <HandHelping className="w-4 h-4" />
-              I Can Help
+              {t("actors.iCanHelp")}
             </button>
           )}
         </div>
@@ -459,10 +454,10 @@ export default function ActorProfilePage({
         {/* Vouch modal */}
         {showVouchModal && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
-            <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-lg mx-auto p-5 shadow-xl">
+            <div className="bg-white rounded-t-2xl sm:rounded-lg w-full max-w-lg mx-auto p-5 shadow-xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-slate-900">
-                  Vouch for {actor.name}
+                  {t("actors.vouchModalTitle", { name: actor.name })}
                 </h3>
                 <button
                   onClick={() => setShowVouchModal(false)}
@@ -473,7 +468,7 @@ export default function ActorProfilePage({
               </div>
 
               <p className="text-sm text-slate-600 mb-4">
-                Your vouch carries weight. Answer these three questions honestly.
+                {t("actors.vouchModalDescription")}
               </p>
 
               <div className="space-y-4 mb-6">
@@ -487,14 +482,14 @@ export default function ActorProfilePage({
                         observedInField: e.target.checked,
                       }))
                     }
-                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
+                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary"
                   />
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      Have you observed this organization operating in the field?
+                      {t("actors.observedQuestion")}
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      You have personally seen their staff or volunteers at work
+                      {t("actors.observedHint")}
                     </p>
                   </div>
                 </label>
@@ -509,14 +504,14 @@ export default function ActorProfilePage({
                         coverageAccurate: e.target.checked,
                       }))
                     }
-                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
+                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary"
                   />
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      Is their stated coverage area accurate?
+                      {t("actors.coverageQuestion")}
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Their listed zones and sectors match what you have observed
+                      {t("actors.coverageHint")}
                     </p>
                   </div>
                 </label>
@@ -531,14 +526,14 @@ export default function ActorProfilePage({
                         willingToAssociate: e.target.checked,
                       }))
                     }
-                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
+                    className="mt-0.5 w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary"
                   />
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      Are you willing to publicly associate your organization with theirs?
+                      {t("actors.associateQuestion")}
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Your name will appear in their vouch chain
+                      {t("actors.associateHint")}
                     </p>
                   </div>
                 </label>
@@ -550,12 +545,12 @@ export default function ActorProfilePage({
                   !vouchAnswers.coverageAccurate ||
                   !vouchAnswers.willingToAssociate
                 }
-                className="w-full py-3 rounded-xl bg-[#1e3a5f] text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1e3a5f]/90 transition-colors"
+                className="w-full py-3 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
               >
-                Submit Vouch
+                {t("actors.submitVouch")}
               </button>
               <p className="text-xs text-slate-400 text-center mt-2">
-                All three questions must be confirmed to vouch
+                {t("actors.confirmAllQuestions")}
               </p>
             </div>
           </div>

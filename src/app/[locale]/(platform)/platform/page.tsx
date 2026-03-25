@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Building2,
   AlertTriangle,
@@ -20,7 +21,8 @@ import type { PlatformStats, Actor, Sector } from "@/lib/types/platform";
 
 export default function PlatformDashboard() {
   const pathname = usePathname();
-  const locale = pathname.split("/")[1] || "en";
+  const locale = useLocale();
+  const t = useTranslations("platform.dashboard");
 
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [actors, setActors] = useState<Actor[]>([]);
@@ -69,7 +71,7 @@ export default function PlatformDashboard() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-pulse text-slate-400 text-sm">
-          Loading dashboard... / جار تحميل لوحة التحكم...
+          {t("loading")}
         </div>
       </div>
     );
@@ -80,78 +82,75 @@ export default function PlatformDashboard() {
       {/* Page header */}
       <div>
         <h2 className="text-2xl font-bold text-slate-900">
-          Public Awareness Dashboard
+          {t("title")}
         </h2>
         <p className="text-sm text-slate-500 mt-1">
-          لوحة الوعي العام — Crisis coordination overview
+          {t("subtitle")}
         </p>
       </div>
 
       {/* Stats row */}
       {stats && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
-            <Building2 className="w-6 h-6 mx-auto mb-1 text-[#1e3a5f]" />
-            <p className="text-2xl font-bold text-[#1e3a5f]">
+          <div className="bg-white rounded-lg p-4 text-center">
+            <Building2 className="w-6 h-6 mx-auto mb-1 text-primary" />
+            <p className="text-2xl font-bold text-primary">
               {stats.totalActors}
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Orgs Mapped
+              {t("orgsMapped")}
             </p>
-            <p className="text-[10px] text-slate-400">منظمات مسجلة</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
-            <AlertTriangle className="w-6 h-6 mx-auto mb-1 text-[#ef4444]" />
-            <p className="text-2xl font-bold text-[#ef4444]">
+          <div className="bg-white rounded-lg p-4 text-center">
+            <AlertTriangle className="w-6 h-6 mx-auto mb-1 text-danger" />
+            <p className="text-2xl font-bold text-danger">
               {stats.coverageGaps}
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Coverage Gaps
+              {t("coverageGaps")}
             </p>
-            <p className="text-[10px] text-slate-400">فجوات التغطية</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
-            <Layers className="w-6 h-6 mx-auto mb-1 text-[#e8913a]" />
-            <p className="text-2xl font-bold text-[#e8913a]">
+          <div className="bg-white rounded-lg p-4 text-center">
+            <Layers className="w-6 h-6 mx-auto mb-1 text-accent" />
+            <p className="text-2xl font-bold text-accent">
               {stats.sectorsMissing}
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Sectors Missing
+              {t("sectorsMissing")}
             </p>
-            <p className="text-[10px] text-slate-400">قطاعات ناقصة</p>
           </div>
         </div>
       )}
 
       {/* Quick stats bar */}
       {stats && (
-        <div className="bg-white rounded-2xl shadow-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-[#22c55e]" />
+            <TrendingUp className="w-4 h-4 text-success" />
             <span className="text-sm font-semibold text-slate-700">
-              This Week / هذا الأسبوع
+              {t("thisWeek")}
             </span>
           </div>
           <div className="flex items-center justify-around text-center">
             <div>
-              <p className="text-lg font-bold text-[#22c55e]">
+              <p className="text-lg font-bold text-success">
                 {stats.familiesReachedThisWeek.toLocaleString()}
               </p>
-              <p className="text-[10px] text-slate-500">Families Reached / عائلات</p>
+              <p className="text-[10px] text-slate-500">{t("familiesReached")}</p>
             </div>
             <div className="w-px h-8 bg-slate-200" />
             <div>
-              <p className="text-lg font-bold text-[#1e3a5f]">
+              <p className="text-lg font-bold text-primary">
                 {stats.activeCollaborations}
               </p>
-              <p className="text-[10px] text-slate-500">Collaborations / تعاون</p>
+              <p className="text-[10px] text-slate-500">{t("collaborations")}</p>
             </div>
             <div className="w-px h-8 bg-slate-200" />
             <div>
-              <p className="text-lg font-bold text-[#e8913a]">
+              <p className="text-lg font-bold text-accent">
                 {stats.gapsClosedThisWeek}
               </p>
-              <p className="text-[10px] text-slate-500">Gaps Closed / فجوات أُغلقت</p>
+              <p className="text-[10px] text-slate-500">{t("gapsClosed")}</p>
             </div>
           </div>
         </div>
@@ -161,27 +160,27 @@ export default function PlatformDashboard() {
       <div className="flex gap-3">
         <Link
           href={`/${locale}/intake`}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#e8913a] text-white rounded-2xl py-3 px-4 font-semibold shadow-lg hover:bg-[#f0a85c] transition-colors tap-target"
+          className="flex-1 flex items-center justify-center gap-2 bg-accent text-white rounded-lg py-3 px-4 font-semibold hover:bg-accent-light transition-colors tap-target"
         >
           <Plus className="w-5 h-5" />
-          <span className="text-sm">Register Org / سجّل منظمة</span>
+          <span className="text-sm">{t("registerOrg")}</span>
         </Link>
         <Link
           href={`/${locale}/map`}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#1e3a5f] text-white rounded-2xl py-3 px-4 font-semibold shadow-lg hover:bg-[#2d5a8e] transition-colors tap-target"
+          className="flex-1 flex items-center justify-center gap-2 bg-primary text-white rounded-lg py-3 px-4 font-semibold hover:bg-primary-dark transition-colors tap-target"
         >
           <MapIcon className="w-5 h-5" />
-          <span className="text-sm">View Map / الخريطة</span>
+          <span className="text-sm">{t("viewMap")}</span>
         </Link>
       </div>
 
       {/* Coverage gaps flags */}
       {coverageGaps.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-5 h-5 text-[#ef4444]" />
+            <AlertTriangle className="w-5 h-5 text-danger" />
             <h3 className="text-sm font-bold text-red-800">
-              Coverage Gaps / فجوات التغطية
+              {t("coverageGapsTitle")}
             </h3>
           </div>
           <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -193,12 +192,12 @@ export default function PlatformDashboard() {
                 <MapPin className="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0" />
                 <div>
                   <span className="font-medium text-red-800">
-                    {getZoneName(gap.zoneId, "en")}
+                    {getZoneName(gap.zoneId, locale)}
                   </span>
                   <span className="text-red-500 mx-1">—</span>
                   <span className="text-red-600">
                     {gap.missingSectors
-                      .map((s) => getSectorName(s, "en"))
+                      .map((s) => getSectorName(s, locale))
                       .join(", ")}
                   </span>
                 </div>
@@ -206,7 +205,7 @@ export default function PlatformDashboard() {
             ))}
             {coverageGaps.length > 8 && (
               <p className="text-[10px] text-red-400 mt-1">
-                +{coverageGaps.length - 8} more zones with gaps
+                {t("moreZonesWithGaps", { count: coverageGaps.length - 8 })}
               </p>
             )}
           </div>
@@ -216,7 +215,7 @@ export default function PlatformDashboard() {
       {/* Organizations by zone */}
       <div>
         <h3 className="text-lg font-bold text-slate-900 mb-3">
-          Organizations by Zone / المنظمات حسب المنطقة
+          {t("orgsByZone")}
         </h3>
         <div className="space-y-3 max-h-[60vh] overflow-y-auto">
           {REGIONS.map((region) => {
@@ -229,12 +228,9 @@ export default function PlatformDashboard() {
             return (
               <div key={region.id}>
                 <div className="flex items-center gap-2 mb-2">
-                  <Shield className="w-4 h-4 text-[#1e3a5f]" />
-                  <h4 className="text-sm font-semibold text-[#1e3a5f]">
-                    {region.nameEn}{" "}
-                    <span className="font-normal text-slate-400">
-                      / {region.nameAr}
-                    </span>
+                  <Shield className="w-4 h-4 text-primary" />
+                  <h4 className="text-sm font-semibold text-primary">
+                    {locale === "ar" ? region.nameAr : region.nameEn}
                   </h4>
                 </div>
                 {zonesWithActors.map((zone) => {
@@ -242,21 +238,17 @@ export default function PlatformDashboard() {
                   return (
                     <div
                       key={zone.id}
-                      className="bg-white rounded-2xl shadow-lg p-4 mb-2"
+                      className="bg-white rounded-lg p-4 mb-2"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-slate-400" />
                           <span className="text-sm font-semibold text-slate-800">
-                            {zone.nameEn}
-                          </span>
-                          <span className="text-xs text-slate-400">
-                            {zone.nameAr}
+                            {locale === "ar" ? zone.nameAr : zone.nameEn}
                           </span>
                         </div>
                         <span className="text-xs text-slate-400">
-                          {zoneActorsList.length} org
-                          {zoneActorsList.length !== 1 ? "s" : ""}
+                          {t("orgCount", { count: zoneActorsList.length })}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -285,7 +277,7 @@ export default function PlatformDashboard() {
                                     backgroundColor: getSectorColor(sector),
                                   }}
                                 >
-                                  {getSectorName(sector, "en")}
+                                  {getSectorName(sector, locale)}
                                 </span>
                               ))}
                               {actor.sectors.length > 3 && (
@@ -311,29 +303,29 @@ export default function PlatformDashboard() {
         <div className="flex justify-center gap-4 text-xs text-slate-400">
           <Link
             href={`/${locale}/privacy`}
-            className="hover:text-[#1e3a5f] transition-colors"
+            className="hover:text-primary transition-colors"
           >
-            Privacy / الخصوصية
+            {t("privacy")}
           </Link>
           <span>·</span>
           <Link
             href={`/${locale}/terms`}
-            className="hover:text-[#1e3a5f] transition-colors"
+            className="hover:text-primary transition-colors"
           >
-            Terms / الشروط
+            {t("terms")}
           </Link>
           <span>·</span>
           <a
             href="/api/v0/coverage"
             target="_blank"
             rel="noopener"
-            className="hover:text-[#1e3a5f] transition-colors"
+            className="hover:text-primary transition-colors"
           >
             API v0
           </a>
         </div>
         <p className="text-center text-[10px] text-slate-300 mt-2">
-          Shabaka · شبكة — Open crisis coordination
+          Shabaka · شبكة — {t("tagline")}
         </p>
       </footer>
     </div>

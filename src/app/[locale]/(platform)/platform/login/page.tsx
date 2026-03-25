@@ -136,7 +136,7 @@ export default function PlatformLoginPage() {
         <p className="mt-1 text-sm text-slate-500">{copy.subheading}</p>
       </div>
 
-      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
         <div className="flex items-center gap-2 font-semibold">
           <ShieldCheck className="h-4 w-4" />
           {copy.devAccounts}
@@ -169,10 +169,10 @@ export default function PlatformLoginPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+        className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5"
       >
         <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#1e3a5f]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <LogIn className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -192,7 +192,7 @@ export default function PlatformLoginPage() {
             data-testid="platform-login-email"
             onChange={(event) => setEmail(event.target.value)}
             placeholder={copy.emailPlaceholder}
-            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             required
           />
         </div>
@@ -208,7 +208,7 @@ export default function PlatformLoginPage() {
             data-testid="platform-login-password"
             onChange={(event) => setPassword(event.target.value)}
             placeholder={copy.passwordPlaceholder}
-            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             required
           />
         </div>
@@ -223,14 +223,14 @@ export default function PlatformLoginPage() {
           type="submit"
           disabled={submitting}
           data-testid="platform-login-submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2d5a8e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
           <LogIn className="h-4 w-4" />
           {submitting ? copy.signingIn : copy.signIn}
         </button>
       </form>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
+      <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">
         <p className="font-medium text-slate-900">{copy.needAccount}</p>
         <p className="mt-1">{copy.needAccountBody}</p>
         <Link
