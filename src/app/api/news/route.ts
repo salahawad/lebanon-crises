@@ -46,11 +46,13 @@ function parseItems(xml: string): NewsItem[] {
   return items;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const res = await fetch(RSS_URL, {
       headers: { "User-Agent": "LebanonRelief/1.0" },
-      next: { revalidate: 300 }, // cache 5 minutes
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -67,7 +69,7 @@ export async function GET() {
       { items },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+          "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300",
         },
       }
     );
