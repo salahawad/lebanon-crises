@@ -112,7 +112,7 @@ export function NewsTicker() {
   if (loading || items.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-[#1e3a5f] text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)]">
+    <div className="fixed bottom-0 inset-x-0 z-50 bg-[#1e3a5f] text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)]" dir="ltr">
       <div className="flex items-center h-11">
         {/* Live badge */}
         <div className="flex-shrink-0 flex items-center gap-1.5 px-3 h-full bg-[#b91c1c] border-e border-white/10">
@@ -133,14 +133,14 @@ export function NewsTicker() {
           onTouchStart={() => setPaused(true)}
           onTouchEnd={() => setPaused(false)}
         >
-          {/* This wrapper moves left; contains original + clone */}
+          {/* This wrapper moves left; dir=ltr ensures translateX works on RTL pages */}
           <div
             ref={wrapperRef}
-            className="flex will-change-transform"
-            style={{ display: "inline-flex" }}
+            className="will-change-transform"
+            style={{ display: "inline-flex", direction: "ltr" }}
           >
             {/* Original strip — measured for loop width */}
-            <div ref={innerRef} className="flex-shrink-0 whitespace-nowrap">
+            <div ref={innerRef} className="flex-shrink-0 whitespace-nowrap" style={{ direction: "ltr" }}>
               {items.map((item, i) => (
                 <a
                   key={i}
