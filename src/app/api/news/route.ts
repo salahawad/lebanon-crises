@@ -10,6 +10,18 @@ export interface NewsItem {
   category: string;
 }
 
+function decodeEntities(str: string): string {
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
 function parseItems(xml: string): NewsItem[] {
   const items: NewsItem[] = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -27,7 +39,7 @@ function parseItems(xml: string): NewsItem[] {
         ?.trim() ?? "";
 
     if (title && link) {
-      items.push({ title, link, pubDate, category });
+      items.push({ title: decodeEntities(title), link, pubDate, category });
     }
   }
 
