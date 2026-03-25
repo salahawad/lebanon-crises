@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 
-const RSS_FEEDS = [
+const DEFAULT_RSS_FEEDS = [
   "https://www.lebanonfiles.com/topics/%d8%a3%d8%ae%d8%a8%d8%a7%d8%b1-%d8%a7%d9%84%d8%b3%d8%a7%d8%b9%d8%a9/feed/",
   "https://www.lebanon24.com/Rss/News/1/%D9%84%D8%A8%D9%86%D8%A7%D9%86",
 ];
+
+const RSS_FEEDS = process.env.NEWS_RSS_FEEDS
+  ? process.env.NEWS_RSS_FEEDS.split(",").map((u) => u.trim())
+  : DEFAULT_RSS_FEEDS;
 
 export interface NewsItem {
   title: string;
@@ -50,7 +54,34 @@ function parseItems(xml: string): NewsItem[] {
 
 export const dynamic = "force-dynamic";
 
+const QUIET_START = Number(process.env.NEWS_QUIET_START ?? 23); // 11 PM
+const QUIET_END = Number(process.env.NEWS_QUIET_END ?? 7); // 7 AM
+const SERVER_TZ = process.env.NEWS_SERVER_TZ ?? "Asia/Beirut";
+
+function isQuietHours(): boolean {
+  const hour = new Date().toLocaleString("en-US", {
+    timeZone: SERVER_TZ,
+    hour: "numeric",
+    hour12: false,
+  });
+  const h = Number(hour);
+  return QUIET_START > QUIET_END
+    ? h >= QUIET_START || h < QUIET_END
+    : h >= QUIET_START && h < QUIET_END;
+}
+
 export async function GET() {
+  if (isQuietHours()) {
+    return NextResponse.json(
+      { items: [], quiet: true },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+        },
+      }
+    );
+  }
+
   try {
     const results = await Promise.allSettled(
       RSS_FEEDS.map((url) =>

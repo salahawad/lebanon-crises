@@ -1,4 +1,7 @@
 {
+  "news": {
+    "quietMessage": "News updates resume at {time} — rest well 🌙"
+  },
   "common": {
     "appName": "Lebanon Relief",
     "tagline": "Connecting those who need help with those who can help",
