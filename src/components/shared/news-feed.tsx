@@ -19,11 +19,35 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(hrs / 24)}d`;
 }
 
+function NewsItemLink({ item }: { item: NewsItem }) {
+  return (
+    <a
+      href={item.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 px-4 hover:text-[#e8913a] transition-colors"
+    >
+      <span className="text-[11px] text-white/40">{timeAgo(item.pubDate)}</span>
+      <span className="text-xs font-medium" dir="rtl">
+        {item.title}
+      </span>
+      {Date.now() - new Date(item.pubDate).getTime() < 600_000 && (
+        <span className="text-[8px] font-bold uppercase bg-[#e8913a] text-white px-1 py-px rounded">
+          new
+        </span>
+      )}
+      <span className="text-white/20 mx-1" aria-hidden>
+        |
+      </span>
+    </a>
+  );
+}
+
 export function NewsTicker() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const offsetRef = useRef(0);
   const halfWidthRef = useRef(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
@@ -37,6 +61,7 @@ export function NewsTicker() {
         .then((data) => {
           if (!active) return;
           const incoming: NewsItem[] = data.items ?? [];
+          if (incoming.length === 0) return; // keep old items if fetch returns empty
           setItems((prev) => {
             const seen = new Set(incoming.map((n) => n.link));
             const kept = prev.filter((p) => !seen.has(p.link));
@@ -54,23 +79,22 @@ export function NewsTicker() {
     };
   }, []);
 
-  // Measure half-width after items render
+  // Measure one-copy width after render
   const measureRef = useCallback((el: HTMLDivElement | null) => {
     trackRef.current = el;
     if (el) {
-      // Half = one copy of the items
+      // We render 2 copies, so half = one copy width
       halfWidthRef.current = el.scrollWidth / 2;
     }
   }, []);
 
-  // Re-measure when items change
   useEffect(() => {
     if (trackRef.current) {
       halfWidthRef.current = trackRef.current.scrollWidth / 2;
     }
   }, [items]);
 
-  // requestAnimationFrame loop — works on all devices
+  // Animation loop using ref for offset (no re-render per frame)
   useEffect(() => {
     if (items.length === 0) return;
 
@@ -79,18 +103,23 @@ export function NewsTicker() {
       const delta = time - lastTimeRef.current;
       lastTimeRef.current = time;
 
-      if (!paused && halfWidthRef.current > 0) {
-        setOffset((prev) => {
-          const next = prev + delta * 0.05; // ~50px/sec
-          return next >= halfWidthRef.current ? 0 : next;
-        });
+      if (!paused && halfWidthRef.current > 0 && trackRef.current) {
+        offsetRef.current += delta * 0.04; // ~40px/sec
+        // Seamless wrap using modulo — never jumps
+        if (offsetRef.current >= halfWidthRef.current) {
+          offsetRef.current = offsetRef.current % halfWidthRef.current;
+        }
+        trackRef.current.style.transform = `translateX(-${offsetRef.current}px)`;
       }
 
       rafRef.current = requestAnimationFrame(tick);
     }
 
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      lastTimeRef.current = 0;
+    };
   }, [items, paused]);
 
   if (loading || items.length === 0) return null;
@@ -120,33 +149,12 @@ export function NewsTicker() {
           <div
             ref={measureRef}
             className="whitespace-nowrap will-change-transform"
-            style={{ transform: `translateX(-${offset}px)` }}
           >
-            {/* Two copies for seamless loop */}
+            {/* Two identical copies — modulo offset wraps seamlessly */}
             {[0, 1].map((copy) => (
               <span key={copy} className="inline">
                 {items.map((item, i) => (
-                  <a
-                    key={`${copy}-${i}`}
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 hover:text-[#e8913a] transition-colors"
-                  >
-                    <span className="text-[11px] text-white/40">
-                      {timeAgo(item.pubDate)}
-                    </span>
-                    <span className="text-xs font-medium" dir="rtl">
-                      {item.title}
-                    </span>
-                    {Date.now() - new Date(item.pubDate).getTime() <
-                      600_000 && (
-                      <span className="text-[8px] font-bold uppercase bg-[#e8913a] text-white px-1 py-px rounded">
-                        new
-                      </span>
-                    )}
-                    <span className="text-white/20 mx-1">|</span>
-                  </a>
+                  <NewsItemLink key={`${copy}-${i}`} item={item} />
                 ))}
               </span>
             ))}
