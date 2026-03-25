@@ -23,8 +23,8 @@ export function NewsTicker() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const animRef = useRef<number>(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [duration, setDuration] = useState(60);
 
   useEffect(() => {
     let active = true;
@@ -51,36 +51,27 @@ export function NewsTicker() {
     };
   }, []);
 
-  // Continuous horizontal scroll animation
+  // Calculate duration based on content width — slower for more items
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || items.length === 0) return;
-
-    let pos = 0;
-    const speed = 0.6; // pixels per frame
-
-    function tick() {
-      if (!paused && el) {
-        pos += speed;
-        if (pos >= el.scrollWidth / 2) {
-          pos = 0;
-        }
-        el.scrollLeft = pos;
-      }
-      animRef.current = requestAnimationFrame(tick);
+    if (trackRef.current) {
+      const w = trackRef.current.scrollWidth / 2;
+      // ~50px per second scrolling speed
+      setDuration(Math.max(30, w / 50));
     }
-    animRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [items, paused]);
+  }, [items]);
 
   if (loading || items.length === 0) return null;
 
-  // Duplicate items for seamless infinite scroll
-  const doubled = [...items, ...items];
-
   return (
     <>
-      {/* Fixed bottom ticker — always visible, overlays content */}
+      <style>{`
+        @keyframes ticker-scroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
+
+      {/* Fixed bottom ticker */}
       <div className="fixed bottom-0 inset-x-0 z-50 bg-[#1e3a5f] text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)]">
         <div className="flex items-center h-11">
           {/* Live badge */}
@@ -94,41 +85,48 @@ export function NewsTicker() {
             </span>
           </div>
 
-          {/* Scrolling headlines */}
+          {/* Scrolling track — CSS animation, GPU-accelerated */}
           <div
-            ref={scrollRef}
-            className="flex-1 overflow-hidden whitespace-nowrap"
+            className="flex-1 overflow-hidden"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
             onTouchStart={() => setPaused(true)}
             onTouchEnd={() => setPaused(false)}
           >
-            <div className="inline-flex items-center">
-              {doubled.map((item, i) => (
-                <a
-                  key={`${item.link}-${i}`}
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 hover:text-[#e8913a] transition-colors"
-                >
-                  <span className="text-[11px] text-white/40">
-                    {timeAgo(item.pubDate)}
-                  </span>
-                  <span
-                    className="text-xs font-medium"
-                    dir="rtl"
+            <div
+              ref={trackRef}
+              className="inline-flex items-center whitespace-nowrap will-change-transform"
+              style={{
+                animation: `ticker-scroll ${duration}s linear infinite`,
+                animationPlayState: paused ? "paused" : "running",
+              }}
+            >
+              {/* Render items twice for seamless loop */}
+              {[0, 1].map((copy) =>
+                items.map((item, i) => (
+                  <a
+                    key={`${copy}-${i}`}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 hover:text-[#e8913a] transition-colors"
                   >
-                    {item.title}
-                  </span>
-                  {Date.now() - new Date(item.pubDate).getTime() < 600_000 && (
-                    <span className="text-[8px] font-bold uppercase bg-[#e8913a] text-white px-1 py-px rounded">
-                      new
+                    <span className="text-[11px] text-white/40 flex-shrink-0">
+                      {timeAgo(item.pubDate)}
                     </span>
-                  )}
-                  <span className="text-white/20 mx-1">|</span>
-                </a>
-              ))}
+                    <span className="text-xs font-medium flex-shrink-0" dir="rtl">
+                      {item.title}
+                    </span>
+                    {Date.now() - new Date(item.pubDate).getTime() <
+                      600_000 && (
+                      <span className="text-[8px] font-bold uppercase bg-[#e8913a] text-white px-1 py-px rounded flex-shrink-0">
+                        new
+                      </span>
+                    )}
+                    <span className="text-white/20 mx-1 flex-shrink-0">|</span>
+                  </a>
+                ))
+              )}
             </div>
           </div>
         </div>
