@@ -124,7 +124,8 @@ export function NewsTicker() {
         if (posRef.current >= stripWidth) {
           posRef.current -= stripWidth;
         }
-        wrapper!.style.transform = `translateX(-${posRef.current}px)`;
+        // Positive direction: content moves left-to-right for Arabic readability
+        wrapper!.style.transform = `translateX(${posRef.current - stripWidth}px)`;
       }
       rafRef.current = requestAnimationFrame(tick);
     }
