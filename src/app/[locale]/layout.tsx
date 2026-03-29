@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { DemoBanner } from "@/components/shared/demo-banner";
 import { NewsTicker } from "@/components/shared/news-feed";
+import { ServiceWorkerRegister } from "@/components/shared/sw-register";
+import { OfflineBanner } from "@/components/shared/offline-banner";
 import "../globals.css";
 
 const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -80,6 +82,8 @@ export default async function LocaleLayout({
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         <NextIntlClientProvider messages={messages}>
+          <ServiceWorkerRegister />
+          <OfflineBanner />
           <DemoBanner />
           {children}
           <NewsTicker />

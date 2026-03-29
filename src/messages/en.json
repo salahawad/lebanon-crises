@@ -696,5 +696,13 @@
         "capacity": "Capacity Data"
       }
     }
+  },
+  "offline": {
+    "banner": "You're offline — showing cached data",
+    "swReady": "Offline mode ready",
+    "cacheCleared": "Cache cleared",
+    "syncing": "Syncing data...",
+    "syncComplete": "Data synced",
+    "cachedItems": "{count} items cached"
   }
 }

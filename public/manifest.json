@@ -2,16 +2,21 @@
   "name": "Lebanon Relief",
   "short_name": "Relief",
   "description": "Connecting displaced people with volunteers who can help",
-  "start_url": "/",
+  "start_url": "/ar",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#F9FAFB",
   "theme_color": "#1E3A8A",
   "orientation": "portrait-primary",
+  "categories": ["social", "utilities"],
+  "lang": "ar",
+  "dir": "rtl",
   "icons": [
     {
       "src": "/icon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

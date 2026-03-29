@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Settings,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { VisibilityLevel, NotificationChannel, Region } from "@/lib/types/platform";
 import { REGIONS } from "@/lib/data/zones";
+import { useOffline } from "@/lib/hooks/use-offline";
 
 interface FieldVisibility {
   label: string;
@@ -51,7 +52,12 @@ const INITIAL_FIELDS: FieldVisibility[] = [
 export default function SettingsPage() {
   const [fields, setFields] = useState<FieldVisibility[]>(INITIAL_FIELDS);
   const [notification, setNotification] = useState<NotificationChannel>("push");
-  const [offlineEnabled, setOfflineEnabled] = useState(true);
+  const [offlineEnabled, setOfflineEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("lr-offline") !== "false";
+    }
+    return true;
+  });
   const [selectedRegions, setSelectedRegions] = useState<Region[]>([
     "beirut_suburbs",
     "south_lebanon",
@@ -60,6 +66,31 @@ export default function SettingsPage() {
   const locale = useLocale();
   const t = useTranslations("platform.settings");
   const tDisclaimer = useTranslations("disclaimer");
+  const { isOffline, swReady, cacheStatus, refreshCacheStatus } = useOffline();
+
+  // Persist offline preference & manage SW
+  useEffect(() => {
+    localStorage.setItem("lr-offline", String(offlineEnabled));
+    if (!offlineEnabled && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const reg of registrations) reg.unregister();
+      });
+      caches.keys().then((names) => {
+        for (const name of names) caches.delete(name);
+      });
+    } else if (offlineEnabled && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .catch((err) => console.warn("SW re-register failed:", err));
+    }
+  }, [offlineEnabled]);
+
+  // Fetch cache status on mount when enabled
+  useEffect(() => {
+    if (offlineEnabled && swReady) {
+      refreshCacheStatus();
+    }
+  }, [offlineEnabled, swReady, refreshCacheStatus]);
 
   function updateFieldLevel(field: string, level: VisibilityLevel) {
     setFields((prev) =>
@@ -80,8 +111,9 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  // Simulated last sync time (static placeholder)
-  const lastSyncedStr = "12 min ago";
+  const totalCached = cacheStatus
+    ? cacheStatus.static + cacheStatus.data + cacheStatus.images
+    : 0;
 
   return (
     <div>
@@ -231,16 +263,35 @@ export default function SettingsPage() {
 
           {offlineEnabled && (
             <>
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>{t("lastSynced", { time: lastSyncedStr })}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-success/5 rounded-xl w-fit">
-                <Check className="w-4 h-4 text-success" />
-                <span className="text-xs font-medium text-success">
-                  {t("fullOffline")}
-                </span>
-              </div>
+              {cacheStatus && (
+                <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>{t("lastSynced", { time: `${totalCached} items` })}</span>
+                </div>
+              )}
+              {swReady ? (
+                <div className="flex items-center gap-2 px-3 py-2 bg-success/5 rounded-xl w-fit">
+                  <Check className="w-4 h-4 text-success" />
+                  <span className="text-xs font-medium text-success">
+                    {t("fullOffline")}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-xl w-fit">
+                  <RefreshCw className="w-4 h-4 text-amber-500 animate-spin" />
+                  <span className="text-xs font-medium text-amber-600">
+                    {t("cacheDesc")}
+                  </span>
+                </div>
+              )}
+              {isOffline && (
+                <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-xl w-fit">
+                  <WifiOff className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-medium text-amber-600">
+                    {t("offlineMode")}
+                  </span>
+                </div>
+              )}
             </>
           )}
         </div>
