@@ -26,7 +26,7 @@
     "arabic-rtl"
   ],
   "scripts": {
-    "dev": "next dev --port 4001",
+    "dev": "next dev --port 4002",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
