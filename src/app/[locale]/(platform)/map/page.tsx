@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { getActors, getMapData, getUrgencyAlerts } from "@/lib/data/platform-api";
 import {
@@ -12,6 +12,7 @@ import {
 import type { MapZoneData, Sector, Actor, UrgencyAlert } from "@/lib/types/platform";
 import {
   AlertTriangle, Users, Layers, ShieldAlert, CheckCircle2, XCircle, X,
+  Maximize2, Minimize2,
 } from "lucide-react";
 
 // ---- SVG Governorate Paths ----
@@ -57,9 +58,10 @@ const GOV_NAMES: Record<string, Record<GovernorateId, string>> = {
 // Project lat/lng to SVG coordinates (calibrated from known governorate positions)
 function latLngToSvg(lat: number, lng: number): { x: number; y: number } {
   // Reference points: Akkar(34.53,36.08)→(350,100), Beirut(33.89,35.49)→(140,344), Nabatieh(33.38,35.48)→(155,580)
-  const x = 140 + (lng - 35.49) * 356;
+  const x = 140 + (lng - 35.49) * 340;
   const y = 100 + (34.53 - lat) * 417;
-  return { x, y };
+  // Clamp to stay within map bounds
+  return { x: Math.max(30, Math.min(470, x)), y: Math.max(55, Math.min(645, y)) };
 }
 
 function getGovColor(actors: number, gaps: number): string {
@@ -94,6 +96,23 @@ export default function MapPage() {
   const [hovered, setHovered] = useState<GovernorateId | null>(null);
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [selectedGov, setSelectedGov] = useState<GovernorateId | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!mapContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      mapContainerRef.current.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => setIsFullscreen(true));
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => setIsFullscreen(false));
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => { if (!document.fullscreenElement) setIsFullscreen(false); };
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
 
   useEffect(() => {
     Promise.all([getMapData(), getActors(), getUrgencyAlerts()])
@@ -213,8 +232,19 @@ export default function MapPage() {
       {loading ? (
         <div className="h-[500px] bg-slate-100 rounded-lg animate-pulse" />
       ) : (
-        <div className="relative bg-white rounded-lg border border-slate-200 p-2">
-          <svg viewBox="-10 30 520 640" className="w-full" style={{ maxHeight: "70vh" }}>
+        <div
+          ref={mapContainerRef}
+          className={`relative bg-white rounded-lg border border-slate-200 p-2 ${isFullscreen ? "fixed inset-0 z-50 flex flex-col items-center justify-center" : ""}`}
+        >
+          {/* Fullscreen toggle */}
+          <button
+            onClick={toggleFullscreen}
+            className={`absolute z-10 p-2 rounded-lg bg-white/90 border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors ${isFullscreen ? "top-4 right-4" : "top-3 right-3"}`}
+            aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4 text-slate-600" /> : <Maximize2 className="w-4 h-4 text-slate-600" />}
+          </button>
+          <svg viewBox="-10 30 520 640" className={isFullscreen ? "w-full max-w-[700px] max-h-[85vh]" : "w-full"} style={isFullscreen ? undefined : { maxHeight: "70vh" }}>
             <defs>
               <filter id="mshadow" x="-10%" y="-10%" width="120%" height="120%">
                 <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.15" />
@@ -223,9 +253,95 @@ export default function MapPage() {
                 <feGaussianBlur stdDeviation="3" result="blur" />
                 <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
               </filter>
+              <linearGradient id="sea-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#bfdbfe" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#93c5fd" stopOpacity="0.05" />
+              </linearGradient>
+              <linearGradient id="snow-cap" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="white" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.4" />
+              </linearGradient>
+              <filter id="peak-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="glow" />
+                <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+              <pattern id="wave-pattern" x="0" y="0" width="40" height="10" patternUnits="userSpaceOnUse">
+                <path d="M0 5 Q10 0 20 5 Q30 10 40 5" fill="none" stroke="#93c5fd" strokeWidth="0.5" opacity="0.3">
+                  <animateTransform attributeName="transform" type="translate" values="0,0;-40,0" dur="4s" repeatCount="indefinite" />
+                </path>
+              </pattern>
+              {/* Clip path from all governorate outlines */}
+              <clipPath id="lebanon-clip">
+                {(Object.keys(GOVERNORATE_PATHS) as GovernorateId[]).map((id) => (
+                  <path key={`clip-${id}`} d={GOVERNORATE_PATHS[id].d} />
+                ))}
+              </clipPath>
             </defs>
 
-            {/* Governorate polygons */}
+            {/* ── Terrain layer (clipped to map outline) ──── */}
+            <g clipPath="url(#lebanon-clip)" className="pointer-events-none">
+              {/* Bekaa Valley floor — green glow */}
+              <path
+                d="M275,320 Q285,370 290,420 Q292,465 280,510 Q270,545 245,560"
+                fill="none" stroke="#4ade80" strokeWidth="40" opacity="0.1"
+                strokeLinecap="round" strokeLinejoin="round"
+              />
+              <text x="295" y="460" textAnchor="middle" fontSize="9" fontWeight="600" letterSpacing="2" fill="#16a34a" opacity="0.25" transform="rotate(-12 295 460)" className="select-none">
+                BEKAA VALLEY
+              </text>
+
+              {/* Mt. Lebanon range */}
+              <path d="M220,230 Q215,275 208,315 Q200,355 194,395 Q187,430 183,465" fill="none" stroke="#64748b" strokeWidth="1.8" strokeDasharray="1 4" opacity="0.35" />
+              {/* Snow-capped peaks */}
+              <g filter="url(#peak-glow)">
+                <polygon points="201,288 209,268 217,288" fill="#64748b" opacity="0.4" />
+                <polygon points="205,278 209,268 213,278" fill="url(#snow-cap)" opacity="0.7" />
+                <text x="209" y="264" textAnchor="middle" fontSize="5.5" fontWeight="600" fill="#475569" opacity="0.4" className="select-none">3,088m</text>
+                <polygon points="195,348 201,333 207,348" fill="#64748b" opacity="0.35" />
+                <polygon points="198,340 201,333 204,340" fill="url(#snow-cap)" opacity="0.6" />
+                <polygon points="189,393 195,380 201,393" fill="#64748b" opacity="0.3" />
+                <polygon points="192,386 195,380 198,386" fill="url(#snow-cap)" opacity="0.5" />
+                <polygon points="214,255 217,248 220,255" fill="#64748b" opacity="0.2" />
+                <polygon points="185,425 188,418 191,425" fill="#64748b" opacity="0.2" />
+              </g>
+              <text x="178" y="340" textAnchor="middle" fontSize="8" fontWeight="700" letterSpacing="2" fill="#64748b" opacity="0.3" transform="rotate(-78 178 340)" className="select-none">
+                MT. LEBANON
+              </text>
+
+              {/* Anti-Lebanon range */}
+              <path d="M460,150 Q453,200 447,260 Q441,320 435,375 Q430,420 425,455" fill="none" stroke="#64748b" strokeWidth="1.5" strokeDasharray="1 4" opacity="0.25" />
+              <g filter="url(#peak-glow)">
+                <polygon points="448,218 454,203 460,218" fill="#64748b" opacity="0.25" />
+                <polygon points="450,210 454,203 458,210" fill="url(#snow-cap)" opacity="0.4" />
+                <text x="454" y="199" textAnchor="middle" fontSize="5" fontWeight="600" fill="#475569" opacity="0.25" className="select-none">2,814m</text>
+                <polygon points="440,298 445,285 450,298" fill="#64748b" opacity="0.22" />
+                <polygon points="442,291 445,285 448,291" fill="url(#snow-cap)" opacity="0.35" />
+                <polygon points="432,368 436,357 440,368" fill="#64748b" opacity="0.18" />
+                <polygon points="434,362 436,357 438,362" fill="url(#snow-cap)" opacity="0.28" />
+              </g>
+              <text x="462" y="310" textAnchor="middle" fontSize="7" fontWeight="600" letterSpacing="1.5" fill="#64748b" opacity="0.2" transform="rotate(-78 462 310)" className="select-none">
+                ANTI-LEBANON
+              </text>
+
+              {/* Litani River */}
+              <path d="M285,420 C272,438 260,446 245,453 Q228,460 212,465 Q195,470 170,462" fill="none" stroke="#93c5fd" strokeWidth="6" opacity="0.12" strokeLinecap="round" />
+              <path d="M285,420 C272,438 260,446 245,453 Q228,460 212,465 Q195,470 170,462" fill="none" stroke="#3b82f6" strokeWidth="2" opacity="0.45" strokeLinecap="round" />
+              <text x="238" y="459" fontSize="8" fontStyle="italic" fontWeight="600" fill="#3b82f6" opacity="0.5" className="select-none">Litani R.</text>
+
+              {/* Orontes River */}
+              <path d="M418,358 C420,328 422,298 420,268 Q417,238 412,208 Q407,178 402,152" fill="none" stroke="#93c5fd" strokeWidth="5" opacity="0.08" strokeLinecap="round" />
+              <path d="M418,358 C420,328 422,298 420,268 Q417,238 412,208 Q407,178 402,152" fill="none" stroke="#3b82f6" strokeWidth="1.5" opacity="0.35" strokeLinecap="round" />
+              <text x="425" y="298" fontSize="7" fontStyle="italic" fontWeight="600" fill="#3b82f6" opacity="0.35" className="select-none">Orontes R.</text>
+
+              {/* Beirut capital — pulsing marker */}
+              <circle cx="140" cy="344" r="20" fill="none" stroke="#1e293b" strokeWidth="0.8" strokeDasharray="4 2" opacity="0.15" />
+              <circle cx="140" cy="344" r="4" fill="#1e293b" opacity="0.3">
+                <animate attributeName="r" values="4;9;4" dur="3s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
+              </circle>
+            </g>
+
+            {/* ── Governorate polygons ────────────────────── */}
             {govData.map(({ govId, totalActors, overallActors, gaps }) => {
               const { d } = GOVERNORATE_PATHS[govId];
               const isHovered = hovered === govId;

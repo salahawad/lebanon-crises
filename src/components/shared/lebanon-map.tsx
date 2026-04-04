@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { Maximize2, Minimize2 } from "lucide-react";
 
 type GovernorateId =
   | "akkar"
@@ -82,26 +83,165 @@ function getHeatBorder(count: number, maxCount: number): string {
 export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: LebanonMapProps) {
   const t = useTranslations();
   const [hovered, setHovered] = useState<GovernorateId | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const maxCount = Math.max(...Object.values(counts), 1);
   const governorates = Object.keys(GOVERNORATE_PATHS) as GovernorateId[];
 
+  const toggleFullscreen = useCallback(() => {
+    if (!containerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch(() => {
+        // Fallback: use CSS fullscreen if API fails
+        setIsFullscreen(true);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      }).catch(() => {
+        setIsFullscreen(false);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => {
+      if (!document.fullscreenElement) setIsFullscreen(false);
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
+
   return (
-    <div className="relative">
+    <div
+      ref={containerRef}
+      className={`relative ${
+        isFullscreen
+          ? "fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-4"
+          : ""
+      }`}
+    >
+      {/* Fullscreen toggle button */}
+      <button
+        onClick={toggleFullscreen}
+        className={`absolute z-10 p-2 rounded-lg bg-white/90 border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors ${
+          isFullscreen ? "top-4 right-4" : "top-1 right-1"
+        }`}
+        aria-label={isFullscreen ? t("common.close") : t("common.fullscreen")}
+      >
+        {isFullscreen ? (
+          <Minimize2 className="w-4 h-4 text-slate-600" />
+        ) : (
+          <Maximize2 className="w-4 h-4 text-slate-600" />
+        )}
+      </button>
+
       <svg
         viewBox="0 40 500 620"
-        className="w-full max-w-[300px] sm:max-w-[340px] mx-auto"
+        className={
+          isFullscreen
+            ? "w-full max-w-[600px] max-h-[80vh] mx-auto"
+            : "w-full max-w-[300px] sm:max-w-[340px] mx-auto"
+        }
         role="img"
         aria-label={t("common.appName")}
       >
-        {/* Drop shadow filter */}
         <defs>
+          {/* Drop shadow for hovered regions */}
           <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
             <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.15" />
           </filter>
+          {/* Mountain ridge texture */}
+          <pattern id="mountain-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M0 18 L5 8 L10 18 M10 18 L15 8 L20 18" stroke="#94a3b8" strokeWidth="0.4" fill="none" opacity="0.3" />
+          </pattern>
+          {/* Sea gradient */}
+          <linearGradient id="sea-gradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#bfdbfe" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#93c5fd" stopOpacity="0.05" />
+          </linearGradient>
+          {/* Subtle glow for mountain peaks */}
+          <filter id="peak-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="glow" />
+            <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          {/* Snow cap gradient */}
+          <linearGradient id="snow-cap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="white" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.4" />
+          </linearGradient>
+          {/* Clip path from all governorate outlines */}
+          <clipPath id="lebanon-clip">
+            {governorates.map((id) => (
+              <path key={`clip-${id}`} d={GOVERNORATE_PATHS[id].d} />
+            ))}
+          </clipPath>
         </defs>
 
-        {/* Render paths first */}
+        {/* ── Terrain layer (clipped to map outline) ──── */}
+        <g clipPath="url(#lebanon-clip)" className="pointer-events-none">
+          {/* Bekaa Valley floor — green glow */}
+          <path
+            d="M275,320 Q285,370 290,420 Q292,465 280,510 Q270,545 245,560"
+            fill="none" stroke="#4ade80" strokeWidth="35" opacity="0.1"
+            strokeLinecap="round" strokeLinejoin="round"
+          />
+          <text x="292" y="460" textAnchor="middle" fontSize="7" fontWeight="600" letterSpacing="1.5" fill="#16a34a" opacity="0.22" transform="rotate(-12 292 460)" className="select-none">
+            BEKAA VALLEY
+          </text>
+
+          {/* Mt. Lebanon range */}
+          <path d="M220,230 Q215,275 208,315 Q200,355 194,395 Q187,430 183,465" fill="none" stroke="#64748b" strokeWidth="1.5" strokeDasharray="1 4" opacity="0.3" />
+          <g filter="url(#peak-glow)">
+            <polygon points="201,288 209,268 217,288" fill="#64748b" opacity="0.35" />
+            <polygon points="205,278 209,268 213,278" fill="url(#snow-cap)" opacity="0.65" />
+            <text x="209" y="265" textAnchor="middle" fontSize="5" fontWeight="600" fill="#475569" opacity="0.35" className="select-none">3,088m</text>
+            <polygon points="195,348 201,333 207,348" fill="#64748b" opacity="0.3" />
+            <polygon points="198,340 201,333 204,340" fill="url(#snow-cap)" opacity="0.55" />
+            <polygon points="189,393 195,380 201,393" fill="#64748b" opacity="0.25" />
+            <polygon points="192,386 195,380 198,386" fill="url(#snow-cap)" opacity="0.45" />
+            <polygon points="214,255 217,248 220,255" fill="#64748b" opacity="0.18" />
+            <polygon points="185,425 188,418 191,425" fill="#64748b" opacity="0.18" />
+          </g>
+          <text x="178" y="335" textAnchor="middle" fontSize="7" fontWeight="700" letterSpacing="1.5" fill="#64748b" opacity="0.25" transform="rotate(-78 178 335)" className="select-none">
+            MT. LEBANON
+          </text>
+
+          {/* Anti-Lebanon range */}
+          <path d="M460,150 Q453,200 447,260 Q441,320 435,375 Q430,420 425,455" fill="none" stroke="#64748b" strokeWidth="1.2" strokeDasharray="1 4" opacity="0.2" />
+          <g filter="url(#peak-glow)">
+            <polygon points="448,218 454,203 460,218" fill="#64748b" opacity="0.22" />
+            <polygon points="450,210 454,203 458,210" fill="url(#snow-cap)" opacity="0.35" />
+            <polygon points="440,298 445,285 450,298" fill="#64748b" opacity="0.18" />
+            <polygon points="442,291 445,285 448,291" fill="url(#snow-cap)" opacity="0.3" />
+          </g>
+          <text x="462" y="300" textAnchor="middle" fontSize="6" fontWeight="600" letterSpacing="1" fill="#64748b" opacity="0.18" transform="rotate(-78 462 300)" className="select-none">
+            ANTI-LEBANON
+          </text>
+
+          {/* Litani River */}
+          <path d="M285,420 C272,438 260,446 245,453 Q228,460 212,465 Q195,470 170,462" fill="none" stroke="#93c5fd" strokeWidth="5" opacity="0.1" strokeLinecap="round" />
+          <path d="M285,420 C272,438 260,446 245,453 Q228,460 212,465 Q195,470 170,462" fill="none" stroke="#3b82f6" strokeWidth="1.8" opacity="0.4" strokeLinecap="round" />
+          <text x="236" y="458" fontSize="7" fontStyle="italic" fontWeight="600" fill="#3b82f6" opacity="0.45" className="select-none">Litani R.</text>
+
+          {/* Orontes River */}
+          <path d="M418,358 C420,328 422,298 420,268 Q417,238 412,208 Q407,178 402,152" fill="none" stroke="#93c5fd" strokeWidth="4" opacity="0.07" strokeLinecap="round" />
+          <path d="M418,358 C420,328 422,298 420,268 Q417,238 412,208 Q407,178 402,152" fill="none" stroke="#3b82f6" strokeWidth="1.3" opacity="0.3" strokeLinecap="round" />
+          <text x="425" y="295" fontSize="6" fontStyle="italic" fontWeight="600" fill="#3b82f6" opacity="0.3" className="select-none">Orontes R.</text>
+
+          {/* Beirut capital — pulsing marker */}
+          <circle cx="140" cy="344" r="18" fill="none" stroke="#1e293b" strokeWidth="0.7" strokeDasharray="4 2" opacity="0.15" />
+          <circle cx="140" cy="344" r="3" fill="#1e293b" opacity="0.25">
+            <animate attributeName="r" values="3;7;3" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.25;0.05;0.25" dur="3s" repeatCount="indefinite" />
+          </circle>
+        </g>
+
+        {/* Render governorate paths */}
         {governorates.map((id) => {
           const { d } = GOVERNORATE_PATHS[id];
           const count = counts[id] || 0;
@@ -124,21 +264,22 @@ export function LebanonMap({ counts, shelterCounts, onSelect, tooltipLabel }: Le
           );
         })}
 
-        {/* Render governorate names with opacity */}
+        {/* Render governorate names */}
         {governorates.map((id) => {
           const { labelX, labelY } = GOVERNORATE_PATHS[id];
           const name = t(`request.governorates.${id}`);
+          const count = counts[id] || 0;
           return (
             <text
               key={`name-${id}`}
               x={labelX}
-              y={labelY + (counts[id] ? 22 : 5)}
+              y={labelY + (count ? 22 : 5)}
               textAnchor="middle"
-              fontSize={id === "beirut" ? "8" : "10"}
-              fontWeight="600"
+              fontSize={id === "beirut" ? "8" : "11"}
+              fontWeight="700"
               fill="var(--color-sub)"
-              opacity={0.5}
-              className="pointer-events-none"
+              opacity={0.85}
+              className="pointer-events-none select-none"
             >
               {name}
             </text>
